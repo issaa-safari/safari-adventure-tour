@@ -1,0 +1,119 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+
+export default function AdminLoginPage() {
+  const router = useRouter()
+  const supabase = createClient()
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [remember, setRemember] = useState(true)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+
+    setLoading(false)
+
+    if (error) {
+      setError('Incorrect email or password. Please try again.')
+      return
+    }
+
+    router.push('/admin/dashboard')
+    router.refresh()
+  }
+
+  return (
+    <div className="flex min-h-screen w-full">
+      <div
+        className="hidden lg:flex lg:w-1/2 relative items-end p-12"
+        style={{
+          backgroundImage: 'linear-gradient(160deg, #2F3B1F 0%, #4C5E2A 45%, #7A9A4A 100%)',
+        }}
+      >
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="relative z-10 text-white">
+          <p className="text-sm uppercase tracking-widest text-white/70 mb-3">
+            Safari Adventure Tour
+          </p>
+          <h2 className="text-3xl font-semibold leading-tight max-w-md">
+            Kenya's Premier Adventure Tours
+          </h2>
+        </div>
+      </div>
+
+      <div className="flex w-full lg:w-1/2 items-center justify-center bg-white px-6 py-12">
+        <div className="w-full max-w-sm">
+          <div className="mb-8">
+            <div className="h-10 w-10 rounded-lg mb-6" style={{ backgroundColor: '#7A9A4A' }} />
+            <h1 className="text-2xl font-semibold text-gray-900">Admin Login</h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Sign in to manage Safari Adventure Tour
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#7A9A4A] focus:border-[#7A9A4A]"
+                placeholder="you@safariadventuretour.com"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#7A9A4A] focus:border-[#7A9A4A]"
+                placeholder="••••••••"
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 text-sm text-gray-600">
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                  className="rounded border-gray-300"
+                />
+                Remember me
+              </label>
+              <a href="#" className="text-sm text-gray-500 hover:text-gray-700">
+                Forgot password?
+              </a>
+            </div>
+
+            {error && <p className="text-sm text-red-600">{error}</p>}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-md py-2.5 text-sm font-medium text-white transition disabled:opacity-60"
+              style={{ backgroundColor: '#7A9A4A' }}
+            >
+              {loading ? 'Signing in…' : 'Sign In'}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  )
+}
