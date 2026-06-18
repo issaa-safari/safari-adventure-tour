@@ -81,8 +81,7 @@ export default function AdminLoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#7A9A4A] focus:border-[#7A9A4A]"
-                placeholder="••••••••"
+className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A] focus:border-[#7A9A4A]"                placeholder="••••••••"
               />
             </div>
 
@@ -106,8 +105,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-md py-2.5 text-sm font-medium text-white transition disabled:opacity-60"
-              style={{ backgroundColor: '#7A9A4A' }}
+className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A] focus:border-[#7A9A4A]"              style={{ backgroundColor: '#7A9A4A' }}
             >
               {loading ? 'Signing in…' : 'Sign In'}
             </button>
