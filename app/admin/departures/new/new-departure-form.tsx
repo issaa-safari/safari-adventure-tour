@@ -1,0 +1,159 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+
+export default function NewDepartureForm({ tours }: { tours: any[] }) {
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const [tourId, setTourId] = useState('')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [maxSeats, setMaxSeats] = useState(12)
+  const [priceUsd, setPriceUsd] = useState('')
+  const [status, setStatus] = useState('available')
+  const [notes, setNotes] = useState('')
+
+  function handleTourChange(id: string) {
+    setTourId(id)
+    const tour = tours.find(t => t.id === id)
+    if (tour && startDate) {
+      const start = new Date(startDate)
+      start.setDate(start.getDate() + (tour.duration_days - 1))
+      setEndDate(start.toISOString().slice(0, 10))
+    }
+    if (tour?.base_price_usd) {
+      setPriceUsd(String(tour.base_price_usd))
+    }
+  }
+
+  function handleStartDateChange(date: string) {
+    setStartDate(date)
+    if (tourId) {
+      const tour = tours.find(t => t.id === tourId)
+      if (tour && date) {
+        const start = new Date(date)
+        start.setDate(start.getDate() + (tour.duration_days - 1))
+        setEndDate(start.toISOString().slice(0, 10))
+      }
+    }
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+
+    try {
+      const res = await fetch('/api/admin/create-departure', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tour_id: tourId,
+          start_date: startDate,
+          end_date: endDate,
+          max_seats: maxSeats,
+          price_usd: parseFloat(priceUsd),
+          status,
+          internal_notes: notes || null,
+          booked_seats: 0,
+          is_active: true,
+        }),
+      })
+
+      if (!res.ok) throw new Error('Failed to create departure')
+      router.push('/admin/departures')
+      router.refresh()
+    } catch (err: any) {
+      setError(err.message)
+      setLoading(false)
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="bg-white rounded-lg border border-gray-200 p-5 space-y-4">
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Tour *</label>
+          <select required value={tourId} onChange={e => handleTourChange(e.target.value)}
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]">
+            <option value="">Select a tour...</option>
+            {tours.map(tour => (
+              <option key={tour.id} value={tour.id}>
+                {tour.title_en} ({tour.duration_days} days)
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date *</label>
+            <input type="date" required value={startDate}
+              onChange={e => handleStartDateChange(e.target.value)}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">End Date *</label>
+            <input type="date" required value={endDate}
+              onChange={e => setEndDate(e.target.value)}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]" />
+            <p className="text-xs text-gray-400 mt-1">Auto-calculated from tour duration</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Max Seats *</label>
+            <input type="number" required min={1} value={maxSeats}
+              onChange={e => setMaxSeats(Number(e.target.value))}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Price Per Person (USD) *</label>
+            <input type="number" required min={0} value={priceUsd}
+              onChange={e => setPriceUsd(e.target.value)}
+              placeholder="e.g. 1350"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]" />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+          <select value={status} onChange={e => setStatus(e.target.value)}
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]">
+            <option value="available">Available</option>
+            <option value="limited">Limited</option>
+            <option value="full">Full</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Internal Notes</label>
+          <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2}
+            placeholder="Any private notes about this departure..."
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]" />
+        </div>
+      </div>
+
+      {error && <p className="text-sm text-red-600 bg-red-50 rounded-md px-4 py-3">{error}</p>}
+
+      <div className="flex gap-3">
+        <button type="submit" disabled={loading}
+          className="rounded-md px-6 py-2.5 text-sm font-medium text-white disabled:opacity-60"
+          style={{ backgroundColor: '#7A9A4A' }}>
+          {loading ? 'Saving...' : 'Add Departure'}
+        </button>
+        <Link href="/admin/departures"
+          className="rounded-md border border-gray-300 px-6 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+          Cancel
+        </Link>
+      </div>
+    </form>
+  )
+}
