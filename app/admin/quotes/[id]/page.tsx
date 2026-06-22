@@ -23,32 +23,40 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
 
   const admin = createAdminClient()
 
+  // Separate queries to avoid PostgREST FK ambiguity
   const { data: quote } = await admin
     .from('quotes')
-    .select(`
-      id, quote_number, status, mode, created_at,
-      clients (first_name, last_name, email, phone, country),
-      requests (id, reference),
-      tours (title_en),
-      departures (start_date, end_date),
-      quote_versions (
-        id, version_number, status, title,
-        travel_start_date, travel_end_date, valid_until,
-        default_markup_percent, sharing_price_per_person_usd,
-        single_price_per_person_usd, single_supplement_usd,
-        total_cost_usd, total_selling_usd, gross_margin_percent,
-        locked_at, sent_at, created_at
-      )
-    `)
+    .select('id, quote_number, status, mode, created_at, client_id, request_id, tour_id, departure_id')
     .eq('id', id)
     .single()
 
   if (!quote) notFound()
 
-  const client = quote.clients as any
-  const versions: any[] = (quote.quote_versions ?? []).sort(
-    (a: any, b: any) => b.version_number - a.version_number
-  )
+  const [
+    { data: clientRow },
+    { data: requestRow },
+    { data: tourRow },
+    { data: departureRow },
+    { data: versionRows },
+  ] = await Promise.all([
+    admin.from('clients').select('first_name, last_name, email, phone, country').eq('id', quote.client_id).single(),
+    quote.request_id
+      ? admin.from('requests').select('id, reference').eq('id', quote.request_id).single()
+      : Promise.resolve({ data: null }),
+    quote.tour_id
+      ? admin.from('tours').select('title_en').eq('id', quote.tour_id).single()
+      : Promise.resolve({ data: null }),
+    quote.departure_id
+      ? admin.from('departures').select('start_date, end_date').eq('id', quote.departure_id).single()
+      : Promise.resolve({ data: null }),
+    admin.from('quote_versions')
+      .select('id, version_number, status, title, travel_start_date, travel_end_date, valid_until, default_markup_percent, sharing_price_per_person_usd, single_price_per_person_usd, single_supplement_usd, total_cost_usd, total_selling_usd, gross_margin_percent, locked_at, sent_at, created_at')
+      .eq('quote_id', id)
+      .order('version_number', { ascending: false }),
+  ])
+
+  const client = clientRow ?? null
+  const versions: any[] = versionRows ?? [] // already ordered desc
   const latestVersion = versions[0]
 
   return (
@@ -106,21 +114,21 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
             )}
           </div>
 
-          {(quote.requests as any) && (
+          {requestRow && (
             <div className="bg-white rounded-lg border border-gray-200 p-5">
               <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Linked Request</h2>
               <Link
-                href={`/admin/requests/${(quote.requests as any).id}`}
+                href={`/admin/requests/${(requestRow as any).id}`}
                 className="text-sm text-[#7A9A4A] hover:underline font-mono">
-                {(quote.requests as any).reference}
+                {(requestRow as any).reference}
               </Link>
             </div>
           )}
 
-          {(quote.tours as any) && (
+          {tourRow && (
             <div className="bg-white rounded-lg border border-gray-200 p-5">
               <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Tour Template</h2>
-              <p className="text-sm text-gray-700">{(quote.tours as any).title_en}</p>
+              <p className="text-sm text-gray-700">{(tourRow as any).title_en}</p>
             </div>
           )}
         </div>

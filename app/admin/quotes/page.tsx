@@ -39,18 +39,34 @@ export default async function QuotesPage({
 
   const activeStatus = status ?? 'draft'
 
+  // Separate queries to avoid PostgREST FK ambiguity and status-column collision
   const { data: quotes } = await admin
     .from('quotes')
-    .select(`
-      id, quote_number, status, mode, created_at,
-      clients (first_name, last_name, email),
-      quote_versions (
-        id, version_number, status, travel_start_date, travel_end_date,
-        sharing_price_per_person_usd, total_selling_usd
-      )
-    `)
+    .select('id, quote_number, status, mode, created_at, client_id')
     .eq('status', activeStatus)
     .order('created_at', { ascending: false })
+
+  const quoteIds = (quotes ?? []).map((q: any) => q.id)
+  const clientIds = [...new Set((quotes ?? []).map((q: any) => q.client_id))]
+
+  const [{ data: clientsData }, { data: versionsData }] = await Promise.all([
+    clientIds.length
+      ? admin.from('clients').select('id, first_name, last_name, email').in('id', clientIds)
+      : Promise.resolve({ data: [] }),
+    quoteIds.length
+      ? admin.from('quote_versions')
+          .select('id, quote_id, version_number, status, travel_start_date, travel_end_date, sharing_price_per_person_usd, total_selling_usd')
+          .in('quote_id', quoteIds)
+          .order('version_number', { ascending: false })
+      : Promise.resolve({ data: [] }),
+  ])
+
+  const clientMap = Object.fromEntries((clientsData ?? []).map((c: any) => [c.id, c]))
+  const versionsByQuote: Record<string, any[]> = {}
+  for (const v of (versionsData ?? [])) {
+    if (!versionsByQuote[v.quote_id]) versionsByQuote[v.quote_id] = []
+    versionsByQuote[v.quote_id].push(v)
+  }
 
   const STATUSES = ['draft', 'ready', 'sent', 'viewed', 'accepted', 'declined', 'expired', 'cancelled']
 
@@ -102,13 +118,12 @@ export default async function QuotesPage({
       ) : (
         <div className="space-y-3">
           {quotes.map((q: any) => {
-            const client = q.clients
+            const client = clientMap[q.client_id] ?? null
             const clientName = client
               ? `${client.first_name} ${client.last_name}`.trim()
               : '—'
-            // Latest version by version_number
-            const versions: any[] = q.quote_versions ?? []
-            const latest = versions.sort((a: any, b: any) => b.version_number - a.version_number)[0]
+            const versions: any[] = versionsByQuote[q.id] ?? []
+            const latest = versions[0] // already ordered desc by version_number
 
             return (
               <Link
