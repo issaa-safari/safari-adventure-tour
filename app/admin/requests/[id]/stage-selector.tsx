@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 
 const STAGE_COLORS: Record<string, string> = {
   new: 'bg-amber-100 text-amber-800 border-amber-300',
@@ -24,7 +23,6 @@ export default function StageSelector({
   stages: { key: string; label: string }[]
 }) {
   const router = useRouter()
-  const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [active, setActive] = useState(currentStage)
 
@@ -33,13 +31,20 @@ export default function StageSelector({
     setLoading(true)
     setActive(newStage)
 
-    await supabase
-      .from('requests')
-      .update({ stage: newStage, updated_at: new Date().toISOString() })
-      .eq('id', requestId)
+    try {
+      const response = await fetch('/api/admin/update-stage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requestId, stage: newStage }),
+      })
 
-    setLoading(false)
-    router.refresh()
+      if (!response.ok) throw new Error('Failed to update stage')
+      router.refresh()
+    } catch (err) {
+      setActive(currentStage)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
