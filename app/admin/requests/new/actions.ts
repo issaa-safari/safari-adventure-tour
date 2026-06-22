@@ -1,13 +1,17 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 
 export async function createRequest(formData: FormData) {
+  // Session client — used ONLY to verify the admin is logged in.
   const supabase = await createClient()
-
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/admin/login')
+
+  // Service-role client — all DB work goes through this. No cookies, bypasses RLS.
+  const admin = createAdminClient()
 
   const email = (formData.get('email') as string).toLowerCase().trim()
   const firstName = formData.get('firstName') as string
@@ -27,7 +31,7 @@ export async function createRequest(formData: FormData) {
   // Check if client exists
   let clientId: string
 
-  const { data: existingClient } = await supabase
+  const { data: existingClient } = await admin
     .from('clients')
     .select('id')
     .eq('email', email)
@@ -35,12 +39,12 @@ export async function createRequest(formData: FormData) {
 
   if (existingClient) {
     clientId = existingClient.id
-    await supabase
+    await admin
       .from('clients')
       .update({ first_name: firstName, last_name: lastName, phone, whatsapp, country, language })
       .eq('id', clientId)
   } else {
-    const { data: newClient, error: clientError } = await supabase
+    const { data: newClient, error: clientError } = await admin
       .from('clients')
       .insert({ email, first_name: firstName, last_name: lastName, phone, whatsapp, country, language })
       .select('id')
@@ -51,7 +55,7 @@ export async function createRequest(formData: FormData) {
   }
 
   // Create request
-  const { data: newRequest, error: requestError } = await supabase
+  const { data: newRequest, error: requestError } = await admin
     .from('requests')
     .insert({
       client_id: clientId,
