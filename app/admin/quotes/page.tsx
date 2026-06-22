@@ -1,0 +1,163 @@
+import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { redirect } from 'next/navigation'
+import Link from 'next/link'
+
+const STATUS_STYLES: Record<string, string> = {
+  draft:    'bg-gray-100 text-gray-600',
+  ready:    'bg-blue-100 text-blue-700',
+  sent:     'bg-purple-100 text-purple-700',
+  viewed:   'bg-indigo-100 text-indigo-700',
+  accepted: 'bg-green-100 text-green-700',
+  declined: 'bg-red-100 text-red-700',
+  expired:  'bg-amber-100 text-amber-700',
+  cancelled:'bg-gray-100 text-gray-500',
+}
+
+export default async function QuotesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>
+}) {
+  const { status } = await searchParams
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/admin/login')
+
+  const admin = createAdminClient()
+
+  // Count per status for tab badges
+  const { data: allQuotes } = await admin
+    .from('quotes')
+    .select('status')
+
+  const counts = (allQuotes ?? []).reduce((acc: Record<string, number>, q: any) => {
+    acc[q.status] = (acc[q.status] ?? 0) + 1
+    return acc
+  }, {})
+
+  const activeStatus = status ?? 'draft'
+
+  const { data: quotes } = await admin
+    .from('quotes')
+    .select(`
+      id, quote_number, status, mode, created_at,
+      clients (first_name, last_name, email),
+      quote_versions (
+        id, version_number, status, travel_start_date, travel_end_date,
+        sharing_price_per_person_usd, total_selling_usd
+      )
+    `)
+    .eq('status', activeStatus)
+    .order('created_at', { ascending: false })
+
+  const STATUSES = ['draft', 'ready', 'sent', 'viewed', 'accepted', 'declined', 'expired', 'cancelled']
+
+  return (
+    <div className="p-6 max-w-6xl mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-lg font-semibold text-gray-900">Quotes</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Build and send pricing proposals to clients</p>
+        </div>
+        <Link
+          href="/admin/quotes/new"
+          className="rounded-md px-4 py-2 text-sm font-medium text-white"
+          style={{ backgroundColor: '#7A9A4A' }}>
+          + New Quote
+        </Link>
+      </div>
+
+      {/* Status tabs */}
+      <div className="flex gap-1 mb-6 border-b border-gray-200 overflow-x-auto">
+        {STATUSES.map((s) => (
+          <Link
+            key={s}
+            href={`/admin/quotes?status=${s}`}
+            className={'px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap ' +
+              (activeStatus === s
+                ? 'border-[#7A9A4A] text-[#7A9A4A]'
+                : 'border-transparent text-gray-500 hover:text-gray-700')}>
+            <span className="capitalize">{s}</span>
+            {counts[s] ? (
+              <span className="ml-1.5 text-xs text-gray-400">({counts[s]})</span>
+            ) : null}
+          </Link>
+        ))}
+      </div>
+
+      {/* Quote list */}
+      {!quotes || quotes.length === 0 ? (
+        <div className="bg-white rounded-lg border border-gray-200 p-10 text-center">
+          <p className="text-sm text-gray-500 mb-4">No {activeStatus} quotes.</p>
+          {activeStatus === 'draft' && (
+            <Link
+              href="/admin/quotes/new"
+              className="text-sm font-medium text-[#7A9A4A] hover:underline">
+              Create your first quote
+            </Link>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {quotes.map((q: any) => {
+            const client = q.clients
+            const clientName = client
+              ? `${client.first_name} ${client.last_name}`.trim()
+              : '—'
+            // Latest version by version_number
+            const versions: any[] = q.quote_versions ?? []
+            const latest = versions.sort((a: any, b: any) => b.version_number - a.version_number)[0]
+
+            return (
+              <Link
+                key={q.id}
+                href={`/admin/quotes/${q.id}`}
+                className="block bg-white rounded-lg border border-gray-200 p-4 hover:border-[#7A9A4A] hover:shadow-sm transition">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className="text-xs font-mono text-gray-400">{q.quote_number}</span>
+                      <span className={'text-xs px-2 py-0.5 rounded-full font-medium ' +
+                        (STATUS_STYLES[q.status] ?? 'bg-gray-100 text-gray-600')}>
+                        {q.status}
+                      </span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 capitalize">
+                        {q.mode === 'fixed_departure' ? 'Fixed Departure' : 'Custom Safari'}
+                      </span>
+                      {versions.length > 1 && (
+                        <span className="text-xs text-gray-400">v{latest?.version_number}</span>
+                      )}
+                    </div>
+                    <p className="font-medium text-gray-900">{clientName}</p>
+                    {client?.email && (
+                      <p className="text-sm text-gray-400">{client.email}</p>
+                    )}
+                    {latest?.travel_start_date && (
+                      <p className="text-sm text-gray-500 mt-1">
+                        {new Date(latest.travel_start_date).toLocaleDateString('en-GB')}
+                        {latest.travel_end_date && (
+                          <> → {new Date(latest.travel_end_date).toLocaleDateString('en-GB')}</>
+                        )}
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-right text-xs text-gray-400 shrink-0">
+                    {latest?.sharing_price_per_person_usd ? (
+                      <p className="text-base font-semibold text-gray-900">
+                        ${Number(latest.sharing_price_per_person_usd).toLocaleString()}
+                        <span className="text-xs font-normal text-gray-400"> /pp</span>
+                      </p>
+                    ) : null}
+                    <p className="mt-1">{new Date(q.created_at).toLocaleDateString('en-GB')}</p>
+                  </div>
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}

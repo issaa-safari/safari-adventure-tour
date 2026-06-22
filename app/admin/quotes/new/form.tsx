@@ -1,0 +1,188 @@
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
+import { createQuote } from './actions'
+
+interface Client { id: string; first_name: string; last_name: string; email: string }
+interface Request { id: string; reference: string; clients: { first_name: string; last_name: string }[] | null }
+interface Tour { id: string; title_en: string; type: string }
+interface Departure { id: string; start_date: string; end_date: string; tours: { title_en: string }[] | null }
+
+const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]'
+const labelCls = 'block text-sm font-medium text-gray-700 mb-1'
+
+export default function NewQuoteForm({
+  clients,
+  requests,
+  tours,
+  departures,
+}: {
+  clients: Client[]
+  requests: Request[]
+  tours: Tour[]
+  departures: Departure[]
+}) {
+  const [mode, setMode] = useState<'custom' | 'fixed_departure' | ''>('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    try {
+      await createQuote(new FormData(e.currentTarget))
+    } catch (err: any) {
+      setError(err.message ?? 'Something went wrong.')
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="p-6 max-w-2xl mx-auto">
+      <div className="flex items-center gap-4 mb-6">
+        <Link href="/admin/quotes" className="text-sm text-gray-500 hover:text-gray-700">
+          ← Back to Quotes
+        </Link>
+        <h1 className="text-lg font-semibold text-gray-900">New Quote</h1>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+
+        {/* Step 1 — Mode */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-3">
+          <h2 className="text-sm font-semibold text-gray-700">Quote Type</h2>
+          <input type="hidden" name="mode" value={mode} />
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setMode('custom')}
+              className={'rounded-lg border-2 p-4 text-left transition ' +
+                (mode === 'custom'
+                  ? 'border-[#7A9A4A] bg-[#7A9A4A]/5'
+                  : 'border-gray-200 hover:border-gray-300')}>
+              <p className="font-medium text-gray-900 text-sm">Custom Safari</p>
+              <p className="text-xs text-gray-500 mt-1">Build a bespoke itinerary and price from scratch</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode('fixed_departure')}
+              className={'rounded-lg border-2 p-4 text-left transition ' +
+                (mode === 'fixed_departure'
+                  ? 'border-[#7A9A4A] bg-[#7A9A4A]/5'
+                  : 'border-gray-200 hover:border-gray-300')}>
+              <p className="font-medium text-gray-900 text-sm">Fixed Departure</p>
+              <p className="text-xs text-gray-500 mt-1">Price a client into a scheduled group departure</p>
+            </button>
+          </div>
+        </div>
+
+        {/* Step 2 — Client & context (shown once mode chosen) */}
+        {mode && (
+          <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
+            <h2 className="text-sm font-semibold text-gray-700">Client</h2>
+
+            <div>
+              <label className={labelCls}>Client <span className="text-red-500">*</span></label>
+              <select name="clientId" required defaultValue="" className={inputCls}>
+                <option value="" disabled>Select a client…</option>
+                {clients.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.first_name} {c.last_name} — {c.email}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className={labelCls}>Linked Request <span className="text-gray-400 font-normal">(optional)</span></label>
+              <select name="requestId" defaultValue="" className={inputCls}>
+                <option value="">No linked request</option>
+                {requests.map((r) => {
+                  const c = Array.isArray(r.clients) ? r.clients[0] : r.clients
+                  const name = c ? `${c.first_name} ${c.last_name}` : ''
+                  return (
+                    <option key={r.id} value={r.id}>
+                      {r.reference}{name ? ` — ${name}` : ''}
+                    </option>
+                  )
+                })}
+              </select>
+            </div>
+
+            <div>
+              <label className={labelCls}>Quote Title <span className="text-gray-400 font-normal">(optional)</span></label>
+              <input
+                type="text"
+                name="title"
+                placeholder="e.g. Maasai Mara & Samburu 8 Days"
+                className={inputCls}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Fixed departure — pick departure */}
+        {mode === 'fixed_departure' && (
+          <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
+            <h2 className="text-sm font-semibold text-gray-700">Departure</h2>
+            <div>
+              <label className={labelCls}>Departure <span className="text-red-500">*</span></label>
+              <select name="departureId" required defaultValue="" className={inputCls}>
+                <option value="" disabled>Select a departure…</option>
+                {departures.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {(Array.isArray(d.tours) ? (d.tours as any)[0]?.title_en : (d.tours as any)?.title_en) ?? 'Unknown tour'} —{' '}
+                    {new Date(d.start_date).toLocaleDateString('en-GB')} →{' '}
+                    {new Date(d.end_date).toLocaleDateString('en-GB')}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+
+        {/* Custom — optionally pin to a tour template */}
+        {mode === 'custom' && (
+          <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
+            <h2 className="text-sm font-semibold text-gray-700">Tour Template <span className="text-gray-400 font-normal text-xs">(optional)</span></h2>
+            <p className="text-xs text-gray-400 -mt-2">Link to a tour to copy its itinerary as a starting point.</p>
+            <div>
+              <label className={labelCls}>Tour</label>
+              <select name="tourId" defaultValue="" className={inputCls}>
+                <option value="">No template</option>
+                {tours.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.title_en} ({t.type})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <p className="text-sm text-red-600 bg-red-50 rounded-md px-4 py-3">{error}</p>
+        )}
+
+        {mode && (
+          <div className="flex gap-3">
+            <button
+              type="submit"
+              disabled={loading}
+              className="rounded-md px-6 py-2.5 text-sm font-medium text-white disabled:opacity-60"
+              style={{ backgroundColor: '#7A9A4A' }}>
+              {loading ? 'Creating…' : 'Create Quote'}
+            </button>
+            <Link
+              href="/admin/quotes"
+              className="rounded-md border border-gray-300 px-6 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+              Cancel
+            </Link>
+          </div>
+        )}
+      </form>
+    </div>
+  )
+}
