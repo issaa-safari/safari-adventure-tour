@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { addPriceLine, updatePriceLine, deletePriceLine } from './price-line-actions'
+import RatePicker from './rate-picker'
 
 const CATEGORIES = [
   { value: 'accommodation', label: 'Accommodation' },
@@ -193,21 +194,30 @@ function LineForm({
   )
 }
 
+interface EntityList { id: string; name: string }
+
 export default function PriceLinesEditor({
   quoteId,
   versionId,
   priceLines: initial,
   isLocked,
   defaultMarkup = 20,
+  entities,
 }: {
   quoteId: string
   versionId: string
   priceLines: PriceLine[]
   isLocked: boolean
   defaultMarkup?: number
+  entities?: {
+    accommodation: EntityList[]
+    vehicle: EntityList[]
+    activity: EntityList[]
+    staff: EntityList[]
+  }
 }) {
   const [lines, setLines] = useState(initial)
-  const [showAdd, setShowAdd] = useState(false)
+  const [showAdd, setShowAdd] = useState<'manual' | 'rate' | false>(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [addError, setAddError] = useState('')
   const [editError, setEditError] = useState('')
@@ -241,6 +251,12 @@ export default function PriceLinesEditor({
         setAddError(err instanceof Error ? err.message : 'Failed to add line.')
       }
     })
+  }
+
+  function handleRateAdded() {
+    setShowAdd(false)
+    // Reload to pick up the new line from the server
+    window.location.reload()
   }
 
   function handleUpdate(lineId: string, f: ReturnType<typeof blankForm>) {
@@ -290,13 +306,24 @@ export default function PriceLinesEditor({
           )}
         </div>
         {!isLocked && !showAdd && (
-          <button
-            type="button"
-            onClick={() => { setShowAdd(true); setAddError('') }}
-            className="text-sm font-medium text-[#7A9A4A] hover:text-[#4C5E2A]"
-          >
-            + Add Line
-          </button>
+          <div className="flex items-center gap-3">
+            {entities && (
+              <button
+                type="button"
+                onClick={() => { setShowAdd('rate'); setAddError('') }}
+                className="text-sm font-medium text-[#7A9A4A] hover:text-[#4C5E2A] flex items-center gap-1"
+              >
+                <span className="text-xs">⚡</span> From rate card
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => { setShowAdd('manual'); setAddError('') }}
+              className="text-sm font-medium text-gray-500 hover:text-gray-700"
+            >
+              + Manual line
+            </button>
+          </div>
         )}
       </div>
 
@@ -362,7 +389,20 @@ export default function PriceLinesEditor({
           </div>
         ))}
 
-        {showAdd && !isLocked && (
+        {showAdd === 'rate' && !isLocked && entities && (
+          <div className="px-6 py-5">
+            <RatePicker
+              versionId={versionId}
+              quoteId={quoteId}
+              defaultMarkup={defaultMarkup}
+              entities={entities}
+              onAdded={handleRateAdded}
+              onCancel={() => setShowAdd(false)}
+            />
+          </div>
+        )}
+
+        {showAdd === 'manual' && !isLocked && (
           <div className="px-6 py-5">
             <p className="text-sm font-medium text-gray-700 mb-3">New price line</p>
             <LineForm

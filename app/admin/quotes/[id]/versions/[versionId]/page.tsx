@@ -166,6 +166,12 @@ export default async function VersionEditorPage({
           priceLines={priceLines ?? []}
           isLocked={isLocked}
           defaultMarkup={settings?.default_markup_percent ?? 20}
+          entities={{
+            accommodation: (accommodations ?? []).map((a: any) => ({ id: a.id, name: a.name })),
+            vehicle: (vehicles ?? []).map((v: any) => ({ id: v.id, name: v.name })),
+            activity: (activities ?? []).map((a: any) => ({ id: a.id, name: a.name })),
+            staff: (staffData ?? []).map((s: any) => ({ id: s.id, name: s.name })),
+          }}
         />
       </div>
 
