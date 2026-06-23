@@ -138,6 +138,27 @@ export async function deletePriceLine(formData: FormData) {
   revalidatePath(`/admin/quotes/${quoteId}/versions/${versionId}`)
 }
 
+export async function lookupRates(formData: FormData) {
+  const { admin } = await authGuard()
+  const entityType = formData.get('entityType') as string
+  const entityId = formData.get('entityId') as string
+  const date = formData.get('date') as string // ISO date to check seasonality
+
+  if (!entityType || !entityId || !date) return { cards: [] as any[] }
+
+  const { data: cards } = await admin
+    .from('supplier_rate_cards')
+    .select('id, name, currency, notes, valid_from, valid_to, supplier_rates(id, room_category, residency, pricing_unit, amount, traveller_category, sort_order)')
+    .eq('entity_type', entityType)
+    .eq('entity_id', entityId)
+    .eq('is_active', true)
+    .lte('valid_from', date)
+    .gte('valid_to', date)
+    .order('name')
+
+  return { cards: cards ?? [] }
+}
+
 export async function setVersionStatus(formData: FormData) {
   const { admin } = await authGuard()
   const versionId = formData.get('versionId') as string
