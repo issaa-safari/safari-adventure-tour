@@ -1,0 +1,95 @@
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
+import { addSupplierRate, deleteSupplierRate, updateRateCard, updateSupplierRate } from './actions'
+import { COST_CATEGORIES, ENTITY_TYPES, PRICING_UNITS, RESIDENCIES, label } from '../constants'
+
+type Entity = { id: string; name: string }
+type AgeBand = { code: string; name: string }
+type Card = {
+  id: string; name: string; supplier_name: string | null; entity_type: string; entity_id: string | null;
+  cost_category: string; valid_from: string; valid_to: string; currency: string; notes: string | null; is_active: boolean
+}
+type Rate = {
+  id: string; traveller_category: string | null; room_category: string | null; residency: string;
+  pricing_unit: string; amount: number; min_group_size: number | null; max_group_size: number | null
+}
+
+const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]'
+const smallInputCls = 'w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]'
+const linkedTypes = new Set(['accommodation', 'activity', 'vehicle', 'staff', 'destination'])
+const roomCategories = ['sharing', 'single', 'triple', 'extra_bed', 'no_bed']
+
+function RateFields({ rate, ageBands }: { rate?: Rate; ageBands: AgeBand[] }) {
+  return <>
+    <select name="travellerCategory" defaultValue={rate?.traveller_category ?? ''} className={smallInputCls}><option value="">All travellers</option>{ageBands.map(b => <option key={b.code} value={b.code}>{b.name}</option>)}</select>
+    <select name="roomCategory" defaultValue={rate?.room_category ?? ''} className={smallInputCls}><option value="">All rooms</option>{roomCategories.map(value => <option key={value} value={value}>{label(value)}</option>)}</select>
+    <select name="residency" defaultValue={rate?.residency ?? 'all'} className={smallInputCls}>{RESIDENCIES.map(value => <option key={value} value={value}>{label(value)}</option>)}</select>
+    <select name="pricingUnit" defaultValue={rate?.pricing_unit ?? 'person'} className={smallInputCls}>{PRICING_UNITS.map(value => <option key={value} value={value}>Per {label(value)}</option>)}</select>
+    <input type="number" name="amount" min={0} step="0.01" required defaultValue={rate?.amount ?? ''} placeholder="Amount" className={smallInputCls} />
+    <input type="number" name="minGroupSize" min={1} defaultValue={rate?.min_group_size ?? ''} placeholder="Min group" className={smallInputCls} />
+    <input type="number" name="maxGroupSize" min={1} defaultValue={rate?.max_group_size ?? ''} placeholder="Max group" className={smallInputCls} />
+  </>
+}
+
+export default function RateCardEditor({ card, rates, ageBands, entities }: { card: Card; rates: Rate[]; ageBands: AgeBand[]; entities: Record<string, Entity[]> }) {
+  const [entityType, setEntityType] = useState(card.entity_type)
+  const [isActive, setIsActive] = useState(card.is_active)
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
+  const [pending, setPending] = useState(false)
+
+  async function run(action: (data: FormData) => Promise<void>, data: FormData, success: string) {
+    setPending(true); setError(''); setMessage('')
+    try { await action(data); setMessage(success) }
+    catch (err) { setError(err instanceof Error ? err.message : 'Something went wrong.') }
+    finally { setPending(false) }
+  }
+
+  function cardSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault(); const data = new FormData(event.currentTarget); data.set('isActive', String(isActive)); run(updateRateCard, data, 'Rate card saved.')
+  }
+
+  function rateSubmit(event: React.FormEvent<HTMLFormElement>, rateId?: string) {
+    event.preventDefault(); const data = new FormData(event.currentTarget); data.set('cardId', card.id)
+    if (rateId) { data.set('rateId', rateId); run(updateSupplierRate, data, 'Rate updated.') }
+    else run(addSupplierRate, data, 'Rate added.')
+  }
+
+  function removeRate(rateId: string) {
+    const data = new FormData(); data.set('cardId', card.id); data.set('rateId', rateId); run(deleteSupplierRate, data, 'Rate deleted.')
+  }
+
+  return (
+    <div className="p-6 max-w-6xl mx-auto space-y-6">
+      <div className="flex items-center gap-4"><Link href="/admin/content/rates" className="text-sm text-gray-500 hover:text-gray-700">← Supplier Rates</Link><h1 className="text-lg font-semibold text-gray-900">{card.name}</h1></div>
+
+      <form onSubmit={cardSubmit} className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
+        <input type="hidden" name="cardId" value={card.id} />
+        <h2 className="text-sm font-semibold text-gray-900">Rate Card Details</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div><label className="block text-sm font-medium text-gray-700 mb-1">Name</label><input name="name" required defaultValue={card.name} className={inputCls} /></div>
+          <div><label className="block text-sm font-medium text-gray-700 mb-1">Supplier</label><input name="supplierName" defaultValue={card.supplier_name ?? ''} className={inputCls} /></div>
+          <div><label className="block text-sm font-medium text-gray-700 mb-1">Entity Type</label><select name="entityType" value={entityType} onChange={e => setEntityType(e.target.value)} className={inputCls}>{ENTITY_TYPES.map(value => <option key={value} value={value}>{label(value)}</option>)}</select></div>
+          <div><label className="block text-sm font-medium text-gray-700 mb-1">Cost Category</label><select name="costCategory" defaultValue={card.cost_category} className={inputCls}>{COST_CATEGORIES.map(value => <option key={value} value={value}>{label(value)}</option>)}</select></div>
+          {linkedTypes.has(entityType) && <div><label className="block text-sm font-medium text-gray-700 mb-1">Linked Content</label><select name="entityId" defaultValue={entityType === card.entity_type ? card.entity_id ?? '' : ''} className={inputCls}><option value="">No linked item</option>{(entities[entityType] ?? []).map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></div>}
+          <div><label className="block text-sm font-medium text-gray-700 mb-1">Currency</label><input name="currency" defaultValue={card.currency} maxLength={3} required className={inputCls} /></div>
+          <div><label className="block text-sm font-medium text-gray-700 mb-1">Valid From</label><input type="date" name="validFrom" defaultValue={card.valid_from} required className={inputCls} /></div>
+          <div><label className="block text-sm font-medium text-gray-700 mb-1">Valid To</label><input type="date" name="validTo" defaultValue={card.valid_to} required className={inputCls} /></div>
+        </div>
+        <div><label className="block text-sm font-medium text-gray-700 mb-1">Notes</label><textarea name="notes" defaultValue={card.notes ?? ''} rows={2} className={inputCls} /></div>
+        <div className="flex items-center justify-between"><label className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)} className="accent-[#7A9A4A]" />Active</label><button disabled={pending} className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60" style={{ backgroundColor: '#7A9A4A' }}>Save Card</button></div>
+      </form>
+
+      <section className="space-y-3">
+        <div><h2 className="text-sm font-semibold text-gray-900">Rates</h2><p className="text-xs text-gray-500">Use blank traveller or room categories when the rate applies to all.</p></div>
+        {rates.map(rate => <form key={rate.id} onSubmit={event => rateSubmit(event, rate.id)} className="bg-white rounded-lg border border-gray-200 p-4"><div className="grid grid-cols-2 md:grid-cols-7 gap-2"><RateFields rate={rate} ageBands={ageBands} /></div><div className="flex justify-end gap-2 mt-3"><button type="button" onClick={() => removeRate(rate.id)} disabled={pending} className="text-xs text-red-600 px-3 py-1.5">Delete</button><button disabled={pending} className="rounded-md px-3 py-1.5 text-xs font-medium text-white" style={{ backgroundColor: '#7A9A4A' }}>Save Rate</button></div></form>)}
+        <form onSubmit={event => rateSubmit(event)} className="bg-[#7A9A4A]/5 rounded-lg border border-[#7A9A4A]/30 p-4"><p className="text-sm font-medium text-gray-700 mb-3">Add Rate</p><div className="grid grid-cols-2 md:grid-cols-7 gap-2"><RateFields ageBands={ageBands} /></div><div className="flex justify-end mt-3"><button disabled={pending} className="rounded-md px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: '#7A9A4A' }}>+ Add Rate</button></div></form>
+      </section>
+
+      {error && <p className="text-sm text-red-600 bg-red-50 rounded-md px-4 py-3">{error}</p>}
+      {message && <p className="text-sm text-green-700 bg-green-50 rounded-md px-4 py-3">{message}</p>}
+    </div>
+  )
+}

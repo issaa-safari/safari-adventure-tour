@@ -43,12 +43,14 @@ export default async function ContentLibraryPage() {
     { count: actCount },
     { count: vehicleCount },
     { count: staffCount },
+    { count: rateCardCount },
   ] = await Promise.all([
     admin.from('destinations').select('*', { count: 'exact', head: true }),
     admin.from('accommodations').select('*', { count: 'exact', head: true }),
     admin.from('activities').select('*', { count: 'exact', head: true }),
     admin.from('vehicles').select('*', { count: 'exact', head: true }),
     admin.from('tour_staff').select('*', { count: 'exact', head: true }),
+    admin.from('supplier_rate_cards').select('*', { count: 'exact', head: true }),
   ])
 
   return (
@@ -103,6 +105,13 @@ export default async function ContentLibraryPage() {
             description="Guides, drivers, chefs, and coordinators"
             count={staffCount}
             icon="👤"
+          />
+          <ContentCard
+            href="/admin/content/rates"
+            title="Supplier Rates"
+            description="Seasonal reusable costs for quote pricing"
+            count={rateCardCount}
+            icon="💵"
           />
         </div>
       </div>
