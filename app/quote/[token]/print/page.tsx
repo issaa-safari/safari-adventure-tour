@@ -49,13 +49,13 @@ export default async function QuotePrintPage({
     { data: settings },
   ] = await Promise.all([
     admin.from('quote_versions')
-      .select('id, version_number, title, travel_start_date, travel_end_date, valid_until, total_selling_usd, sharing_price_per_person_usd, single_price_per_person_usd, client_snapshot')
+      .select('id, version_number, title, language, travel_start_date, travel_end_date, valid_until, total_selling_usd, sharing_price_per_person_usd, single_price_per_person_usd, client_snapshot')
       .eq('id', delivery.quote_version_id).single(),
     admin.from('quotes')
       .select('id, quote_number, mode, client_id')
       .eq('id', delivery.quote_id).single(),
     admin.from('quote_days')
-      .select('id, day_number, day_date, title, description_en, client_notes, destination_snapshot, meals')
+      .select('id, day_number, day_date, title, description_en, client_notes, title_ar, description_ar, client_notes_ar, destination_snapshot, meals')
       .eq('quote_version_id', delivery.quote_version_id)
       .order('day_number'),
     admin.from('quote_price_lines')
@@ -89,10 +89,11 @@ export default async function QuotePrintPage({
 
   const { data: client } = await admin
     .from('clients')
-    .select('first_name, last_name, email')
+    .select('first_name, last_name, email, preferred_language')
     .eq('id', quote.client_id)
     .single()
 
+  const isArabic = (version as any)?.language === 'ar'
   const clientName = client ? `${client.first_name} ${client.last_name}`.trim() : 'Guest'
   const companyName = settings?.company_name ?? 'Safari Adventures'
   const totalSelling = Number(version.total_selling_usd ?? 0)
@@ -102,6 +103,24 @@ export default async function QuotePrintPage({
   const includedLines = (priceLines ?? []).filter((l: any) => !l.is_optional)
   const optionalLines = (priceLines ?? []).filter((l: any) => l.is_optional)
 
+  const AR = {
+    quotation:      'عرض سعر',
+    preparedFor:    'مُعَدّ لـ',
+    travelDates:    'تواريخ الرحلة',
+    validUntil:     'صالح حتى',
+    itinerary:      'برنامج الرحلة',
+    day:            'يوم',
+    included:       'ما يشمله السعر',
+    optional:       'إضافات اختيارية',
+    pricing:        'التسعير',
+    sharingPp:      'للشخص (مشاركة)',
+    singlePp:       'للشخص (غرفة منفردة)',
+    total:          'الإجمالي',
+    footerValidity: 'هذا العرض صالح حتى',
+    footerTerms:    'الأسعار بالدولار الأمريكي. شروط الدفع وأحكام الحجز متاحة عند الطلب.',
+    contactUs:      'تواصل معنا',
+  }
+
   return (
     <>
       <style>{`
@@ -110,7 +129,8 @@ export default async function QuotePrintPage({
           body { margin: 0; }
           @page { margin: 1.5cm 2cm; size: A4; }
         }
-        body { font-family: Georgia, 'Times New Roman', serif; }
+        body { font-family: ${isArabic ? "'Noto Sans Arabic', 'Arial', sans-serif" : "Georgia, 'Times New Roman', serif"}; }
+        ${isArabic ? '@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&display=swap");' : ''}
       `}</style>
 
       {/* Print button — hidden when printing */}
@@ -130,7 +150,7 @@ export default async function QuotePrintPage({
         </button>
       </div>
 
-      <div className="max-w-[780px] mx-auto p-8 text-gray-900">
+      <div className="max-w-[780px] mx-auto p-8 text-gray-900" dir={isArabic ? 'rtl' : 'ltr'}>
         {/* Header */}
         <div className="flex items-start justify-between border-b-2 pb-6 mb-6" style={{ borderColor: '#7A9A4A' }}>
           <div>
@@ -147,10 +167,12 @@ export default async function QuotePrintPage({
             {settings?.email && <p className="text-sm text-gray-500">{settings.email}</p>}
             {settings?.phone && <p className="text-sm text-gray-500">{settings.phone}</p>}
           </div>
-          <div className="text-right">
-            <p className="text-2xl font-bold" style={{ color: '#7A9A4A' }}>QUOTATION</p>
+          <div className={isArabic ? 'text-left' : 'text-right'}>
+            <p className="text-2xl font-bold" style={{ color: '#7A9A4A' }}>
+              {isArabic ? AR.quotation : 'QUOTATION'}
+            </p>
             <p className="text-sm font-mono text-gray-500 mt-1">{quote.quote_number}</p>
-            <p className="text-sm text-gray-500 mt-3">Prepared for:</p>
+            <p className="text-sm text-gray-500 mt-3">{isArabic ? AR.preparedFor : 'Prepared for:'}</p>
             <p className="font-semibold text-gray-900">{clientName}</p>
             {client?.email && <p className="text-sm text-gray-500">{client.email}</p>}
           </div>
@@ -163,7 +185,7 @@ export default async function QuotePrintPage({
           </h1>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-gray-500">Travel dates: </span>
+              <span className="text-gray-500">{isArabic ? AR.travelDates : 'Travel dates'}: </span>
               <span className="font-medium">
                 {fmtDate(version.travel_start_date)}
                 {version.travel_end_date && version.travel_end_date !== version.travel_start_date
@@ -173,7 +195,7 @@ export default async function QuotePrintPage({
             </div>
             {version.valid_until && (
               <div>
-                <span className="text-gray-500">Valid until: </span>
+                <span className="text-gray-500">{isArabic ? AR.validUntil : 'Valid until'}: </span>
                 <span className="font-medium">{fmtDate(version.valid_until)}</span>
               </div>
             )}
@@ -184,17 +206,19 @@ export default async function QuotePrintPage({
         {quoteDays && quoteDays.length > 0 && (
           <div className="mb-8">
             <h2 className="text-sm font-bold uppercase tracking-widest mb-3" style={{ color: '#7A9A4A' }}>
-              Itinerary
+              {isArabic ? AR.itinerary : 'Itinerary'}
             </h2>
             <div className="space-y-4">
               {quoteDays.map((day: any) => {
                 const meals: string[] = day.meals ?? []
                 const dest = day.destination_snapshot as Record<string, string> | null
                 const accoms = accomByDay[day.id] ?? []
+                const dayTitle = isArabic && day.title_ar ? day.title_ar : day.title
+                const dayNotes = isArabic && day.client_notes_ar ? day.client_notes_ar : day.client_notes
                 return (
-                  <div key={day.id} className="border-l-2 pl-4" style={{ borderColor: '#d4e5b8' }}>
+                  <div key={day.id} className={`border-${isArabic ? 'r' : 'l'}-2 ${isArabic ? 'pr-4' : 'pl-4'}`} style={{ borderColor: '#d4e5b8' }}>
                     <p className="text-xs text-gray-400 font-medium">
-                      Day {day.day_number}
+                      {isArabic ? AR.day : 'Day'} {day.day_number}
                       {day.day_date ? ` · ${fmtDate(day.day_date)}` : ''}
                       {dest?.name && (
                         <>
@@ -211,19 +235,22 @@ export default async function QuotePrintPage({
                       )}
                       {meals.length > 0 && ` · ${meals.map((m: string) => MEAL_LABELS[m] ?? m).join(', ')}`}
                     </p>
-                    <h3 className="font-semibold text-gray-900 mb-1">{day.title || `Day ${day.day_number}`}</h3>
-                    {day.description_en && (
+                    <h3 className="font-semibold text-gray-900 mb-1">{dayTitle || `${isArabic ? AR.day : 'Day'} ${day.day_number}`}</h3>
+                    {day.description_en && !isArabic && (
                       <p className="text-sm text-gray-600 leading-relaxed">{day.description_en}</p>
                     )}
-                    {day.client_notes && (
-                      <p className="text-sm mt-1 italic text-gray-500">{day.client_notes}</p>
+                    {isArabic && day.description_ar && (
+                      <p className="text-sm text-gray-600 leading-relaxed">{day.description_ar}</p>
+                    )}
+                    {dayNotes && (
+                      <p className="text-sm mt-1 italic text-gray-500">{dayNotes}</p>
                     )}
                     {accoms.length > 0 && (
                       <p className="text-xs mt-1.5 text-gray-400">
                         🏕{' '}
-                        {accoms.map((name, i) => (
-                          <span key={i}>
-                            {i > 0 && ', '}
+                        {accoms.map((name, idx2) => (
+                          <span key={idx2}>
+                            {idx2 > 0 && ', '}
                             <a
                               href={mapsUrl(name)}
                               target="_blank"
@@ -247,7 +274,7 @@ export default async function QuotePrintPage({
         {includedLines.length > 0 && (
           <div className="mb-8">
             <h2 className="text-sm font-bold uppercase tracking-widest mb-3" style={{ color: '#7A9A4A' }}>
-              What&apos;s Included
+              {isArabic ? AR.included : "What's Included"}
             </h2>
             <ul className="space-y-1.5">
               {includedLines.map((line: any) => (
@@ -267,7 +294,7 @@ export default async function QuotePrintPage({
         {optionalLines.length > 0 && (
           <div className="mb-8">
             <h2 className="text-sm font-bold uppercase tracking-widest mb-3" style={{ color: '#7A9A4A' }}>
-              Optional Add-ons
+              {isArabic ? AR.optional : 'Optional Add-ons'}
             </h2>
             <table className="w-full text-sm">
               <tbody>
@@ -287,23 +314,23 @@ export default async function QuotePrintPage({
         {totalSelling > 0 && (
           <div className="mb-8">
             <h2 className="text-sm font-bold uppercase tracking-widest mb-3" style={{ color: '#7A9A4A' }}>
-              Pricing
+              {isArabic ? AR.pricing : 'Pricing'}
             </h2>
             <div className="border rounded-lg overflow-hidden" style={{ borderColor: '#d4e5b8' }}>
               {sharingPp > 0 && (
                 <div className="flex justify-between px-4 py-2.5 border-b text-sm" style={{ borderColor: '#d4e5b8' }}>
-                  <span className="text-gray-600">Per person (sharing)</span>
+                  <span className="text-gray-600">{isArabic ? AR.sharingPp : 'Per person (sharing)'}</span>
                   <span className="font-semibold">${fmt(sharingPp)} USD</span>
                 </div>
               )}
               {singlePp > 0 && (
                 <div className="flex justify-between px-4 py-2.5 border-b text-sm" style={{ borderColor: '#d4e5b8' }}>
-                  <span className="text-gray-600">Per person (single room)</span>
+                  <span className="text-gray-600">{isArabic ? AR.singlePp : 'Per person (single room)'}</span>
                   <span className="font-semibold">${fmt(singlePp)} USD</span>
                 </div>
               )}
               <div className="flex justify-between px-4 py-3 text-base font-bold" style={{ backgroundColor: '#f8faf4' }}>
-                <span>Total</span>
+                <span>{isArabic ? AR.total : 'Total'}</span>
                 <span>${fmt(totalSelling)} USD</span>
               </div>
             </div>
@@ -312,11 +339,20 @@ export default async function QuotePrintPage({
 
         {/* Footer */}
         <div className="pt-6 border-t border-gray-200 text-xs text-gray-400 text-center space-y-1">
-          <p>This quotation is valid until {fmtDate(version.valid_until)} and subject to availability at time of confirmation.</p>
-          <p>Prices quoted in USD. Payment terms and booking conditions available on request.</p>
+          {isArabic ? (
+            <>
+              <p>{AR.footerValidity} {fmtDate(version.valid_until)} وهو رهن بالتوفر عند التأكيد.</p>
+              <p>{AR.footerTerms}</p>
+            </>
+          ) : (
+            <>
+              <p>This quotation is valid until {fmtDate(version.valid_until)} and subject to availability at time of confirmation.</p>
+              <p>Prices quoted in USD. Payment terms and booking conditions available on request.</p>
+            </>
+          )}
           {(settings?.email || settings?.phone || settings?.whatsapp) && (
             <p>
-              Contact us: {[settings.email, settings.phone, settings.whatsapp && `WhatsApp: ${settings.whatsapp}`].filter(Boolean).join(' · ')}
+              {isArabic ? AR.contactUs : 'Contact us'}: {[settings.email, settings.phone, settings.whatsapp && `WhatsApp: ${settings.whatsapp}`].filter(Boolean).join(' · ')}
             </p>
           )}
         </div>

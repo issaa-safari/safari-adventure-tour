@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { saveDates, addTraveller, deleteTraveller, updateTraveller } from './actions'
+import { saveDates, saveLanguage, addTraveller, deleteTraveller, updateTraveller } from './actions'
 
 interface AgeBand {
   id: string
@@ -35,6 +35,7 @@ interface Version {
   status: string
   travel_start_date: string | null
   travel_end_date: string | null
+  language?: string | null
 }
 
 const ROOM_OPTIONS = [
@@ -110,6 +111,26 @@ export default function VersionEditorForm({
       } catch (err: unknown) {
         setDatesError(err instanceof Error ? err.message : 'Failed to save dates.')
       }
+    })
+  }
+
+  // ── Language ────────────────────────────────────────────────────────────
+  const [language, setLanguage] = useState(version.language ?? 'en')
+  const [langPending, startLangTransition] = useTransition()
+  const [langSaved, setLangSaved] = useState(false)
+
+  function handleSaveLang(lang: string) {
+    setLanguage(lang)
+    setLangSaved(false)
+    const fd = new FormData()
+    fd.set('versionId', version.id)
+    fd.set('quoteId', quoteId)
+    fd.set('language', lang)
+    startLangTransition(async () => {
+      try {
+        await saveLanguage(fd)
+        setLangSaved(true)
+      } catch { /* ignore */ }
     })
   }
 
@@ -413,7 +434,7 @@ export default function VersionEditorForm({
           <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2 mb-3">{datesError}</p>
         )}
         {!isLocked && (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <button
               type="button"
               onClick={handleSaveDates}
@@ -428,6 +449,29 @@ export default function VersionEditorForm({
             )}
           </div>
         )}
+
+        {/* Language / direction */}
+        <div className="mt-4 pt-4 border-t border-gray-100 flex items-center gap-3">
+          <span className="text-sm text-gray-500">Itinerary language:</span>
+          {(['en', 'ar'] as const).map(lang => (
+            <button
+              key={lang}
+              type="button"
+              disabled={isLocked || langPending}
+              onClick={() => handleSaveLang(lang)}
+              className={`px-3 py-1 rounded-full text-xs font-medium border transition disabled:opacity-50 ${
+                language === lang
+                  ? 'border-[#7A9A4A] bg-[#7A9A4A]/10 text-[#4C5E2A]'
+                  : 'border-gray-300 text-gray-500 hover:border-gray-400'
+              }`}
+            >
+              {lang === 'en' ? '🇬🇧 English' : '🇸🇦 Arabic (RTL)'}
+            </button>
+          ))}
+          {langSaved && !langPending && (
+            <span className="text-xs text-green-600">Saved</span>
+          )}
+        </div>
       </section>
 
       {/* ── Travellers ─────────────────────────────────────────────────── */}

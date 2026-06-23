@@ -17,6 +17,12 @@ function fmt(n: number) {
   return n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 }
 
+function daysAgo(dateStr: string | null): number | null {
+  if (!dateStr) return null
+  const ms = Date.now() - new Date(dateStr).getTime()
+  return Math.floor(ms / 86_400_000)
+}
+
 export default function ReceivablesTable({ rows }: { rows: ReceivableRow[] }) {
   const [expanded, setExpanded] = useState<string | null>(null)
   const [paying, setPaying] = useState<string | null>(null)
@@ -32,6 +38,8 @@ export default function ReceivablesTable({ rows }: { rows: ReceivableRow[] }) {
         const outstanding = Math.max(row.totalSelling - row.totalReceived, 0)
         const pct = row.totalSelling > 0 ? Math.round((row.totalReceived / row.totalSelling) * 100) : 0
         const isOpen = expanded === row.quoteId
+        const daysOutstanding = outstanding > 0 ? daysAgo(row.acceptedAt) : null
+        const overdue = daysOutstanding !== null && daysOutstanding > 30
 
         return (
           <div key={row.quoteId}>
@@ -47,8 +55,15 @@ export default function ReceivablesTable({ rows }: { rows: ReceivableRow[] }) {
                     <span className="font-medium text-gray-900 text-sm">{row.clientName}</span>
                   </div>
                   {row.acceptedAt && (
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      Accepted {new Date(row.acceptedAt).toLocaleDateString('en-GB')}
+                    <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-2">
+                      <span>Accepted {new Date(row.acceptedAt).toLocaleDateString('en-GB')}</span>
+                      {daysOutstanding !== null && (
+                        <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold ${
+                          overdue ? 'bg-red-100 text-red-700' : 'bg-amber-50 text-amber-700'
+                        }`}>
+                          {daysOutstanding}d
+                        </span>
+                      )}
                     </p>
                   )}
                 </div>
@@ -61,7 +76,9 @@ export default function ReceivablesTable({ rows }: { rows: ReceivableRow[] }) {
                     <span className="text-xs text-gray-400">{pct}%</span>
                   </div>
                   {outstanding > 0 ? (
-                    <p className="text-xs text-amber-600 mt-0.5">Due ${fmt(outstanding)}</p>
+                    <p className={`text-xs mt-0.5 font-medium ${overdue ? 'text-red-600' : 'text-amber-600'}`}>
+                      Due ${fmt(outstanding)}{overdue ? ' — overdue' : ''}
+                    </p>
                   ) : (
                     <p className="text-xs text-green-600 mt-0.5">Paid in full</p>
                   )}

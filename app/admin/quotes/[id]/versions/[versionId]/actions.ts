@@ -72,6 +72,18 @@ export async function saveDates(formData: FormData) {
   revalidatePath(`/admin/quotes/${quoteId}/versions/${versionId}`)
 }
 
+export async function saveLanguage(formData: FormData) {
+  const { admin } = await authGuard()
+  const versionId = formData.get('versionId') as string
+  const quoteId = formData.get('quoteId') as string
+  const language = formData.get('language') as string
+  if (!['en', 'ar'].includes(language)) throw new Error('Invalid language.')
+  await requireMutableVersion(admin, versionId, quoteId)
+  const { error } = await admin.from('quote_versions').update({ language }).eq('id', versionId)
+  if (error) throw new Error(error.message)
+  revalidatePath(`/admin/quotes/${quoteId}/versions/${versionId}`)
+}
+
 export async function addTraveller(formData: FormData) {
   const { admin } = await authGuard()
 

@@ -47,7 +47,7 @@ export default async function VersionEditorPage({
     { data: parksData },
   ] = await Promise.all([
     admin.from('quote_versions')
-      .select('id, version_number, status, title, travel_start_date, travel_end_date, valid_until')
+      .select('id, version_number, status, title, travel_start_date, travel_end_date, valid_until, language')
       .eq('id', versionId).single(),
     admin.from('quotes')
       .select('id, quote_number, status, mode, client_id, tour_id')
@@ -59,7 +59,7 @@ export default async function VersionEditorPage({
       .select('id, name, code, min_age, max_age, default_pricing_method, default_percentage, default_fixed_amount_usd, sort_order')
       .eq('is_active', true).order('sort_order'),
     admin.from('quote_days')
-      .select('id, day_number, day_date, title, description_en, client_notes, destination_id, destination_snapshot, meals, sort_order')
+      .select('id, day_number, day_date, title, description_en, client_notes, title_ar, description_ar, client_notes_ar, destination_id, destination_snapshot, meals, sort_order')
       .eq('quote_version_id', versionId).order('sort_order'),
     admin.from('destinations')
       .select('id, name').eq('is_active', true).order('name'),
@@ -161,8 +161,47 @@ export default async function VersionEditorPage({
         ageBands={ageBands ?? []}
       />
 
+      {/* Live pricing summary */}
+      {(priceLines ?? []).length > 0 && (() => {
+        const payingPax = (travellers ?? []).filter((t: any) => t.is_paying && !t.is_complimentary).length
+        const totalSelling = (priceLines ?? []).filter((l: any) => !l.is_optional)
+          .reduce((s: number, l: any) => s + Number(l.total_selling_usd), 0)
+        const totalCost = (priceLines ?? []).filter((l: any) => !l.is_optional)
+          .reduce((s: number, l: any) => s + Number(l.total_cost_usd), 0)
+        const perPerson = payingPax > 0 ? totalSelling / payingPax : 0
+        const marginPct = totalSelling > 0 ? ((totalSelling - totalCost) / totalSelling) * 100 : 0
+        return (
+          <div className="mt-4 mb-2 rounded-lg px-5 py-3 flex flex-wrap items-center gap-x-6 gap-y-1 text-sm border"
+            style={{ backgroundColor: 'rgba(122,154,74,0.07)', borderColor: '#C5D9B0' }}>
+            {payingPax > 0 && (
+              <span className="text-gray-600">
+                <span className="font-semibold text-gray-900">{payingPax}</span>{' '}
+                paying pax
+              </span>
+            )}
+            <span className="text-gray-600">
+              Total <span className="font-semibold text-gray-900">
+                ${totalSelling.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+              </span>
+            </span>
+            {perPerson > 0 && (
+              <span className="text-gray-600">
+                Per person <span className="font-semibold text-[#5C7A3E]">
+                  ${perPerson.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                </span>
+              </span>
+            )}
+            <span className="text-gray-600">
+              Margin <span className={`font-semibold ${marginPct < 15 ? 'text-red-600' : 'text-[#5C7A3E]'}`}>
+                {marginPct.toFixed(1)}%
+              </span>
+            </span>
+          </div>
+        )
+      })()}
+
       {/* Pricing */}
-      <div className="mt-6">
+      <div className="mt-2">
         <PriceLinesEditor
           quoteId={id}
           versionId={versionId}
