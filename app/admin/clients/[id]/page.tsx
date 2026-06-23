@@ -73,10 +73,30 @@ export default async function ClientDetailPage({
               )}
             </div>
             <p className="text-gray-500 text-sm mt-1">{client.email}</p>
-            <div className="flex flex-wrap gap-4 mt-3 text-sm">
-              {client.phone && <span className="text-gray-600">Phone: {client.phone}</span>}
-              {client.whatsapp && <span className="text-gray-600">WhatsApp: {client.whatsapp}</span>}
-              {client.country && <span className="text-gray-600">Country: {client.country}</span>}
+            <div className="flex flex-wrap gap-2 mt-3">
+              {client.phone && (
+                <a href={`tel:${client.phone}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition"
+                  style={{ backgroundColor: '#F0F4ED', color: '#3D5229', border: '1px solid #C5D9B0' }}>
+                  📞 {client.phone}
+                </a>
+              )}
+              {client.whatsapp && (
+                <a href={`https://wa.me/${client.whatsapp.replace(/\D/g, '')}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition"
+                  style={{ backgroundColor: '#DCFCE7', color: '#166534', border: '1px solid #BBF7D0' }}>
+                  💬 WhatsApp
+                </a>
+              )}
+              {client.email && (
+                <a href={`mailto:${client.email}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition"
+                  style={{ backgroundColor: '#EFF6FF', color: '#1D4ED8', border: '1px solid #BFDBFE' }}>
+                  ✉ Email
+                </a>
+              )}
+              {client.country && <span className="text-sm text-gray-500 self-center ml-1">🌍 {client.country}</span>}
             </div>
           </div>
           <div className="text-right text-sm shrink-0">
@@ -102,13 +122,15 @@ export default async function ClientDetailPage({
               {client.phone && (
                 <div>
                   <p className="text-xs text-gray-400">Phone</p>
-                  <p className="text-gray-700">{client.phone}</p>
+                  <a href={`tel:${client.phone}`} className="text-[#5C7A3E] hover:underline text-sm">{client.phone}</a>
                 </div>
               )}
               {client.whatsapp && (
                 <div>
                   <p className="text-xs text-gray-400">WhatsApp</p>
-                  <p className="text-gray-700">{client.whatsapp}</p>
+                  <a href={`https://wa.me/${client.whatsapp.replace(/\D/g, '')}`}
+                    target="_blank" rel="noopener noreferrer"
+                    className="text-[#5C7A3E] hover:underline text-sm">{client.whatsapp}</a>
                 </div>
               )}
               {client.country && (

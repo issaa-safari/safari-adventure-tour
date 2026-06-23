@@ -4,6 +4,7 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { headers } from 'next/headers'
 import DeliveryPanel from './delivery-panel'
+import CloneVersionButton from './clone-version-button'
 
 const STATUS_STYLES: Record<string, string> = {
   draft:    'bg-gray-100 text-gray-600',
@@ -117,10 +118,34 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
             <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Client</h2>
             {client ? (
               <>
-                <p className="font-medium text-gray-900">{client.first_name} {client.last_name}</p>
-                <p className="text-sm text-gray-500">{client.email}</p>
-                {client.phone && <p className="text-sm text-gray-500">{client.phone}</p>}
-                {client.country && <p className="text-sm text-gray-400">{client.country}</p>}
+                <Link href={`/admin/clients/${quote.client_id}`}
+                  className="font-medium text-gray-900 hover:text-[#5C7A3E]">
+                  {client.first_name} {client.last_name}
+                </Link>
+                <p className="text-sm text-gray-500 mt-0.5">{client.email}</p>
+                {client.country && <p className="text-xs text-gray-400 mt-0.5">🌍 {client.country}</p>}
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {client.phone && (
+                    <a href={`tel:${client.phone}`}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium"
+                      style={{ backgroundColor: '#F0F4ED', color: '#3D5229', border: '1px solid #C5D9B0' }}>
+                      📞 Call
+                    </a>
+                  )}
+                  {client.phone && (
+                    <a href={`https://wa.me/${client.phone.replace(/\D/g, '')}`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium"
+                      style={{ backgroundColor: '#DCFCE7', color: '#166534', border: '1px solid #BBF7D0' }}>
+                      💬 WhatsApp
+                    </a>
+                  )}
+                  <a href={`mailto:${client.email}`}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium"
+                    style={{ backgroundColor: '#EFF6FF', color: '#1D4ED8', border: '1px solid #BFDBFE' }}>
+                    ✉ Email
+                  </a>
+                </div>
               </>
             ) : (
               <p className="text-sm text-gray-400">—</p>
@@ -163,6 +188,7 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
                     <th className="px-5 py-3 font-medium">Status</th>
                     <th className="px-5 py-3 font-medium hidden md:table-cell">Dates</th>
                     <th className="px-5 py-3 font-medium text-right">Price /pp</th>
+                    <th className="px-5 py-3"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -193,6 +219,9 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
                         {v.sharing_price_per_person_usd
                           ? `$${Number(v.sharing_price_per_person_usd).toLocaleString()}`
                           : '—'}
+                      </td>
+                      <td className="px-5 py-3">
+                        <CloneVersionButton quoteId={id} versionId={v.id} />
                       </td>
                     </tr>
                   ))}

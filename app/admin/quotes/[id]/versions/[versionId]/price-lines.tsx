@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { addPriceLine, updatePriceLine, deletePriceLine } from './price-line-actions'
+import { addPriceLine, updatePriceLine, deletePriceLine, bulkSetMarkup } from './price-line-actions'
 import RatePicker from './rate-picker'
 
 const CATEGORIES = [
@@ -310,6 +310,8 @@ export default function PriceLinesEditor({
   const [editingId, setEditingId] = useState<string | null>(null)
   const [addError, setAddError] = useState('')
   const [editError, setEditError] = useState('')
+  const [bulkMarkup, setBulkMarkup] = useState('')
+  const [bulkError, setBulkError] = useState('')
   const [pending, startTransition] = useTransition()
 
   const totalCost    = lines.reduce((s, l) => s + l.total_cost_usd, 0)
@@ -498,6 +500,42 @@ export default function PriceLinesEditor({
               ⚡ From rate card…
             </button>
           )}
+        </div>
+      )}
+
+      {/* Bulk markup override */}
+      {!isLocked && lines.length > 1 && !addingCategory && !showRatePicker && (
+        <div className="px-4 py-2.5 border-t border-gray-100 bg-amber-50/50 flex items-center gap-2 flex-wrap">
+          <span className="text-xs text-gray-500">Set all markups to:</span>
+          <input
+            type="number" min="0" step="0.5"
+            className="w-16 text-center rounded border border-gray-300 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-[#7A9A4A]"
+            value={bulkMarkup}
+            onChange={e => setBulkMarkup(e.target.value)}
+            placeholder="%"
+          />
+          <button
+            type="button"
+            disabled={pending || !bulkMarkup}
+            onClick={() => {
+              setBulkError('')
+              const pct = parseFloat(bulkMarkup)
+              if (!isFinite(pct) || pct < 0) { setBulkError('Enter a valid %'); return }
+              const fd = new FormData()
+              fd.set('versionId', versionId)
+              fd.set('quoteId', quoteId)
+              fd.set('markupPercent', bulkMarkup)
+              startTransition(async () => {
+                try { await bulkSetMarkup(fd); window.location.reload() }
+                catch (err) { setBulkError(err instanceof Error ? err.message : 'Failed.') }
+              })
+            }}
+            className="text-xs font-medium text-white px-3 py-1 rounded disabled:opacity-40"
+            style={{ backgroundColor: '#C9A84C' }}
+          >
+            Apply to all
+          </button>
+          {bulkError && <span className="text-xs text-red-500">{bulkError}</span>}
         </div>
       )}
 

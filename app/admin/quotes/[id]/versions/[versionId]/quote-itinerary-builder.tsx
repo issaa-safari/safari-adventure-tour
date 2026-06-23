@@ -22,6 +22,9 @@ type Day = {
   title: string
   descriptionEn: string
   clientNotes: string
+  titleAr: string
+  descriptionAr: string
+  clientNotesAr: string
   destinationId: string | null
   destinationSnapshot: Record<string, unknown>
   meals: string[]
@@ -102,6 +105,9 @@ function fromTourDays(
       title: td.title_en ?? '',
       descriptionEn: '',
       clientNotes: '',
+      titleAr: '',
+      descriptionAr: '',
+      clientNotesAr: '',
       destinationId: dest?.id ?? null,
       destinationSnapshot: dest ? { id: dest.id, name: dest.name } : {},
       meals,
@@ -133,6 +139,9 @@ function loadInitialDays(
       title: qd.title ?? '',
       descriptionEn: qd.description_en ?? '',
       clientNotes: qd.client_notes ?? '',
+      titleAr: qd.title_ar ?? '',
+      descriptionAr: qd.description_ar ?? '',
+      clientNotesAr: qd.client_notes_ar ?? '',
       destinationId: qd.destination_id ?? null,
       destinationSnapshot: qd.destination_snapshot ?? {},
       meals: qd.meals ?? [],
@@ -176,6 +185,13 @@ export default function QuoteItineraryBuilder({
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
+  const [arOpenIndices, setArOpenIndices] = useState<Set<number>>(
+    () => new Set(
+      initialQuoteDays
+        .map((d: any, i: number) => (d.title_ar || d.description_ar || d.client_notes_ar ? i : -1))
+        .filter((i: number) => i >= 0)
+    )
+  )
 
   // ── Day mutations ───────────────────────────────────────────────────────
 
@@ -190,8 +206,9 @@ export default function QuoteItineraryBuilder({
       : 1
     setDays(p => [...p, {
       _key: uid(), id: null, dayNumber: next, dayDate: '', title: '',
-      descriptionEn: '', clientNotes: '', destinationId: null,
-      destinationSnapshot: {}, meals: [], items: [],
+      descriptionEn: '', clientNotes: '',
+      titleAr: '', descriptionAr: '', clientNotesAr: '',
+      destinationId: null, destinationSnapshot: {}, meals: [], items: [],
     }])
     setSaved(false)
   }
@@ -405,13 +422,38 @@ export default function QuoteItineraryBuilder({
               <div className="space-y-1.5">
                 <input type="text" value={day.title}
                   onChange={e => update(i, { title: e.target.value })}
-                  placeholder="Day title"
+                  placeholder="Day title (English)"
                   className={inputCls} disabled={isLocked} />
                 <textarea value={day.clientNotes}
                   onChange={e => update(i, { clientNotes: e.target.value })}
-                  placeholder="Client-facing notes (optional)"
+                  placeholder="Notes (English, optional)"
                   rows={2}
                   className={inputCls + ' resize-none'} disabled={isLocked} />
+                {/* Arabic toggle */}
+                <button
+                  type="button"
+                  onClick={() => setArOpenIndices(prev => {
+                    const next = new Set(prev)
+                    next.has(i) ? next.delete(i) : next.add(i)
+                    return next
+                  })}
+                  className="text-[10px] text-gray-400 hover:text-[#7A9A4A] transition"
+                >
+                  {arOpenIndices.has(i) ? '▲ Hide Arabic' : '🇸🇦 + Arabic'}
+                </button>
+                {arOpenIndices.has(i) && (
+                  <div className="mt-1 pt-1 border-t border-amber-100 space-y-1.5" dir="rtl">
+                    <input type="text" value={day.titleAr}
+                      onChange={e => update(i, { titleAr: e.target.value })}
+                      placeholder="عنوان اليوم"
+                      className={inputCls + ' text-right'} disabled={isLocked} />
+                    <textarea value={day.clientNotesAr}
+                      onChange={e => update(i, { clientNotesAr: e.target.value })}
+                      placeholder="ملاحظات (اختياري)"
+                      rows={2}
+                      className={inputCls + ' resize-none text-right'} disabled={isLocked} />
+                  </div>
+                )}
               </div>
 
               {/* Meals */}

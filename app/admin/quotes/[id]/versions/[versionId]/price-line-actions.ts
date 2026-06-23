@@ -159,6 +159,35 @@ export async function lookupRates(formData: FormData) {
   return { cards: cards ?? [] }
 }
 
+export async function bulkSetMarkup(formData: FormData) {
+  const { admin } = await authGuard()
+  const versionId = formData.get('versionId') as string
+  const quoteId = formData.get('quoteId') as string
+  const markupPct = parseFloat(formData.get('markupPercent') as string)
+  if (!Number.isFinite(markupPct) || markupPct < 0) throw new Error('Invalid markup.')
+
+  await requireMutableVersion(admin, versionId, quoteId)
+
+  const { data: lines } = await admin
+    .from('quote_price_lines')
+    .select('id, quantity, unit_cost_usd')
+    .eq('quote_version_id', versionId)
+
+  if (!lines?.length) return
+
+  for (const line of lines) {
+    const totalCostUsd = line.quantity * line.unit_cost_usd
+    const totalSellingUsd = totalCostUsd * (1 + markupPct / 100)
+    await admin.from('quote_price_lines').update({
+      markup_percent_override: markupPct,
+      total_selling_usd: totalSellingUsd,
+      is_manual_override: true,
+    }).eq('id', line.id)
+  }
+
+  revalidatePath(`/admin/quotes/${quoteId}/versions/${versionId}`)
+}
+
 export async function setVersionStatus(formData: FormData) {
   const { admin } = await authGuard()
   const versionId = formData.get('versionId') as string
