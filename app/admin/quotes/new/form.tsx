@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { createQuote } from './actions'
 
 interface Client { id: string; first_name: string; last_name: string; email: string }
-interface Request { id: string; reference: string; clients: { first_name: string; last_name: string }[] | null }
+interface Request { id: string; reference: string; client_id: string }
 interface Tour { id: string; title_en: string; type: string }
 interface Departure { id: string; start_date: string; end_date: string; tours: { title_en: string }[] | null }
 
@@ -17,13 +17,20 @@ export default function NewQuoteForm({
   requests,
   tours,
   departures,
+  defaultClientId = '',
+  defaultRequestId = '',
 }: {
   clients: Client[]
   requests: Request[]
   tours: Tour[]
   departures: Departure[]
+  defaultClientId?: string
+  defaultRequestId?: string
 }) {
-  const [mode, setMode] = useState<'custom' | 'fixed_departure' | ''>('')
+  const [mode, setMode] = useState<'custom' | 'fixed_departure' | ''>(
+    defaultRequestId ? 'custom' : ''
+  )
+  const [clientId, setClientId] = useState(defaultClientId)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -85,7 +92,13 @@ export default function NewQuoteForm({
 
             <div>
               <label className={labelCls}>Client <span className="text-red-500">*</span></label>
-              <select name="clientId" required defaultValue="" className={inputCls}>
+              <select
+                name="clientId"
+                required
+                value={clientId}
+                onChange={e => setClientId(e.target.value)}
+                className={inputCls}
+              >
                 <option value="" disabled>Select a client…</option>
                 {clients.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -97,17 +110,21 @@ export default function NewQuoteForm({
 
             <div>
               <label className={labelCls}>Linked Request <span className="text-gray-400 font-normal">(optional)</span></label>
-              <select name="requestId" defaultValue="" className={inputCls}>
+              <select
+                name="requestId"
+                defaultValue={defaultRequestId}
+                onChange={e => {
+                  const req = requests.find(r => r.id === e.target.value)
+                  if (req?.client_id) setClientId(req.client_id)
+                }}
+                className={inputCls}
+              >
                 <option value="">No linked request</option>
-                {requests.map((r) => {
-                  const c = Array.isArray(r.clients) ? r.clients[0] : r.clients
-                  const name = c ? `${c.first_name} ${c.last_name}` : ''
-                  return (
-                    <option key={r.id} value={r.id}>
-                      {r.reference}{name ? ` — ${name}` : ''}
-                    </option>
-                  )
-                })}
+                {requests.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.reference}
+                  </option>
+                ))}
               </select>
             </div>
 
