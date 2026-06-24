@@ -26,7 +26,7 @@ export default async function TourDetailPage({
 
   const { data: days } = await admin
     .from('tour_days')
-    .select('*, destinations(name), accommodations(name)')
+    .select('id, day_number, day_number_end, title_en, destination_id')
     .eq('tour_id', id)
     .order('day_number', { ascending: true })
 
@@ -102,7 +102,7 @@ export default async function TourDetailPage({
                       Day {day.day_number}{day.day_number_end ? '-' + day.day_number_end : ''}
                     </span>
                     {' — '}
-                    {(day.destinations as any)?.name ?? 'No destination set'}
+                    {day.title_en || 'No title set'}
                   </li>
                 ))}
               </ul>
