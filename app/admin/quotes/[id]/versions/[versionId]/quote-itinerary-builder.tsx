@@ -246,18 +246,6 @@ export default function QuoteItineraryBuilder({
     setSaved(false)
   }
 
-  function generateBlankDays(count: number) {
-    if (count < 1 || count > 60) return
-    setDays(Array.from({ length: count }, (_, i) => ({
-      _key: uid(), id: null,
-      dayNumber: i + 1, dayDate: '', title: '',
-      descriptionEn: '', clientNotes: '',
-      titleAr: '', descriptionAr: '', clientNotesAr: '',
-      destinationId: null, destinationSnapshot: {}, meals: [], items: [],
-    })))
-    setSaved(false)
-  }
-
   function removeDay(i: number) {
     setDays(p => p.filter((_, idx) => idx !== i))
     setSaved(false)

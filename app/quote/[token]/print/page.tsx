@@ -2,27 +2,79 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { notFound } from 'next/navigation'
 
 const MEAL_LABELS: Record<string, string> = { B: 'Breakfast', L: 'Lunch', D: 'Dinner' }
+const MEAL_LABELS_AR: Record<string, string> = { B: 'إفطار', L: 'غداء', D: 'عشاء' }
 const CATEGORY_LABELS: Record<string, string> = {
-  accommodation: 'Accommodation',
-  activities: 'Activities',
-  park_fees: 'Park Fees',
-  transport: 'Transport',
-  staff: 'Staff',
-  meals: 'Meals',
-  flights: 'Flights',
-  other: 'Other',
+  accommodation: 'Accommodation', activities: 'Activities', park_fees: 'Park Fees',
+  transport: 'Transport', staff: 'Staff', meals: 'Meals', flights: 'Flights', other: 'Other',
 }
 
 function fmt(n: number) {
-  return n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+  return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 function fmtDate(d: string | null) {
   if (!d) return '—'
   return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 }
-function mapsUrl(name: string) {
-  return `https://maps.google.com/?q=${encodeURIComponent(name)}`
+
+const G = '#7A9A4A'
+
+const CSS = `
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: #fff; }
+body { font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size: 13px; }
+body.ar { font-family: 'Noto Sans Arabic', Arial, sans-serif; }
+.page { max-width: 780px; margin: 0 auto; padding: 36px 40px; min-height: 280mm; position: relative; }
+.sec-bar { display: flex; align-items: center; margin-bottom: 24px; }
+.sec-pill { background: ${G}; color: #fff; font-size: 12px; font-weight: 700; padding: 5px 18px 5px 14px; border-radius: 20px 0 0 20px; white-space: nowrap; flex-shrink: 0; }
+.sec-line { flex: 1; height: 2px; background: #1a1a1a; }
+.sec-end { padding-left: 12px; font-size: 12px; color: #555; font-weight: 600; white-space: nowrap; font-family: 'Helvetica Neue', Arial, sans-serif; }
+.sec-end-r { padding-left: 10px; font-size: 12px; font-weight: 700; }
+.meta-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 14px; border: 1px solid #c8e0a0; border-radius: 8px; padding: 12px 16px; background: #f8fdf0; margin-bottom: 22px; }
+.meta-2 { grid-template-columns: 1fr 1fr; }
+.meta-label { font-size: 10px; color: #777; margin-bottom: 3px; font-family: 'Helvetica Neue', Arial, sans-serif; text-transform: uppercase; letter-spacing: 0.3px; }
+.meta-val { font-size: 13px; font-weight: 700; }
+.letter-card { background: #232323; color: #ddd; border-radius: 12px; padding: 28px 32px; margin: 16px 0 28px; }
+.letter-card p { margin: 0 0 10px; font-size: 13px; line-height: 1.75; }
+.letter-sig { border-top: 1px solid #3a3a3a; margin-top: 20px; padding-top: 16px; display: flex; align-items: center; gap: 14px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.box { border: 1px solid #d0e8b0; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; background: #fafdf5; }
+.box-meal { border-color: #e8dda0; background: #fffdf0; }
+.box-title { font-size: 12px; font-weight: 700; margin-bottom: 9px; font-family: 'Helvetica Neue', Arial, sans-serif; }
+.box-title span { font-weight: 400; }
+.bullet { display: flex; align-items: flex-start; gap: 6px; font-size: 12px; margin-bottom: 5px; line-height: 1.45; }
+.arrow { color: ${G}; flex-shrink: 0; font-style: normal; }
+.accom-card { display: flex; align-items: flex-start; gap: 10px; border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; }
+.accom-meta { font-size: 10px; color: #999; margin-bottom: 3px; font-family: 'Helvetica Neue', Arial, sans-serif; }
+.accom-name { font-size: 13px; font-weight: 700; }
+.summary-tbl { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 12px; }
+.summary-tbl th { text-align: left; padding: 8px 10px; color: #666; border-bottom: 2px solid #c8e0a0; font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; font-family: 'Helvetica Neue', Arial, sans-serif; }
+.summary-tbl td { padding: 9px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+.summary-tbl tr:nth-child(even) td { background: #fafafa; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${G}; margin-right: 6px; vertical-align: middle; }
+.cost-tbl { width: 100%; border-collapse: collapse; font-size: 13px; border: 1px solid #e8e8e8; border-radius: 8px; overflow: hidden; }
+.cost-tbl td { padding: 10px 14px; border-bottom: 1px solid #f0f0f0; }
+.cost-tbl tr:last-child td { border-bottom: none; font-weight: 700; font-size: 14px; background: #f8fdf0; }
+.incl-excl { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+.incl { border: 1px solid #c8e0a0; border-radius: 8px; padding: 14px; }
+.excl { border: 1px solid #f5c0c0; border-radius: 8px; padding: 14px; }
+.incl-hd { color: ${G}; font-weight: 700; font-size: 12px; margin-bottom: 8px; font-family: 'Helvetica Neue', Arial, sans-serif; }
+.excl-hd { color: #c0392b; font-weight: 700; font-size: 12px; margin-bottom: 8px; font-family: 'Helvetica Neue', Arial, sans-serif; }
+.sm { font-size: 11px; line-height: 1.7; color: #444; margin: 0; }
+.contact-box { border: 1px solid #c8e0a0; border-radius: 10px; padding: 16px 20px; max-width: 420px; background: #fafdf5; }
+.contact-row { display: flex; gap: 12px; margin-bottom: 6px; font-size: 12px; }
+.contact-lbl { font-weight: 700; color: #555; min-width: 70px; flex-shrink: 0; }
+.ft { display: flex; justify-content: space-between; border-top: 1px solid #eee; margin-top: 36px; padding-top: 8px; font-size: 10px; color: #aaa; font-family: 'Helvetica Neue', Arial, sans-serif; }
+h1 { font-size: 30px; font-weight: 800; margin: 0 0 6px; line-height: 1.2; }
+h2 { font-size: 22px; font-weight: 700; margin: 0 0 14px; }
+h3 { font-size: 15px; font-weight: 700; margin: 0 0 12px; }
+@media print {
+  .no-print { display: none !important; }
+  @page { margin: 1.5cm 2cm; size: A4 portrait; }
+  .pb { break-after: page; page-break-after: always; }
+  .nb { break-inside: avoid; page-break-inside: avoid; }
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+`
 
 export default async function QuotePrintPage({
   params,
@@ -49,13 +101,13 @@ export default async function QuotePrintPage({
     { data: settings },
   ] = await Promise.all([
     admin.from('quote_versions')
-      .select('id, version_number, title, language, travel_start_date, travel_end_date, valid_until, total_selling_usd, sharing_price_per_person_usd, single_price_per_person_usd, client_snapshot')
+      .select('id, version_number, title, language, travel_start_date, travel_end_date, valid_until, total_selling_usd, sharing_price_per_person_usd, single_price_per_person_usd')
       .eq('id', delivery.quote_version_id).single(),
     admin.from('quotes')
       .select('id, quote_number, mode, client_id')
       .eq('id', delivery.quote_id).single(),
     admin.from('quote_days')
-      .select('id, day_number, day_date, title, description_en, client_notes, title_ar, description_ar, client_notes_ar, destination_snapshot, meals')
+      .select('id, day_number, day_number_end, day_date, title, description_en, client_notes, title_ar, description_ar, client_notes_ar, destination_snapshot, meals')
       .eq('quote_version_id', delivery.quote_version_id)
       .order('day_number'),
     admin.from('quote_price_lines')
@@ -68,294 +120,490 @@ export default async function QuotePrintPage({
       .limit(1).single(),
   ])
 
-  // Load accommodation items for each day so we can show map links
-  const dayIds = (quoteDays ?? []).map((d: any) => d.id)
-  const { data: dayItems } = dayIds.length
-    ? await admin.from('quote_day_items')
-        .select('quote_day_id, item_type, title_snapshot')
-        .in('quote_day_id', dayIds)
-        .eq('item_type', 'accommodation')
-        .order('sort_order')
-    : { data: [] as any[] }
-
-  // Group accommodation items by day
-  const accomByDay: Record<string, string[]> = {}
-  for (const item of dayItems ?? []) {
-    if (!accomByDay[item.quote_day_id]) accomByDay[item.quote_day_id] = []
-    if (item.title_snapshot) accomByDay[item.quote_day_id].push(item.title_snapshot)
-  }
-
   if (!version || !quote) notFound()
 
   const { data: client } = await admin
     .from('clients')
-    .select('first_name, last_name, email, preferred_language')
+    .select('first_name, last_name, email')
     .eq('id', quote.client_id)
     .single()
 
+  const dayIds = (quoteDays ?? []).map((d: any) => d.id)
+  const { data: dayItems } = dayIds.length
+    ? await admin.from('quote_day_items')
+        .select('quote_day_id, item_type, title_snapshot, sort_order')
+        .in('quote_day_id', dayIds)
+        .in('item_type', ['accommodation', 'activity'])
+        .order('sort_order')
+    : { data: [] as any[] }
+
+  const accomByDay: Record<string, string[]> = {}
+  const actsByDay: Record<string, string[]> = {}
+  for (const item of dayItems ?? []) {
+    if (item.item_type === 'accommodation') {
+      if (!accomByDay[item.quote_day_id]) accomByDay[item.quote_day_id] = []
+      if (item.title_snapshot) accomByDay[item.quote_day_id].push(item.title_snapshot)
+    } else if (item.item_type === 'activity') {
+      if (!actsByDay[item.quote_day_id]) actsByDay[item.quote_day_id] = []
+      if (item.title_snapshot) actsByDay[item.quote_day_id].push(item.title_snapshot)
+    }
+  }
+
   const isArabic = (version as any)?.language === 'ar'
   const clientName = client ? `${client.first_name} ${client.last_name}`.trim() : 'Guest'
+  const clientFirst = client?.first_name ?? clientName
   const companyName = settings?.company_name ?? 'Safari Adventures'
   const totalSelling = Number(version.total_selling_usd ?? 0)
   const sharingPp = Number(version.sharing_price_per_person_usd ?? 0)
   const singlePp = Number(version.single_price_per_person_usd ?? 0)
+  const tourTitle = version.title || 'Safari Quotation'
+  const numDays = (quoteDays ?? []).length
+  const numNights = Math.max(0, numDays - 1)
+  const durationStr = numDays > 0 ? `${numDays} Day${numDays !== 1 ? 's' : ''} / ${numNights} Night${numNights !== 1 ? 's' : ''}` : '—'
 
   const includedLines = (priceLines ?? []).filter((l: any) => !l.is_optional)
   const optionalLines = (priceLines ?? []).filter((l: any) => l.is_optional)
 
-  const AR = {
-    quotation:      'عرض سعر',
-    preparedFor:    'مُعَدّ لـ',
-    travelDates:    'تواريخ الرحلة',
-    validUntil:     'صالح حتى',
-    itinerary:      'برنامج الرحلة',
-    day:            'يوم',
-    included:       'ما يشمله السعر',
-    optional:       'إضافات اختيارية',
-    pricing:        'التسعير',
-    sharingPp:      'للشخص (مشاركة)',
-    singlePp:       'للشخص (غرفة منفردة)',
-    total:          'الإجمالي',
-    footerValidity: 'هذا العرض صالح حتى',
-    footerTerms:    'الأسعار بالدولار الأمريكي. شروط الدفع وأحكام الحجز متاحة عند الطلب.',
-    contactUs:      'تواصل معنا',
+  const days = quoteDays ?? []
+  const startDest = (days[0]?.destination_snapshot as any)?.name ?? ''
+  const endDest = (days[days.length - 1]?.destination_snapshot as any)?.name ?? ''
+
+  function dayLabel(day: any) {
+    const end = day.day_number_end
+    if (end && end !== day.day_number) return `${day.day_number} & ${end}`
+    return `${day.day_number}`
   }
+
+  const t = isArabic ? {
+    proposal: 'عرض سفر', summary: 'ملخص', pricing: 'التسعير', aboutUs: 'من نحن',
+    tourLength: 'مدة الرحلة', traveler: 'المسافر', startTour: 'بداية الرحلة', endTour: 'نهاية الرحلة',
+    dayByDay: 'يوم بيوم', arrival: 'الوصول', startDest: 'نقطة البداية:', endDest: 'نقطة النهاية:',
+    days: 'اليوم', dest: 'الوجهة', accom: 'الإقامة', meals: 'الوجبات',
+    activity: 'نشاط', mealPlan: 'خطة الوجبات', day: 'يوم',
+    included: 'ما يشمله', excluded: 'ما لا يشمله',
+    breakdown: 'تفاصيل التكاليف', perSharing: 'للشخص (مشاركة)',
+    perSingle: 'للشخص (غرفة منفردة)', total: 'الإجمالي بالدولار',
+    optional: 'إضافات اختيارية', contactUs: 'تواصل معنا',
+    ourOffer: `عرضنا لـ ${clientFirst}`,
+    dear: `عزيزي/عزيزتي ${clientFirst}،`,
+    p1: 'شكرًا على اهتمامكم.',
+    p2: `يسعدنا تقديم هذا العرض المخصص لرحلة "${tourTitle}" بناءً على طلبكم. تبدأ الرحلة في ${startDest || 'الوجهة المحددة'} وتمتد على مدار ${numDays} أيام.`,
+    p3: 'لا تترددوا في التواصل معنا لأي استفسارات. نتطلع إلى مساعدتكم في تخطيط رحلة أحلامكم.',
+    regards: 'مع خالص التحيات',
+    inclText: 'جميع الأنشطة (ما لم تُشَر إلى أنها اختيارية)، الوجبات، رسوم الحدائق، جميع مرافق الإقامة، المرشد المتخصص، جميع وسائل النقل.',
+    exclText: 'المواد الشخصية، تأمين السفر، رسوم التأشيرة، الزيادات الضريبية الحكومية، الإكراميات ($10 للشخص/يوم)، الرحلات الجوية الدولية.',
+    aboutDesc: `${companyName} هي شركة رائدة في السياحة، متخصصة في رحلات السفاري والتجارب الثقافية في شرق أفريقيا.`,
+    address: 'العنوان', email: 'البريد', phone: 'الهاتف',
+    noAccom: 'بدون إقامة',
+    validUntil: (d: string) => `هذا العرض صالح حتى ${d} ورهن بالتوفر عند التأكيد.`,
+  } : {
+    proposal: 'Proposal', summary: 'Summary', pricing: 'Pricing', aboutUs: 'About Us',
+    tourLength: 'Tour Length', traveler: 'Traveler', startTour: 'Start Tour', endTour: 'End Tour',
+    dayByDay: 'Day by Day', arrival: 'Arrival', startDest: 'Start Destination:', endDest: 'End Destination:',
+    days: 'Days', dest: 'Main Destination', accom: 'Accommodation', meals: 'Meal Plan',
+    activity: 'Activity', mealPlan: 'Meal Plan', day: 'Day',
+    included: 'Included', excluded: 'Excluded',
+    breakdown: 'Breakdown of Costs', perSharing: 'Per person (sharing)',
+    perSingle: 'Per person (single room)', total: 'Total in USD',
+    optional: 'Optional Add-ons', contactUs: 'Contact Us',
+    ourOffer: `Our offer for ${clientFirst}`,
+    dear: `Dear ${clientFirst},`,
+    p1: 'Thank you for your inquiry.',
+    p2: `It is our pleasure to send you a custom-made quote for our ${tourTitle} as per your request. The tour begins in ${startDest || 'the specified destination'} and runs for ${numDays} day${numDays !== 1 ? 's' : ''}.`,
+    p3: 'Please do not hesitate to contact us if you have any questions. We look forward to helping you plan your safari trip of a lifetime.',
+    regards: 'Best regards',
+    inclText: 'All activities (unless indicated as optional), Meals (as specified in the itinerary), Park fees, All accommodations, Professional guide, All transportation.',
+    exclText: 'Personal items (souvenirs, travel insurance, visa fees, etc.), Government-imposed tax increases, Tips ($10 pp/day guideline), International flights.',
+    aboutDesc: `${companyName} is a leading tour operator specializing in wildlife safaris and cultural experiences in East Africa.`,
+    address: 'Address', email: 'Email', phone: 'Phone',
+    noAccom: 'No accommodation',
+    validUntil: (d: string) => `This quotation is valid until ${d} and subject to availability at time of confirmation.`,
+  }
+
+  const ml = isArabic ? MEAL_LABELS_AR : MEAL_LABELS
 
   return (
     <>
-      <style>{`
-        @media print {
-          .no-print { display: none !important; }
-          body { margin: 0; }
-          @page { margin: 1.5cm 2cm; size: A4; }
-        }
-        body { font-family: ${isArabic ? "'Noto Sans Arabic', 'Arial', sans-serif" : "Georgia, 'Times New Roman', serif"}; }
-        ${isArabic ? '@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&display=swap");' : ''}
-      `}</style>
+      <style>{CSS + (isArabic ? `body { font-family: 'Noto Sans Arabic', Arial, sans-serif; }` : '')}</style>
+      {isArabic && (
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&display=swap" />
+      )}
 
-      {/* Print button — hidden when printing */}
-      <div className="no-print fixed top-4 right-4 z-50 flex gap-2">
+      <div className="no-print" style={{ position: 'fixed', top: 16, right: 16, zIndex: 50, display: 'flex', gap: 8 }}>
         <button
-          onClick={() => window.print()}
-          className="rounded-md px-4 py-2 text-sm font-medium text-white shadow-lg"
-          style={{ backgroundColor: '#7A9A4A' }}
+          onClick={() => (window as any).print()}
+          style={{ background: G, color: '#fff', border: 'none', borderRadius: 6, padding: '8px 18px', fontSize: 13, cursor: 'pointer', fontWeight: 600 }}
         >
           Print / Save PDF
         </button>
         <button
-          onClick={() => window.history.back()}
-          className="rounded-md px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 shadow-sm"
+          onClick={() => (window as any).history.back()}
+          style={{ background: '#fff', color: '#555', border: '1px solid #ddd', borderRadius: 6, padding: '8px 14px', fontSize: 13, cursor: 'pointer' }}
         >
           ← Back
         </button>
       </div>
 
-      <div className="max-w-[780px] mx-auto p-4 sm:p-8 text-gray-900" dir={isArabic ? 'rtl' : 'ltr'}>
-        {/* Header */}
-        <div className="flex flex-wrap items-start justify-between gap-4 border-b-2 pb-6 mb-6" style={{ borderColor: '#7A9A4A' }}>
-          <div>
-            {settings?.logo_url ? (
-              <img src={settings.logo_url} alt={companyName} className="h-12 w-auto mb-2" />
-            ) : (
-              <div className="h-12 w-12 rounded-full flex items-center justify-center text-white text-xl font-bold mb-2"
-                style={{ backgroundColor: '#7A9A4A' }}>
-                {companyName[0]}
-              </div>
-            )}
-            <p className="text-xl font-bold text-gray-900">{companyName}</p>
-            {settings?.address && <p className="text-sm text-gray-500 mt-0.5">{settings.address}</p>}
-            {settings?.email && <p className="text-sm text-gray-500">{settings.email}</p>}
-            {settings?.phone && <p className="text-sm text-gray-500">{settings.phone}</p>}
-          </div>
-          <div className={isArabic ? 'text-left' : 'text-right'}>
-            <p className="text-2xl font-bold" style={{ color: '#7A9A4A' }}>
-              {isArabic ? AR.quotation : 'QUOTATION'}
-            </p>
-            <p className="text-sm font-mono text-gray-500 mt-1">{quote.quote_number}</p>
-            <p className="text-sm text-gray-500 mt-3">{isArabic ? AR.preparedFor : 'Prepared for:'}</p>
-            <p className="font-semibold text-gray-900">{clientName}</p>
-            {client?.email && <p className="text-sm text-gray-500">{client.email}</p>}
-          </div>
-        </div>
+      <div dir={isArabic ? 'rtl' : 'ltr'}>
 
-        {/* Trip overview */}
-        <div className="mb-6 p-4 rounded-lg" style={{ backgroundColor: '#f8faf4', border: '1px solid #d4e5b8' }}>
-          <h1 className="text-xl font-bold text-gray-900 mb-2">
-            {version.title || 'Safari Quotation'}
-          </h1>
-          <div className="grid grid-cols-2 gap-4 text-sm">
+        {/* ── PAGE 1: COVER ── */}
+        <div className="page pb">
+          <div className="sec-bar">
+            <div className="sec-pill">{t.proposal}</div>
+            <div className="sec-line" />
+            <div className="sec-end">{quote.quote_number}</div>
+            <div className="sec-end-r">&nbsp;&nbsp;{clientFirst.toUpperCase()}</div>
+          </div>
+
+          <div className="meta-grid">
             <div>
-              <span className="text-gray-500">{isArabic ? AR.travelDates : 'Travel dates'}: </span>
-              <span className="font-medium">
-                {fmtDate(version.travel_start_date)}
-                {version.travel_end_date && version.travel_end_date !== version.travel_start_date
-                  ? ` – ${fmtDate(version.travel_end_date)}`
-                  : ''}
-              </span>
+              <div className="meta-label">{t.tourLength}</div>
+              <div className="meta-val">{durationStr}</div>
             </div>
-            {version.valid_until && (
+            <div>
+              <div className="meta-label">{t.traveler}</div>
+              <div className="meta-val">{clientName}</div>
+            </div>
+            <div>
+              <div className="meta-label">{t.startTour}</div>
+              <div className="meta-val">{version.travel_start_date ? fmtDate(version.travel_start_date) : '—'}</div>
+            </div>
+            <div>
+              <div className="meta-label">{t.endTour}</div>
+              <div className="meta-val">{version.travel_end_date ? fmtDate(version.travel_end_date) : '—'}</div>
+            </div>
+          </div>
+
+          <h1>{tourTitle}</h1>
+
+          <div className="letter-card">
+            <p style={{ color: '#fff', fontWeight: 700, fontSize: 15, marginBottom: 14 }}>{t.dear}</p>
+            <p>{t.p1}</p>
+            <p>{t.p2}</p>
+            <p>{t.p3}</p>
+            <p style={{ color: '#aaa', marginBottom: 0 }}>{t.regards}</p>
+
+            <div className="letter-sig">
+              {settings?.logo_url ? (
+                <img src={settings.logo_url} alt={companyName} style={{ height: 44, width: 'auto', borderRadius: '50%', background: '#fff', padding: 2 }} />
+              ) : (
+                <div style={{ width: 44, height: 44, borderRadius: '50%', background: G, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 18, flexShrink: 0 }}>
+                  {companyName[0]}
+                </div>
+              )}
               <div>
-                <span className="text-gray-500">{isArabic ? AR.validUntil : 'Valid until'}: </span>
-                <span className="font-medium">{fmtDate(version.valid_until)}</span>
+                <div style={{ fontWeight: 700, fontSize: 14, color: '#fff' }}>{companyName}</div>
+                <div style={{ fontSize: 11, color: '#bbb', marginTop: 4 }}>
+                  {settings?.phone && <span>Phone&nbsp;{settings.phone}</span>}
+                  {settings?.phone && settings?.email && <span> &middot; </span>}
+                  {settings?.email && <span>Email&nbsp;{settings.email}</span>}
+                </div>
               </div>
-            )}
+            </div>
+          </div>
+
+          <div className="ft">
+            <span>{companyName}</span>
+            <span>{settings?.address ?? ''}</span>
           </div>
         </div>
 
-        {/* Itinerary */}
-        {quoteDays && quoteDays.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-sm font-bold uppercase tracking-widest mb-3" style={{ color: '#7A9A4A' }}>
-              {isArabic ? AR.itinerary : 'Itinerary'}
-            </h2>
-            <div className="space-y-4">
-              {quoteDays.map((day: any) => {
-                const meals: string[] = day.meals ?? []
-                const dest = day.destination_snapshot as Record<string, string> | null
-                const accoms = accomByDay[day.id] ?? []
-                const dayTitle = isArabic && day.title_ar ? day.title_ar : day.title
-                const dayNotes = isArabic && day.client_notes_ar ? day.client_notes_ar : day.client_notes
-                return (
-                  <div key={day.id} className={`border-${isArabic ? 'r' : 'l'}-2 ${isArabic ? 'pr-4' : 'pl-4'}`} style={{ borderColor: '#d4e5b8' }}>
-                    <p className="text-xs text-gray-400 font-medium">
-                      {isArabic ? AR.day : 'Day'} {day.day_number}
-                      {day.day_date ? ` · ${fmtDate(day.day_date)}` : ''}
-                      {dest?.name && (
-                        <>
-                          {' · '}
-                          <a
-                            href={mapsUrl(dest.name)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ color: '#7A9A4A' }}
-                          >
-                            {dest.name}
-                          </a>
-                        </>
-                      )}
-                      {meals.length > 0 && ` · ${meals.map((m: string) => MEAL_LABELS[m] ?? m).join(', ')}`}
-                    </p>
-                    <h3 className="font-semibold text-gray-900 mb-1">{dayTitle || `${isArabic ? AR.day : 'Day'} ${day.day_number}`}</h3>
-                    {day.description_en && !isArabic && (
-                      <p className="text-sm text-gray-600 leading-relaxed">{day.description_en}</p>
-                    )}
-                    {isArabic && day.description_ar && (
-                      <p className="text-sm text-gray-600 leading-relaxed">{day.description_ar}</p>
-                    )}
-                    {dayNotes && (
-                      <p className="text-sm mt-1 italic text-gray-500">{dayNotes}</p>
-                    )}
-                    {accoms.length > 0 && (
-                      <p className="text-xs mt-1.5 text-gray-400">
-                        🏕{' '}
-                        {accoms.map((name, idx2) => (
-                          <span key={idx2}>
-                            {idx2 > 0 && ', '}
-                            <a
-                              href={mapsUrl(name)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              style={{ color: '#7A9A4A' }}
-                            >
-                              {name}
-                            </a>
-                          </span>
-                        ))}
-                      </p>
-                    )}
-                  </div>
-                )
-              })}
+        {/* ── PAGE 2: SUMMARY ── */}
+        {days.length > 0 && (
+          <div className="page pb">
+            <div className="sec-bar">
+              <div className="sec-pill">{t.summary}</div>
+              <div className="sec-line" />
             </div>
-          </div>
-        )}
 
-        {/* What's included */}
-        {includedLines.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-sm font-bold uppercase tracking-widest mb-3" style={{ color: '#7A9A4A' }}>
-              {isArabic ? AR.included : "What's Included"}
-            </h2>
-            <ul className="space-y-1.5">
-              {includedLines.map((line: any) => (
-                <li key={line.id} className="flex items-start gap-2 text-sm">
-                  <span className="mt-0.5 shrink-0" style={{ color: '#7A9A4A' }}>✓</span>
-                  <span>
-                    <span className="text-gray-800">{line.description}</span>
-                    <span className="text-gray-400 text-xs ml-1">({CATEGORY_LABELS[line.cost_category] ?? line.cost_category})</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+            <h2>{tourTitle}</h2>
+            <h3 style={{ fontSize: 17 }}>{t.dayByDay}</h3>
 
-        {/* Optional add-ons */}
-        {optionalLines.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-sm font-bold uppercase tracking-widest mb-3" style={{ color: '#7A9A4A' }}>
-              {isArabic ? AR.optional : 'Optional Add-ons'}
-            </h2>
-            <table className="w-full text-sm">
+            {startDest && (
+              <p style={{ fontSize: 12, color: '#555', marginBottom: 6, marginTop: 0 }}>
+                ✈ {t.arrival}: {startDest}, Airport transfer included
+              </p>
+            )}
+            <p style={{ fontSize: 12, color: '#555', marginBottom: 14, marginTop: 0 }}>
+              📍 <strong>{t.startDest}</strong> {startDest || '—'}
+            </p>
+
+            <table className="summary-tbl">
+              <thead>
+                <tr>
+                  <th>{t.days}</th>
+                  <th>{t.dest}</th>
+                  <th>{t.accom}</th>
+                  <th>{t.meals}</th>
+                </tr>
+              </thead>
               <tbody>
-                {optionalLines.map((line: any) => (
-                  <tr key={line.id} className="border-b border-gray-100">
-                    <td className="py-2 text-gray-800">{line.description}</td>
-                    <td className="py-2 text-gray-400 text-xs">{CATEGORY_LABELS[line.cost_category] ?? line.cost_category}</td>
-                    <td className="py-2 text-right font-medium text-gray-900">${fmt(Number(line.total_selling_usd))}</td>
-                  </tr>
-                ))}
+                {days.map((day: any) => {
+                  const dest = (day.destination_snapshot as any)?.name ?? '—'
+                  const accoms = accomByDay[day.id] ?? []
+                  const dayMeals: string[] = day.meals ?? []
+                  const mealStr = dayMeals.map((m: string) => MEAL_LABELS[m] ?? m).join(' & ') || '—'
+                  const lbl = day.day_number_end && day.day_number_end !== day.day_number
+                    ? `${t.day} ${day.day_number}–${day.day_number_end}`
+                    : `${t.day} ${day.day_number}`
+                  return (
+                    <tr key={day.id}>
+                      <td><span className="dot" />{lbl}</td>
+                      <td style={{ fontWeight: 600 }}>{dest}</td>
+                      <td style={{ color: '#444' }}>{accoms.length > 0 ? accoms[0] : t.noAccom}</td>
+                      <td style={{ color: '#444' }}>{mealStr}</td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
-          </div>
-        )}
 
-        {/* Pricing */}
-        {totalSelling > 0 && (
-          <div className="mb-8">
-            <h2 className="text-sm font-bold uppercase tracking-widest mb-3" style={{ color: '#7A9A4A' }}>
-              {isArabic ? AR.pricing : 'Pricing'}
-            </h2>
-            <div className="border rounded-lg overflow-hidden" style={{ borderColor: '#d4e5b8' }}>
-              {sharingPp > 0 && (
-                <div className="flex justify-between px-4 py-2.5 border-b text-sm" style={{ borderColor: '#d4e5b8' }}>
-                  <span className="text-gray-600">{isArabic ? AR.sharingPp : 'Per person (sharing)'}</span>
-                  <span className="font-semibold">${fmt(sharingPp)} USD</span>
-                </div>
-              )}
-              {singlePp > 0 && (
-                <div className="flex justify-between px-4 py-2.5 border-b text-sm" style={{ borderColor: '#d4e5b8' }}>
-                  <span className="text-gray-600">{isArabic ? AR.singlePp : 'Per person (single room)'}</span>
-                  <span className="font-semibold">${fmt(singlePp)} USD</span>
-                </div>
-              )}
-              <div className="flex justify-between px-4 py-3 text-base font-bold" style={{ backgroundColor: '#f8faf4' }}>
-                <span>{isArabic ? AR.total : 'Total'}</span>
-                <span>${fmt(totalSelling)} USD</span>
-              </div>
+            {endDest && (
+              <p style={{ fontSize: 12, color: '#555', marginTop: 12 }}>
+                📍 <strong>{t.endDest}</strong> {endDest}
+              </p>
+            )}
+
+            <div className="ft">
+              <span>Page 2</span>
+              <span>{quote.quote_number}</span>
+              <span>{companyName}</span>
             </div>
           </div>
         )}
 
-        {/* Footer */}
-        <div className="pt-6 border-t border-gray-200 text-xs text-gray-400 text-center space-y-1">
-          {isArabic ? (
-            <>
-              <p>{AR.footerValidity} {fmtDate(version.valid_until)} وهو رهن بالتوفر عند التأكيد.</p>
-              <p>{AR.footerTerms}</p>
-            </>
-          ) : (
-            <>
-              <p>This quotation is valid until {fmtDate(version.valid_until)} and subject to availability at time of confirmation.</p>
-              <p>Prices quoted in USD. Payment terms and booking conditions available on request.</p>
-            </>
+        {/* ── DAILY ITINERARY PAGES ── */}
+        {days.map((day: any, idx: number) => {
+          const dest = (day.destination_snapshot as any)?.name ?? ''
+          const accoms = accomByDay[day.id] ?? []
+          const acts = actsByDay[day.id] ?? []
+          const dayMeals: string[] = day.meals ?? []
+          const isLast = idx === days.length - 1
+          const dl = dayLabel(day)
+          const title = (isArabic && day.title_ar ? day.title_ar : day.title)
+            || (isLast ? (isArabic ? 'اليوم الأخير معنا' : 'The last day with us') : (dest || `Day ${day.day_number}`))
+          const desc = isArabic && day.description_ar ? day.description_ar : day.description_en
+          const notes = isArabic && day.client_notes_ar ? day.client_notes_ar : day.client_notes
+          const actLabel = acts.length > 1 ? (isArabic ? 'أنشطة' : 'Activities') : t.activity
+
+          return (
+            <div key={day.id} className="page pb">
+              <div className="sec-bar">
+                <div className="sec-pill">{t.day} {dl}</div>
+                <div className="sec-line" />
+                {dest && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: '#444', paddingLeft: 10 }}>
+                    <span>📍</span><span>{dest}</span>
+                  </div>
+                )}
+              </div>
+
+              <h2>{title}</h2>
+
+              <div className="two-col">
+                <div>
+                  {desc && (
+                    <p style={{ fontSize: 13, lineHeight: 1.75, color: '#333', margin: '0 0 16px' }}>{desc}</p>
+                  )}
+
+                  {accoms.length > 0 && (
+                    <div className="accom-card nb">
+                      <span style={{ fontSize: 18 }}>🏠</span>
+                      <div>
+                        <div className="accom-meta">{t.accom} | {t.day} {dl}</div>
+                        {accoms.map((a: string, ai: number) => (
+                          <div key={ai} className="accom-name">{a}</div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {notes && (
+                    <p style={{ fontSize: 12, color: '#666', fontStyle: 'italic', lineHeight: 1.6, margin: '8px 0 0' }}>{notes}</p>
+                  )}
+                </div>
+
+                <div>
+                  {acts.length > 0 && (
+                    <div className="box nb">
+                      <div className="box-title">
+                        {actLabel} <span>{t.day} {dl}</span>
+                      </div>
+                      {acts.map((act: string, ai: number) => (
+                        <div key={ai} className="bullet">
+                          <em className="arrow">→</em>
+                          <span>{act}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {dayMeals.length > 0 && (
+                    <div className="box box-meal nb">
+                      <div className="box-title">
+                        🍴 {t.mealPlan} — <span>{t.day} {dl}</span>
+                      </div>
+                      <div className="bullet">
+                        <em className="arrow">→</em>
+                        <span>{dayMeals.map((m: string) => ml[m] ?? m).join(', ')}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="ft">
+                <span>Page {3 + idx}</span>
+                <span>{quote.quote_number}</span>
+                <span>{companyName}</span>
+              </div>
+            </div>
+          )
+        })}
+
+        {/* ── PRICING PAGE ── */}
+        <div className="page pb">
+          <div className="sec-bar">
+            <div className="sec-pill">{t.pricing}</div>
+            <div className="sec-line" />
+            <div className="sec-end">{t.ourOffer}</div>
+          </div>
+
+          <div className="meta-grid meta-2" style={{ marginBottom: 22 }}>
+            <div>
+              <div className="meta-label">{t.tourLength}</div>
+              <div className="meta-val">{durationStr}</div>
+            </div>
+            <div>
+              <div className="meta-label">{t.traveler}</div>
+              <div className="meta-val">{clientName}</div>
+            </div>
+          </div>
+
+          <div className="incl-excl nb">
+            <div className="incl">
+              <div className="incl-hd">⊕ {t.included}</div>
+              {includedLines.length > 0 ? (
+                <p className="sm">
+                  {includedLines.map((l: any, i: number) => (
+                    <span key={l.id}>{l.description}{i < includedLines.length - 1 ? ', ' : ''}</span>
+                  ))}
+                </p>
+              ) : (
+                <p className="sm">{t.inclText}</p>
+              )}
+            </div>
+            <div className="excl">
+              <div className="excl-hd">⊖ {t.excluded}</div>
+              <p className="sm">{t.exclText}</p>
+            </div>
+          </div>
+
+          <h3 style={{ fontSize: 17 }}>{t.breakdown}</h3>
+
+          <table className="cost-tbl nb">
+            <tbody>
+              {sharingPp > 0 && (
+                <tr>
+                  <td>{t.perSharing}</td>
+                  <td style={{ textAlign: 'right', fontWeight: 600 }}>${fmt(sharingPp)}</td>
+                  <td />
+                </tr>
+              )}
+              {singlePp > 0 && (
+                <tr>
+                  <td>{t.perSingle}</td>
+                  <td style={{ textAlign: 'right', fontWeight: 600 }}>${fmt(singlePp)}</td>
+                  <td />
+                </tr>
+              )}
+              {totalSelling > 0 && (
+                <tr>
+                  <td>{t.total}</td>
+                  <td />
+                  <td style={{ textAlign: 'right' }}>${fmt(totalSelling)}</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+
+          {optionalLines.length > 0 && (
+            <div style={{ marginTop: 28 }}>
+              <h3 style={{ fontSize: 15 }}>{t.optional}</h3>
+              <table className="cost-tbl nb">
+                <tbody>
+                  {optionalLines.map((line: any) => (
+                    <tr key={line.id}>
+                      <td>{line.description}</td>
+                      <td style={{ color: '#888', fontSize: 11 }}>
+                        {CATEGORY_LABELS[line.cost_category] ?? line.cost_category}
+                      </td>
+                      <td style={{ textAlign: 'right', fontWeight: 600 }}>
+                        ${fmt(Number(line.total_selling_usd))}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
-          {(settings?.email || settings?.phone || settings?.whatsapp) && (
-            <p>
-              {isArabic ? AR.contactUs : 'Contact us'}: {[settings.email, settings.phone, settings.whatsapp && `WhatsApp: ${settings.whatsapp}`].filter(Boolean).join(' · ')}
-            </p>
+
+          {version.valid_until && (
+            <p style={{ fontSize: 11, color: '#999', marginTop: 20 }}>{t.validUntil(fmtDate(version.valid_until))}</p>
           )}
+
+          <div className="ft">
+            <span>Page {3 + days.length}</span>
+            <span>{quote.quote_number}</span>
+            <span>{companyName}</span>
+          </div>
         </div>
+
+        {/* ── ABOUT / CONTACT PAGE ── */}
+        <div className="page">
+          <div className="sec-bar">
+            <div className="sec-pill">{t.aboutUs}</div>
+            <div className="sec-line" />
+          </div>
+
+          <h2 style={{ marginBottom: 6 }}>{companyName}</h2>
+          <p style={{ fontSize: 13, color: '#555', marginBottom: 28, lineHeight: 1.65 }}>{t.aboutDesc}</p>
+
+          <div className="contact-box">
+            <h3 style={{ color: G, margin: '0 0 14px', fontSize: 14 }}>{t.contactUs}</h3>
+            {settings?.address && (
+              <div className="contact-row">
+                <span className="contact-lbl">{t.address}</span>
+                <span>{settings.address}</span>
+              </div>
+            )}
+            {settings?.email && (
+              <div className="contact-row">
+                <span className="contact-lbl">{t.email}</span>
+                <span>{settings.email}</span>
+              </div>
+            )}
+            {settings?.phone && (
+              <div className="contact-row">
+                <span className="contact-lbl">{t.phone}</span>
+                <span>{settings.phone}</span>
+              </div>
+            )}
+            {settings?.whatsapp && (
+              <div className="contact-row">
+                <span className="contact-lbl">WhatsApp</span>
+                <span>{settings.whatsapp}</span>
+              </div>
+            )}
+          </div>
+
+          <div className="ft">
+            <span>Page {4 + days.length}</span>
+            <span>{quote.quote_number}</span>
+            <span>{companyName}</span>
+          </div>
+        </div>
+
       </div>
     </>
   )
