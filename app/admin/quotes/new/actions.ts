@@ -27,6 +27,15 @@ export async function createQuote(formData: FormData) {
 
   const admin = createAdminClient()
   await assertAdminAccess(admin, user.email)
+
+  // Read client's preferred language before creating the quote
+  const { data: clientData } = await admin
+    .from('clients')
+    .select('language')
+    .eq('id', clientId)
+    .single()
+  const clientLanguage = clientData?.language === 'ar' ? 'ar' : 'en'
+
   const { data: newQuoteId, error } = await admin.rpc('create_quote_with_version', {
     p_client_id: clientId,
     p_request_id: requestId,
@@ -39,6 +48,14 @@ export async function createQuote(formData: FormData) {
 
   if (error) throw new Error(error.message)
   if (!newQuoteId) throw new Error('Quote was not created.')
+
+  // Auto-set quote version language from the client's profile
+  if (clientLanguage !== 'en') {
+    await admin
+      .from('quote_versions')
+      .update({ language: clientLanguage })
+      .eq('quote_id', newQuoteId)
+  }
 
   // redirect() outside try/catch — Next.js throws NEXT_REDIRECT internally
   // and it must not be caught

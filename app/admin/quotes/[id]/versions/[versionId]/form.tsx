@@ -451,8 +451,8 @@ export default function VersionEditorForm({
         )}
 
         {/* Language / direction */}
-        <div className="mt-4 pt-4 border-t border-gray-100 flex items-center gap-3">
-          <span className="text-sm text-gray-500">Itinerary language:</span>
+        <div className="mt-4 pt-4 border-t border-gray-100 flex items-center gap-3 flex-wrap">
+          <span className="text-sm text-gray-500">Quote language <span className="text-gray-400 text-xs">(auto-set from client)</span>:</span>
           {(['en', 'ar'] as const).map(lang => (
             <button
               key={lang}
