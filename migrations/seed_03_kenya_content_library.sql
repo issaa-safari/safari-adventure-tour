@@ -1,5 +1,5 @@
 -- Seed 03: Kenya Content Library
--- Destinations, Activities, Parks & Reserves with EN + AR descriptions
+-- Destinations, Activities with EN + AR descriptions
 -- Also updates Kenya 8D/7N tour_days with proper destination + activity links
 -- Run in Supabase SQL Editor after seed_02.
 
@@ -179,7 +179,6 @@ BEGIN
   -- 2. ACTIVITIES
   -- ═══════════════════════════════════════════════════════════════
 
-  -- Welcome Dinner
   UPDATE activities SET
     description_en = 'A carefully curated welcome dinner bringing the group together on the eve of the adventure. Held at a quality restaurant in Nairobi, the evening features local Kenyan cuisine — nyama choma (roasted meat), ugali, sukuma wiki — alongside continental options. Your tour captain walks through the full route plan, safety briefing, and equipment check over dinner, setting the tone for the journey ahead.',
     description_ar = 'عشاء ترحيبي منظم بعناية يجمع المجموعة في ليلة ما قبل المغامرة. يُقام في مطعم راقٍ في نيروبي ويتضمن المطبخ الكيني المحلي — نياما تشوما (اللحم المشوي) والأوغالي والخضروات — إلى جانب خيارات قارية. يستعرض قائد الجولة خطة المسار الكاملة وإحاطة السلامة وفحص المعدات خلال العشاء.',
@@ -196,7 +195,6 @@ BEGIN
 
   SELECT id INTO a_welcome_dinner FROM activities WHERE name = 'Welcome Dinner';
 
-  -- Farewell Dinner
   UPDATE activities SET
     description_en = 'A celebratory farewell dinner marking the completion of the Kenya bike adventure. The group gathers to share highlights, swap stories from the road, and toast to the kilometres covered. Certificates of completion are presented to every cyclist. A fitting end to an extraordinary journey through Kenya''s highlands, lakes, and tea country.',
     description_ar = 'عشاء وداع احتفالي يُميز اختتام مغامرة ركوب الدراجات في كينيا. تجتمع المجموعة لمشاركة أبرز اللحظات وتبادل القصص من الطريق والاحتفال بالكيلومترات المقطوعة. تُسلَّم شهادات الإتمام لكل راكب دراجة. نهاية لائقة لرحلة استثنائية عبر مرتفعات كينيا وبحيراتها وأراضي الشاي.',
@@ -213,7 +211,6 @@ BEGIN
 
   SELECT id INTO a_farewell_dinner FROM activities WHERE name = 'Farewell Dinner';
 
-  -- City Tour Nairobi
   UPDATE activities SET
     description_en = 'A guided orientation drive through Nairobi''s key landmarks: the historic Railway Museum, Parliament Buildings, Uhuru Park, the iconic Kenyatta International Conference Centre, and the vibrant Maasai Market. Visit the Giraffe Centre to hand-feed Rothschild giraffes, or catch the Karen Blixen Museum and elephant orphanage if time allows. A perfect introduction to the city''s layered history and culture.',
     description_ar = 'جولة توجيهية إرشادية عبر معالم نيروبي الرئيسية: متحف السكك الحديدية التاريخي ومباني البرلمان وحديقة أوهورو ومركز كينياتا الدولي للمؤتمرات والسوق الماسائي. قم بزيارة مركز الزرافة لإطعام زرافات روثشيلد، أو قصد متحف كارين بليكسن وملجأ الفيلة إن سمح الوقت. مقدمة مثالية للتاريخ والثقافة المتشابكين للمدينة.',
@@ -230,7 +227,6 @@ BEGIN
 
   SELECT id INTO a_city_tour FROM activities WHERE name = 'City Tour Nairobi';
 
-  -- Airport Transfer
   UPDATE activities SET
     description_en = 'Private vehicle transfer to or from Jomo Kenyatta International Airport (JKIA) or Wilson Airport. All transfers are in comfortable air-conditioned vehicles with experienced drivers who know the city routes. Luggage assistance is included. Please share your flight details in advance so pickups can be timed precisely to your arrival.',
     description_ar = 'نقل خاص بالسيارة من وإلى مطار جومو كينياتا الدولي (JKIA) أو مطار ويلسون. جميع التنقلات في مركبات مريحة مع مكيفات هواء وسائقين متمرسين يعرفون طرق المدينة. تشمل الخدمة المساعدة في الأمتعة. يرجى مشاركة تفاصيل رحلتك مسبقاً لجدولة الاستقبال بدقة.',
@@ -247,7 +243,6 @@ BEGIN
 
   SELECT id INTO a_airport_transfer FROM activities WHERE name = 'Airport Transfer';
 
-  -- Bike Riding
   UPDATE activities SET
     description_en = 'The core experience of the safari — cycling through Kenya''s diverse landscapes on quality mountain bikes. Each day covers between 140 and 260 km of paved and off-road terrain, passing through the Rift Valley escarpment, highland tea country, athletics towns, and volcanic lake shores. Support vehicles shadow the group throughout, carrying luggage and providing mechanical assistance. Cyclists ride at their own pace with daily briefings and waypoints.',
     description_ar = 'التجربة الجوهرية للرحلة — ركوب الدراجات عبر المناظر الطبيعية المتنوعة لكينيا على دراجات جبلية عالية الجودة. يتراوح المسار اليومي بين 140 و260 كم من الطرق المعبدة والوعرة، مروراً بمنحدرات وادي الصدع ومرتفعات الشاي ومدن الألعاب الرياضية وشواطئ البحيرات البركانية. ترافق سيارات الدعم المجموعة طوال الوقت لحمل الأمتعة وتقديم المساعدة الميكانيكية.',
@@ -263,7 +258,6 @@ BEGIN
 
   SELECT id INTO a_bike_riding FROM activities WHERE name = 'Bike Riding';
 
-  -- Game Drive
   UPDATE activities SET
     description_en = 'A classic open-vehicle game drive through Kenya''s reserves and national parks. Expert wildlife guides track animal movements in real time, positioning the vehicle for close encounters with the Big Five and beyond. Game drives typically run at dawn when predators are most active, and again at dusk for golden-light photography. All vehicles are 4x4 with roof hatches for unobstructed wildlife viewing.',
     description_ar = 'رحلة سفاري كلاسيكية بمركبة مفتوحة عبر محميات وحدائق كينيا الوطنية. يتتبع المرشدون خبراء الحياة البرية تحركات الحيوانات لحظةً بلحظة، لتوجيه السيارة نحو مشاهدات قريبة من الخمسة الكبار. تُنظَّم الرحلات في الفجر عندما يكون الحيوانات المفترسة أكثر نشاطاً، ومرة أخرى عند الغسق للتصوير في ضوء ذهبي.',
@@ -279,7 +273,6 @@ BEGIN
 
   SELECT id INTO a_game_drive FROM activities WHERE name = 'Game Drive';
 
-  -- Guided Game Drive
   UPDATE activities SET
     description_en = 'An extended game drive led by a professional Kenya Wildlife Service certified guide with deep knowledge of local animal behaviour and ecology. The guide narrates animal tracks, vegetation types, and seasonal migration patterns throughout the drive. Ideal for guests who want an immersive educational experience alongside the wildlife viewing. Binoculars and field guides are provided.',
     description_ar = 'رحلة سفاري موسعة يقودها مرشد محترف معتمد من قِبل هيئة الحياة البرية الكينية، يتمتع بمعرفة عميقة بسلوك الحيوانات المحلية وعلم البيئة. يشرح المرشد آثار الحيوانات وأنواع النباتات وأنماط الهجرة الموسمية. مثالية لمن يرغبون في تجربة تعليمية غامرة. تُوفَّر المناظير وأدلة الحقل.',
@@ -295,7 +288,6 @@ BEGIN
 
   SELECT id INTO a_guided_game_drive FROM activities WHERE name = 'Guided Game Drive';
 
-  -- Night Game Drive
   UPDATE activities SET
     description_en = 'A thrilling after-dark safari using powerful spotlights to reveal Kenya''s nocturnal wildlife — leopards on the prowl, spotted hyenas on patrol, aardvarks, bush babies, civets, and the elusive serval cat. Night drives operate only in specific reserves where permitted, and the guides'' spotlight technique creates dramatic close-range encounters impossible during daylight hours.',
     description_ar = 'سفاري مثيرة بعد حلول الظلام تستخدم مصابيح ضوئية قوية للكشف عن الحياة البرية الليلية في كينيا — الفهد في دورياته والضبع المنقط في جولاته والخنزير الأرضي وطفل الشجيرات والزباد وقط السيرفال المراوغ. تعمل رحلات الليل في محميات معينة فقط وتخلق مشاهدات درامية مقربة مستحيلة في النهار.',
@@ -311,7 +303,6 @@ BEGIN
 
   SELECT id INTO a_night_game_drive FROM activities WHERE name = 'Night Game Drive';
 
-  -- Aberdare National Park Game Drive
   UPDATE activities SET
     description_en = 'A game drive through the misty moorlands and dense forest of Aberdare National Park, one of Kenya''s most atmospheric wilderness areas. The park is renowned for its unique highland ecosystem, elephant herds, giant forest hogs, bongo antelopes, leopards, and black rhinos. Game drives here often pass through fog-draped bamboo zones and across moorland streams, creating an ethereal safari experience quite unlike the open savannah.',
     description_ar = 'رحلة سفاري عبر المراعي الضبابية والغابات الكثيفة في محمية أبيرداري الوطنية، إحدى أكثر مناطق البرية في كينيا غموضاً. تشتهر المحمية بنظامها البيئي المرتفع الفريد وقطعان الأفيال والخنزير البري الضخم وظبي البونغو والفهد ووحيد القرن الأسود. كثيراً ما تمر الرحلات عبر مناطق الخيزران الضبابية وجداول المراعي الجبلية.',
@@ -328,7 +319,6 @@ BEGIN
 
   SELECT id INTO a_aberdare_drive FROM activities WHERE name = 'Aberdare National Park Game Drive';
 
-  -- Boat Safari on Lake Naivasha
   UPDATE activities SET
     description_en = 'A guided motorboat excursion on the glassy waters of Lake Naivasha, one of the Rift Valley''s most bird-rich lakes. The boat glides among papyrus beds where African fish eagles swoop for catches, cormorants dry their wings, and kingfishers dart in flashes of electric blue. Hippo pods surface unexpectedly close to the boat as the golden sunset reflects off the water. Evening departures are particularly magical.',
     description_ar = 'رحلة بزورق مرشد على المياه الهادئة لبحيرة نايفاشا، إحدى أغنى بحيرات وادي الصدع بالطيور. يتزلج الزورق بين أحراش البردي حيث ينقضّ عقاب السمك الأفريقي على فريسته ويجفف الكورموران جناحيه ويتسلل طائر الرفراف في وميض أزرق كهربائي. تظهر مجموعات أفراس النهر قريبةً بشكل غير متوقع بينما ينعكس غروب الشمس الذهبي على الماء.',
@@ -345,7 +335,6 @@ BEGIN
 
   SELECT id INTO a_boat_naivasha FROM activities WHERE name = 'Boat Safari on Lake Naivasha';
 
-  -- Bush Walk with Armed Ranger
   UPDATE activities SET
     description_en = 'A guided walking safari escorted by a Kenya Wildlife Service armed ranger — the most intimate way to experience Africa''s wilderness. On foot, you read animal tracks, identify medicinal plants, and learn the survival skills of Kenya''s pastoral communities. The armed escort is a safety measure that allows walking in areas populated by big game, bringing you close to nature in a way no vehicle ever can.',
     description_ar = 'سفاري مشي إرشادي برفقة حارس مسلح من هيئة الحياة البرية الكينية — الطريقة الأكثر حميمية لتجربة البرية الأفريقية. سيراً على الأقدام تقرأ آثار الحيوانات وتتعرف على النباتات الطبية وتتعلم مهارات البقاء لدى مجتمعات كينيا الرعوية. الحارس المسلح وسيلة أمان تتيح المشي في مناطق يقطنها الصيد الكبير.',
@@ -361,7 +350,6 @@ BEGIN
 
   SELECT id INTO a_bush_walk FROM activities WHERE name = 'Bush Walk with Armed Ranger';
 
-  -- Coffee Farm Visit
   UPDATE activities SET
     description_en = 'A guided tour of a Kenyan coffee estate — the country produces some of the world''s most sought-after Arabica beans. Walk through the shaded plantation rows, learn to identify the red coffee cherries at peak ripeness, and follow the bean from hand-picking through pulping, fermentation, washing, and drying. End with a cupping session to taste the distinct profiles of Kenya''s highland-grown coffee.',
     description_ar = 'جولة إرشادية في مزرعة قهوة كينية — تُنتج البلاد بعضاً من أكثر حبوب الأرابيكا طلباً في العالم. امش بين صفوف المزرعة المظللة وتعلم التعرف على كرز القهوة الأحمر عند ذروة نضجه، وتابع حبة القهوة من القطف اليدوي عبر التقشير والتخمير والغسيل والتجفيف. اختتم بجلسة تذوق لاستكشاف النكهات المميزة للقهوة الكينية.',
@@ -378,7 +366,6 @@ BEGIN
 
   SELECT id INTO a_coffee_farm FROM activities WHERE name = 'Coffee Farm Visit';
 
-  -- Forest Hike Castle Forest
   UPDATE activities SET
     description_en = 'A guided hike through the ancient montane forest surrounding Castle Forest Lodge on the slopes of Mount Kenya. The trail winds through moss-draped trees where black-and-white colobus monkeys leap overhead, sunbirds flash between giant tree heathers, and the mist rolls in from the mountain above. A naturalist guide identifies plants, fungi, and animal signs along the route. One of the most atmospheric forest experiences in East Africa.',
     description_ar = 'مشية إرشادية عبر الغابة الجبلية القديمة المحيطة بـ كاسل فورست لودج على سفوح جبل كينيا. يتعرج الممر عبر الأشجار المغطاة بالطحالب حيث تقفز قرود الكولوبوس الأبيض والأسود، وتتراقص طيور الشمس بين خلنجات الأشجار الضخمة، ويتسلل الضباب من الجبل. يحدد المرشد الطبيعي النباتات والفطريات وعلامات الحيوانات على طول الطريق.',
@@ -395,7 +382,6 @@ BEGIN
 
   SELECT id INTO a_forest_hike FROM activities WHERE name = 'Forest Hike Castle Forest';
 
-  -- Horseback Riding
   UPDATE activities SET
     description_en = 'A horseback safari through the landscapes surrounding Lake Naivasha — one of the most thrilling ways to encounter wildlife. Riders move silently through the bush, allowing closer approaches to zebras, giraffes, and wildebeest than any vehicle could achieve. Guided rides cater to all experience levels from beginners to experienced equestrians, with experienced wranglers and well-trained horses ensuring safety throughout.',
     description_ar = 'سفاري على ظهر الخيل عبر المناظر الطبيعية المحيطة ببحيرة نايفاشا — واحدة من أكثر الطرق إثارة لمشاهدة الحياة البرية. يتحرك الفرسان بصمت عبر الأدغال مما يتيح الاقتراب أكثر من الحمير الوحشية والزرافات والحيوانات. تلائم الجولات الإرشادية جميع مستويات الخبرة مع مدربين ذوي خبرة وخيول مدربة جيداً.',
@@ -412,7 +398,6 @@ BEGIN
 
   SELECT id INTO a_horseback FROM activities WHERE name = 'Horseback Riding';
 
-  -- Hot Air Balloon Safari
   UPDATE activities SET
     description_en = 'A dawn hot-air balloon flight over Kenya''s wilderness — widely considered one of the most spectacular wildlife experiences on earth. The balloon ascends silently at first light, drifting above herds of elephant, lion prides, and vast plains as the golden sunrise illuminates the landscape. Flights typically last 60–90 minutes and conclude with a champagne bush breakfast. Subject to weather conditions and advance booking.',
     description_ar = 'رحلة بالمنطاد عند الفجر فوق البرية الكينية — تُعدّ على نطاق واسع من أروع تجارب مشاهدة الحياة البرية في العالم. يرتفع المنطاد بصمت عند أول ضوء النهار منجرفاً فوق قطعان الأفيال وأسراب الأسود والسهول الشاسعة بينما يضيء شروق الشمس الذهبي المشهد. تستمر الرحلات 60-90 دقيقة وتنتهي بإفطار شمبانيا في العراء. تخضع للأحوال الجوية والحجز المسبق.',
@@ -428,7 +413,6 @@ BEGIN
 
   SELECT id INTO a_balloon FROM activities WHERE name = 'Hot Air Balloon Safari';
 
-  -- Maasai Village Visit
   UPDATE activities SET
     description_en = 'A respectful cultural visit to a traditional Maasai manyatta (village) — one of Kenya''s most iconic cultural experiences. Warriors in full red shuka and beaded jewellery demonstrate the adumu (jumping dance), fire-making, and spear throwing. Elders explain the pastoral lifestyle, cattle-centred economy, and age-grade social system. Traditional crafts and beadwork are available directly from the artisans. Entrance fees go directly to the community.',
     description_ar = 'زيارة ثقافية محترمة لقرية مانياتا الماسائية التقليدية — واحدة من أكثر التجارب الثقافية المميزة في كينيا. يُظهر المحاربون في الشوكا الحمراء والمجوهرات المخرزة رقصة أدوم (رقصة القفز) وصنع النار وإلقاء الرمح. يشرح كبار السن أسلوب الحياة الرعوي والاقتصاد القائم على الماشية والنظام الاجتماعي. المنتجات الحرفية والأعمال المخرزة متاحة مباشرة من الحرفيين. تذهب رسوم الدخول مباشرة إلى المجتمع.',
@@ -444,7 +428,6 @@ BEGIN
 
   SELECT id INTO a_maasai_village FROM activities WHERE name = 'Maasai Village Visit';
 
-  -- Observation Hill Sundowner
   UPDATE activities SET
     description_en = 'A sundowner visit to Observation Hill inside Lake Nakuru National Park — a raised viewpoint offering sweeping panoramas over the entire lake, the pink flamingo flocks massed at the shore, and the Rift Valley escarpment beyond. The guide brings cool drinks and snacks as the sun descends, painting the soda lake in shades of gold and rose. One of Kenya''s most photographed sunsets.',
     description_ar = 'زيارة غروب الشمس إلى تلة الرصد داخل حديقة بحيرة ناكورو الوطنية — منظور مرتفع يُطل على البحيرة بأكملها وأسراب الفلامنغو الوردية المحتشدة على الشاطئ وهضبة وادي الصدع خلفها. يُحضر المرشد مشروبات باردة ووجبات خفيفة بينما تنحدر الشمس وتلون بحيرة الصودا بألوان ذهبية وورديه. أحد أكثر مشاهد الغروب تصويراً في كينيا.',
@@ -461,7 +444,6 @@ BEGIN
 
   SELECT id INTO a_obs_hill FROM activities WHERE name = 'Observation Hill Sundowner';
 
-  -- Photography Masterclass
   UPDATE activities SET
     description_en = 'An in-field photography workshop led by a professional wildlife photographer, designed to help guests capture the best images of their safari. The session covers camera settings for fast-moving animals, golden-hour composition, and techniques for low-light lion and leopard shots. Whether you are shooting with a DSLR or a smartphone, the guide tailors advice to your equipment. Operates during the morning or evening game drive.',
     description_ar = 'ورشة تصوير ميدانية يقودها مصور بري محترف، صُمِّمت لمساعدة الضيوف على التقاط أفضل الصور في رحلتهم. يتناول الجلسة إعدادات الكاميرا للحيوانات سريعة الحركة وتكوين صورة الساعة الذهبية وتقنيات التصوير في ضوء منخفض للأسود والفهود. سواء كنت تصور بـ DSLR أو هاتف ذكي، يكيّف المرشد نصائحه مع معداتك.',
@@ -477,7 +459,6 @@ BEGIN
 
   SELECT id INTO a_photography FROM activities WHERE name = 'Photography Masterclass';
 
-  -- Sanctuary Farm Visit
   UPDATE activities SET
     description_en = 'A visit to Sanctuary Farm on the shores of Lake Naivasha — a private conservancy home to Rothschild giraffes, zebras, Cape buffaloes, and over 200 bird species. Guests walk freely among the giraffes, feed them from hand, and explore the lakeshore under the guidance of a naturalist. Optional boat trips, cycling within the property, and sundowner drinks overlooking the lake complete a perfect afternoon.',
     description_ar = 'زيارة لمزرعة سانكتشري على شواطئ بحيرة نايفاشا — محمية خاصة تضم زرافات روثشيلد والحمير الوحشية وجاموس الرأس والبيسون وأكثر من 200 نوع من الطيور. يتجول الضيوف بحرية بين الزرافات ويطعمونها من يدهم ويستكشفون الشاطئ بإرشاد من عالم طبيعة. تكمل رحلات الزوارق الاختيارية وركوب الدراجات والمشروبات بين شواطئ البحيرة فترة ما بعد الظهر المثالية.',
@@ -494,7 +475,6 @@ BEGIN
 
   SELECT id INTO a_sanctuary_farm FROM activities WHERE name = 'Sanctuary Farm Visit';
 
-  -- Thomson Falls Visit
   UPDATE activities SET
     description_en = 'A visit to Thomson''s Falls in Nyahururu — a breathtaking 74-metre waterfall named after Scottish explorer Joseph Thomson who "discovered" it in 1883. The falls plunge into a deep forested gorge surrounded by colobus monkeys and colourful forest birds. A short walking trail descends to the base of the falls for an up-close view of the thundering torrent. Local artisans sell carvings and crafts near the viewing platform.',
     description_ar = 'زيارة شلالات تومسون في نياهورورو — شلال مبهر بارتفاع 74 متراً يحمل اسم المستكشف الاسكتلندي جوزيف تومسون الذي "اكتشفه" عام 1883. تنهمر المياه في خانق غابوي عميق تسكنه قرود الكولوبوس وطيور الغابة الملونة. يهبط ممر مشي قصير إلى قاعدة الشلالات للمشاهدة عن قرب. يبيع الحرفيون المحليون المنحوتات والأعمال الحرفية بالقرب من منصة المشاهدة.',
@@ -513,116 +493,7 @@ BEGIN
 
 
   -- ═══════════════════════════════════════════════════════════════
-  -- 3. PARKS & RESERVES
-  -- ═══════════════════════════════════════════════════════════════
-
-  UPDATE parks SET
-    description_en = 'A unique national park near Lake Naivasha famous for its dramatic volcanic gorge, towering rock columns, and geothermal steam vents. Hells Gate is one of Kenya''s only parks where visitors can walk, cycle, and hike freely among wildlife including zebras, giraffes, buffalo, hyenas, and leopards — without the safety of a vehicle. The 68 sq km park is also home to over 100 bird species and stunning cliff-face vulture colonies. The gorge walls reach 120 metres and the walking trail to the inner gorge follows the same route as the animated film The Lion King drew inspiration from.',
-    description_ar = 'حديقة وطنية فريدة بالقرب من بحيرة نايفاشا، تشتهر بخانقها البركاني الدرامي وأعمدة الصخور الشاهقة وفوهات البخار الحرارية الأرضية. تُعدّ هيلز غيت إحدى المحميات النادرة في كينيا حيث يمكن للزوار المشي وركوب الدراجات والتنزه بحرية بين الحياة البرية — الحمير الوحشية والزرافات والجاموس والضباع والفهود — دون الحماية من مركبة. تضم المحمية البالغة 68 كم² أكثر من 100 نوع من الطيور ومستعمرات النسور الرائعة على واجهات الجروف.',
-    is_active = true
-  WHERE name = 'Hells Gate National Park' AND country = 'Kenya';
-
-  INSERT INTO parks (name, country, is_active, description_en, description_ar)
-  SELECT
-    'Hells Gate National Park', 'Kenya', true,
-    'A unique national park near Lake Naivasha famous for its dramatic volcanic gorge, towering rock columns, and geothermal steam vents. Hells Gate is one of Kenya''s only parks where visitors can walk, cycle, and hike freely among wildlife including zebras, giraffes, buffalo, hyenas, and leopards — without the safety of a vehicle. The 68 sq km park is also home to over 100 bird species and stunning cliff-face vulture colonies. The gorge walls reach 120 metres and the walking trail to the inner gorge follows the same route as the animated film The Lion King drew inspiration from.',
-    'حديقة وطنية فريدة بالقرب من بحيرة نايفاشا، تشتهر بخانقها البركاني الدرامي وأعمدة الصخور الشاهقة وفوهات البخار الحرارية الأرضية. تُعدّ هيلز غيت إحدى المحميات النادرة في كينيا حيث يمكن للزوار المشي وركوب الدراجات والتنزه بحرية بين الحياة البرية — الحمير الوحشية والزرافات والجاموس والضباع والفهود — دون الحماية من مركبة. تضم المحمية البالغة 68 كم² أكثر من 100 نوع من الطيور ومستعمرات النسور الرائعة على واجهات الجروف.'
-  WHERE NOT EXISTS (SELECT 1 FROM parks WHERE name = 'Hells Gate National Park' AND country = 'Kenya');
-
-  UPDATE parks SET
-    description_en = 'A protected parkland encircling Lake Nakuru in the Rift Valley, famous worldwide for its vast flocks of lesser and greater flamingos that turn the lake''s shores a vivid pink. The 188 sq km park is a rhino sanctuary for both black and white rhinos and is home to lions, leopards, Rothschild giraffes, waterbucks, and over 400 bird species. Observation Hill provides a panoramic viewpoint over the entire lake. The park is one of Kenya''s most visited and rewards visitors year-round.',
-    description_ar = 'منطقة محمية تحيط ببحيرة ناكورو في وادي الصدع، تشتهر عالمياً بأسراب الفلامنغو الصغير والكبير الهائلة التي تحوّل شواطئ البحيرة إلى اللون الوردي الزاهي. المحمية البالغة 188 كم² ملجأ لوحيد القرن الأسود والأبيض معاً وموطن للأسود والفهود وزرافات روثشيلد والواترباك وأكثر من 400 نوع من الطيور. تلة الرصد تقدم منظوراً بانورامياً على البحيرة بأكملها. إحدى أكثر محميات كينيا زيارةً وتكافئ الزوار على مدار العام.',
-    is_active = true
-  WHERE name = 'Lake Nakuru National Park' AND country = 'Kenya';
-
-  INSERT INTO parks (name, country, is_active, description_en, description_ar)
-  SELECT
-    'Lake Nakuru National Park', 'Kenya', true,
-    'A protected parkland encircling Lake Nakuru in the Rift Valley, famous worldwide for its vast flocks of lesser and greater flamingos that turn the lake''s shores a vivid pink. The 188 sq km park is a rhino sanctuary for both black and white rhinos and is home to lions, leopards, Rothschild giraffes, waterbucks, and over 400 bird species. Observation Hill provides a panoramic viewpoint over the entire lake. The park is one of Kenya''s most visited and rewards visitors year-round.',
-    'منطقة محمية تحيط ببحيرة ناكورو في وادي الصدع، تشتهر عالمياً بأسراب الفلامنغو الصغير والكبير الهائلة التي تحوّل شواطئ البحيرة إلى اللون الوردي الزاهي. المحمية البالغة 188 كم² ملجأ لوحيد القرن الأسود والأبيض معاً وموطن للأسود والفهود وزرافات روثشيلد والواترباك وأكثر من 400 نوع من الطيور. تلة الرصد تقدم منظوراً بانورامياً على البحيرة بأكملها. إحدى أكثر محميات كينيا زيارةً وتكافئ الزوار على مدار العام.'
-  WHERE NOT EXISTS (SELECT 1 FROM parks WHERE name = 'Lake Nakuru National Park' AND country = 'Kenya');
-
-  UPDATE parks SET
-    description_en = 'A highland wilderness park covering the Aberdare mountain range at altitudes between 2,000 and 4,000 metres. The park''s diverse habitats — rainforest, bamboo zones, moorland, and alpine meadow — support an extraordinary range of wildlife including elephants, buffalo, black rhinos, giant forest hogs, bongo antelopes, leopards, hyenas, and colobus monkeys. The famous Ark and Treetops lodges offer night-time wildlife viewing over floodlit waterholes. Waterfalls including the 300-metre Gura Falls are among Kenya''s highest.',
-    description_ar = 'محمية برية جبلية تغطي سلسلة جبال أبيرداري على ارتفاعات تتراوح بين 2,000 و4,000 متر. تدعم الموائل المتنوعة للمحمية — الغابات المطيرة ومناطق الخيزران والمراعي والمروج الألبية — مجموعة استثنائية من الحياة البرية: الأفيال والجاموس ووحيد القرن الأسود والخنزير البري الضخم وظبي البونغو والفهد والضبع وقرد الكولوبوس. توفر مطاعم The Ark وTreetops الشهيرة مشاهدة الحياة البرية ليلاً على مواقع الشرب المضاءة.',
-    is_active = true
-  WHERE name = 'Aberdare National Park' AND country = 'Kenya';
-
-  INSERT INTO parks (name, country, is_active, description_en, description_ar)
-  SELECT
-    'Aberdare National Park', 'Kenya', true,
-    'A highland wilderness park covering the Aberdare mountain range at altitudes between 2,000 and 4,000 metres. The park''s diverse habitats — rainforest, bamboo zones, moorland, and alpine meadow — support an extraordinary range of wildlife including elephants, buffalo, black rhinos, giant forest hogs, bongo antelopes, leopards, hyenas, and colobus monkeys. The famous Ark and Treetops lodges offer night-time wildlife viewing over floodlit waterholes. Waterfalls including the 300-metre Gura Falls are among Kenya''s highest.',
-    'محمية برية جبلية تغطي سلسلة جبال أبيرداري على ارتفاعات تتراوح بين 2,000 و4,000 متر. تدعم الموائل المتنوعة للمحمية — الغابات المطيرة ومناطق الخيزران والمراعي والمروج الألبية — مجموعة استثنائية من الحياة البرية: الأفيال والجاموس ووحيد القرن الأسود والخنزير البري الضخم وظبي البونغو والفهد والضبع وقرد الكولوبوس. توفر مطاعم The Ark وTreetops الشهيرة مشاهدة الحياة البرية ليلاً على مواقع الشرب المضاءة.'
-  WHERE NOT EXISTS (SELECT 1 FROM parks WHERE name = 'Aberdare National Park' AND country = 'Kenya');
-
-  UPDATE parks SET
-    description_en = 'A soda lake reserve in the northern Rift Valley renowned for its spectacular concentrations of lesser flamingos and powerful boiling hot springs that bubble and spout along the eastern shoreline. The alkaline lake sits in a dramatic rocky escarpment and is one of the most volcanically active landscapes in Kenya. Greater kudus frequent the surrounding scrubland, and the lake hosts some of East Africa''s largest flamingo aggregations when water levels are right.',
-    description_ar = 'محمية بحيرة صودا في شمال وادي الصدع تشتهر بتركزات الفلامنغو الصغير الاستثنائية والينابيع الساخنة المغلية القوية التي تفور وتتطاير على طول الشاطئ الشرقي. تقع البحيرة القلوية في منحدر صخري درامي وتُعدّ من أكثر المناطق البركانية نشاطاً في كينيا. تتردد الكودو الكبيرة على الأراضي المحيطة، وتستضيف البحيرة بعضاً من أكبر تجمعات الفلامنغو في شرق أفريقيا.',
-    is_active = true
-  WHERE name = 'Lake Bogoria National Reserve' AND country = 'Kenya';
-
-  INSERT INTO parks (name, country, is_active, description_en, description_ar)
-  SELECT
-    'Lake Bogoria National Reserve', 'Kenya', true,
-    'A soda lake reserve in the northern Rift Valley renowned for its spectacular concentrations of lesser flamingos and powerful boiling hot springs that bubble and spout along the eastern shoreline. The alkaline lake sits in a dramatic rocky escarpment and is one of the most volcanically active landscapes in Kenya. Greater kudus frequent the surrounding scrubland, and the lake hosts some of East Africa''s largest flamingo aggregations when water levels are right.',
-    'محمية بحيرة صودا في شمال وادي الصدع تشتهر بتركزات الفلامنغو الصغير الاستثنائية والينابيع الساخنة المغلية القوية التي تفور وتتطاير على طول الشاطئ الشرقي. تقع البحيرة القلوية في منحدر صخري درامي وتُعدّ من أكثر المناطق البركانية نشاطاً في كينيا. تتردد الكودو الكبيرة على الأراضي المحيطة، وتستضيف البحيرة بعضاً من أكبر تجمعات الفلامنغو في شرق أفريقيا.'
-  WHERE NOT EXISTS (SELECT 1 FROM parks WHERE name = 'Lake Bogoria National Reserve' AND country = 'Kenya');
-
-  UPDATE parks SET
-    description_en = 'Kenya''s most celebrated wildlife reserve and a global icon of the African safari, the Maasai Mara covers 1,510 sq km of open savannah in the southwestern Rift Valley. Home to the densest population of lions in Africa and the setting for the annual Great Migration when over 1.5 million wildebeest and zebras cross the Mara River. Year-round game viewing offers encounters with cheetahs, leopards, elephants, hyenas, and hundreds of bird species. The Mara forms the northern extension of Tanzania''s Serengeti ecosystem.',
-    description_ar = 'أشهر محميات الحياة البرية في كينيا ورمز عالمي للسفاري الأفريقية، تغطي ماسائي مارا 1,510 كم² من السافانا المفتوحة في جنوب غرب وادي الصدع. موطن لأكثف كثافة للأسود في أفريقيا ومسرح الهجرة الكبرى السنوية حيث تعبر أكثر من 1.5 مليون حيوان من الجلادة والحمير الوحشية نهر مارا. تقدم مشاهدة الألعاب على مدار العام مشاهدات للفهد الصياد والفهد المرقط والأفيال والضباع ومئات أنواع الطيور.',
-    is_active = true
-  WHERE name = 'Maasai Mara National Reserve' AND country = 'Kenya';
-
-  INSERT INTO parks (name, country, is_active, description_en, description_ar)
-  SELECT
-    'Maasai Mara National Reserve', 'Kenya', true,
-    'Kenya''s most celebrated wildlife reserve and a global icon of the African safari, the Maasai Mara covers 1,510 sq km of open savannah in the southwestern Rift Valley. Home to the densest population of lions in Africa and the setting for the annual Great Migration when over 1.5 million wildebeest and zebras cross the Mara River. Year-round game viewing offers encounters with cheetahs, leopards, elephants, hyenas, and hundreds of bird species. The Mara forms the northern extension of Tanzania''s Serengeti ecosystem.',
-    'أشهر محميات الحياة البرية في كينيا ورمز عالمي للسفاري الأفريقية، تغطي ماسائي مارا 1,510 كم² من السافانا المفتوحة في جنوب غرب وادي الصدع. موطن لأكثف كثافة للأسود في أفريقيا ومسرح الهجرة الكبرى السنوية حيث تعبر أكثر من 1.5 مليون حيوان من الجلادة والحمير الوحشية نهر مارا. تقدم مشاهدة الألعاب على مدار العام مشاهدات للفهد الصياد والفهد المرقط والأفيال والضباع ومئات أنواع الطيور.'
-  WHERE NOT EXISTS (SELECT 1 FROM parks WHERE name = 'Maasai Mara National Reserve' AND country = 'Kenya');
-
-  UPDATE parks SET
-    description_en = 'A UNESCO World Heritage Site protecting Africa''s second-highest peak (5,199 m) and its surrounding mountain ecosystem. The park encompasses glaciers, moorlands, bamboo forests, and dense rainforest populated by colobus monkeys, elephants, buffalo, bongo antelopes, and leopards. Mount Kenya can be trekked via multiple routes to Point Lenana (4,985 m), the trekking summit. The lower forest zones are accessible from the main gates and offer spectacular forest hikes without the need for technical climbing equipment.',
-    description_ar = 'موقع تراث عالمي لليونسكو يحمي ثاني أعلى قمة في أفريقيا (5,199 م) ونظامها البيئي الجبلي المحيط. تشمل المحمية الأنهار الجليدية والمراعي الجبلية وغابات الخيزران والغابات المطيرة الكثيفة حيث تعيش قرود الكولوبوس والأفيال والجاموس وظباء البونغو والفهود. يمكن التنزه على جبل كينيا عبر مسارات متعددة وصولاً إلى نقطة لينانا (4,985 م). المناطق الغابوية السفلى يمكن الوصول إليها من البوابات الرئيسية.',
-    is_active = true
-  WHERE name = 'Mount Kenya National Park' AND country = 'Kenya';
-
-  INSERT INTO parks (name, country, is_active, description_en, description_ar)
-  SELECT
-    'Mount Kenya National Park', 'Kenya', true,
-    'A UNESCO World Heritage Site protecting Africa''s second-highest peak (5,199 m) and its surrounding mountain ecosystem. The park encompasses glaciers, moorlands, bamboo forests, and dense rainforest populated by colobus monkeys, elephants, buffalo, bongo antelopes, and leopards. Mount Kenya can be trekked via multiple routes to Point Lenana (4,985 m), the trekking summit. The lower forest zones are accessible from the main gates and offer spectacular forest hikes without the need for technical climbing equipment.',
-    'موقع تراث عالمي لليونسكو يحمي ثاني أعلى قمة في أفريقيا (5,199 م) ونظامها البيئي الجبلي المحيط. تشمل المحمية الأنهار الجليدية والمراعي الجبلية وغابات الخيزران والغابات المطيرة الكثيفة حيث تعيش قرود الكولوبوس والأفيال والجاموس وظباء البونغو والفهود. يمكن التنزه على جبل كينيا عبر مسارات متعددة وصولاً إلى نقطة لينانا (4,985 م). المناطق الغابوية السفلى يمكن الوصول إليها من البوابات الرئيسية.'
-  WHERE NOT EXISTS (SELECT 1 FROM parks WHERE name = 'Mount Kenya National Park' AND country = 'Kenya');
-
-  UPDATE parks SET
-    description_en = 'One of Kenya''s most iconic parks, Amboseli sits at the foot of Mount Kilimanjaro and is famous for its large elephant herds that roam the open grasslands against the backdrop of Africa''s highest snow-capped peak. The 392 sq km park is also home to large concentrations of Cape buffaloes, lions, cheetahs, zebras, giraffes, and over 600 bird species. The image of an elephant silhouetted against Kilimanjaro is one of Africa''s most iconic wildlife photographs.',
-    description_ar = 'إحدى أكثر حدائق كينيا الوطنية شهرة، تقع أمبوسيلي عند سفح جبل كيليمانجارو وتشتهر بقطعان الأفيال الكبيرة التي تجوب المراعي المفتوحة بمحاذاة أعلى قمة مكسوة بالثلوج في أفريقيا. تضم المحمية البالغة 392 كم² أيضاً تركزات كبيرة من جاموس الرأس والأسود والفهود الصياد والحمير الوحشية والزرافات وأكثر من 600 نوع من الطيور.',
-    is_active = true
-  WHERE name = 'Amboseli National Park' AND country = 'Kenya';
-
-  INSERT INTO parks (name, country, is_active, description_en, description_ar)
-  SELECT
-    'Amboseli National Park', 'Kenya', true,
-    'One of Kenya''s most iconic parks, Amboseli sits at the foot of Mount Kilimanjaro and is famous for its large elephant herds that roam the open grasslands against the backdrop of Africa''s highest snow-capped peak. The 392 sq km park is also home to large concentrations of Cape buffaloes, lions, cheetahs, zebras, giraffes, and over 600 bird species. The image of an elephant silhouetted against Kilimanjaro is one of Africa''s most iconic wildlife photographs.',
-    'إحدى أكثر حدائق كينيا الوطنية شهرة، تقع أمبوسيلي عند سفح جبل كيليمانجارو وتشتهر بقطعان الأفيال الكبيرة التي تجوب المراعي المفتوحة بمحاذاة أعلى قمة مكسوة بالثلوج في أفريقيا. تضم المحمية البالغة 392 كم² أيضاً تركزات كبيرة من جاموس الرأس والأسود والفهود الصياد والحمير الوحشية والزرافات وأكثر من 600 نوع من الطيور.'
-  WHERE NOT EXISTS (SELECT 1 FROM parks WHERE name = 'Amboseli National Park' AND country = 'Kenya');
-
-  UPDATE parks SET
-    description_en = 'A semi-arid reserve in northern Kenya along the Ewaso Ng''iro River, home to species found nowhere else in Kenya: the reticulated giraffe, Grevy''s zebra, Somali ostrich, Beisa oryx, and the gerenuk (long-necked antelope). The dry riverine forest attracts large numbers of elephants and provides superb leopard sightings. The local Samburu people — cousins of the Maasai — inhabit the surrounding countryside and contribute to the reserve''s cultural richness.',
-    description_ar = 'محمية شبه جافة في شمال كينيا على طول نهر إيواسو نيرو، موطن لأنواع لا تتواجد في أي مكان آخر في كينيا: الزرافة الشبكية وحمار زيبرا غريفي والنعامة الصومالية وأوريكس بيسا وجيرنوك (الظبي ذو العنق الطويل). تجذب غابة النهر الجافة أعداداً كبيرة من الأفيال وتوفر مشاهدات ممتازة للفهد. يقطن شعب السامبورو — أبناء عمومة الماسائي — المناطق المحيطة ويُثرون بُعده الثقافي.',
-    is_active = true
-  WHERE name = 'Samburu National Reserve' AND country = 'Kenya';
-
-  INSERT INTO parks (name, country, is_active, description_en, description_ar)
-  SELECT
-    'Samburu National Reserve', 'Kenya', true,
-    'A semi-arid reserve in northern Kenya along the Ewaso Ng''iro River, home to species found nowhere else in Kenya: the reticulated giraffe, Grevy''s zebra, Somali ostrich, Beisa oryx, and the gerenuk (long-necked antelope). The dry riverine forest attracts large numbers of elephants and provides superb leopard sightings. The local Samburu people — cousins of the Maasai — inhabit the surrounding countryside and contribute to the reserve''s cultural richness.',
-    'محمية شبه جافة في شمال كينيا على طول نهر إيواسو نيرو، موطن لأنواع لا تتواجد في أي مكان آخر في كينيا: الزرافة الشبكية وحمار زيبرا غريفي والنعامة الصومالية وأوريكس بيسا وجيرنوك (الظبي ذو العنق الطويل). تجذب غابة النهر الجافة أعداداً كبيرة من الأفيال وتوفر مشاهدات ممتازة للفهد. يقطن شعب السامبورو — أبناء عمومة الماسائي — المناطق المحيطة ويُثرون بُعده الثقافي.'
-  WHERE NOT EXISTS (SELECT 1 FROM parks WHERE name = 'Samburu National Reserve' AND country = 'Kenya');
-
-
-  -- ═══════════════════════════════════════════════════════════════
-  -- 4. UPDATE TOUR_DAYS — link destinations + activities
+  -- 3. UPDATE TOUR_DAYS — link destinations + activities
   -- ═══════════════════════════════════════════════════════════════
   SELECT id INTO v_tour_id
   FROM tours WHERE slug = 'kenya-8d-7n-nairobi-bike-tour';
@@ -706,7 +577,7 @@ BEGIN
     RAISE NOTICE '⚠ Kenya tour not found — run seed_02 first';
   END IF;
 
-  RAISE NOTICE '✓ seed_03 complete: destinations, activities, parks all populated';
+  RAISE NOTICE '✓ seed_03 complete: destinations and activities populated';
 
 END;
 $$;
