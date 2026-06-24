@@ -240,6 +240,7 @@ export default async function VersionEditorPage({
           vehicles={vehicles ?? []}
           staff={staffData ?? []}
           isLocked={isLocked}
+          language={(version.language as 'en' | 'ar') ?? 'en'}
         />
       </div>
     </div>

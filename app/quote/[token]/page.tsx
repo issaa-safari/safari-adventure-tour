@@ -4,6 +4,27 @@ import { headers } from 'next/headers'
 import AcceptForm from './accept-form'
 
 const MEAL_LABELS: Record<string, string> = { B: 'Breakfast', L: 'Lunch', D: 'Dinner' }
+const MEAL_LABELS_AR: Record<string, string> = { B: 'إفطار', L: 'غداء', D: 'عشاء' }
+
+const AR = {
+  hello:        'مرحباً،',
+  itinerary:    'برنامج الرحلة',
+  day:          'يوم',
+  included:     'ما يشمله السعر',
+  optional:     'إضافات اختيارية',
+  pricing:      'التسعير',
+  sharingPp:    'للشخص (مشاركة)',
+  singlePp:     'للشخص (غرفة منفردة)',
+  total:        'الإجمالي',
+  accept:       'قبول هذا العرض',
+  acceptBody:   'هل أنت مستعد للمتابعة؟ أدخل اسمك أدناه لقبول العرض وبدء إجراءات الحجز. سيتواصل معك فريقنا خلال 24 ساعة لتأكيد التفاصيل وترتيب الدفع.',
+  accepted:     'تم قبول العرض',
+  acceptedBy:   'تم القبول من قِبل',
+  on:           'بتاريخ',
+  declined:     'تم رفض العرض',
+  validUntil:   'العرض صالح حتى',
+  contact:      'تواصل معنا',
+}
 
 const CATEGORY_LABELS: Record<string, string> = {
   accommodation: 'Accommodation',
@@ -62,7 +83,7 @@ export default async function QuotePortalPage({
     { data: settings },
   ] = await Promise.all([
     admin.from('quote_versions')
-      .select('id, version_number, status, title, travel_start_date, travel_end_date, valid_until, total_selling_usd, sharing_price_per_person_usd, single_price_per_person_usd, client_snapshot')
+      .select('id, version_number, status, title, language, travel_start_date, travel_end_date, valid_until, total_selling_usd, sharing_price_per_person_usd, single_price_per_person_usd, client_snapshot')
       .eq('id', delivery.quote_version_id)
       .single(),
     admin.from('quotes')
@@ -70,7 +91,7 @@ export default async function QuotePortalPage({
       .eq('id', delivery.quote_id)
       .single(),
     admin.from('quote_days')
-      .select('id, day_number, day_date, title, description_en, client_notes, destination_snapshot, meals')
+      .select('id, day_number, day_date, title, description_en, client_notes, title_ar, description_ar, client_notes_ar, destination_snapshot, meals')
       .eq('quote_version_id', delivery.quote_version_id)
       .order('day_number'),
     admin.from('quote_price_lines')
@@ -100,6 +121,7 @@ export default async function QuotePortalPage({
     .eq('id', quote.client_id)
     .single()
 
+  const isArabic = (version as any)?.language === 'ar'
   const clientName = client ? `${client.first_name} ${client.last_name}`.trim() : 'Guest'
   const isAccepted = !!acceptance
   const isDeclined = version.status === 'declined'
@@ -142,12 +164,12 @@ export default async function QuotePortalPage({
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+      <main className="max-w-3xl mx-auto px-4 py-8 space-y-6" dir={isArabic ? 'rtl' : 'ltr'}>
         {/* Hero */}
         <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <p className="text-sm text-gray-500 mb-1">Hello, {clientName}</p>
+          <p className="text-sm text-gray-500 mb-1">{isArabic ? AR.hello : 'Hello,'} {clientName}</p>
           <h1 className="text-2xl font-bold text-gray-900 mb-1">
-            {version.title || 'Your Safari Quote'}
+            {version.title || (isArabic ? 'عرض سعر رحلتك' : 'Your Safari Quote')}
           </h1>
           <p className="text-sm text-gray-500">
             {fmtDate(version.travel_start_date)}
@@ -163,16 +185,15 @@ export default async function QuotePortalPage({
 
           {isAccepted && (
             <div className="mt-4 rounded-lg bg-green-50 border border-green-200 px-4 py-3">
-              <p className="text-sm font-semibold text-green-800">Quote accepted</p>
+              <p className="text-sm font-semibold text-green-800">{isArabic ? AR.accepted : 'Quote accepted'}</p>
               <p className="text-xs text-green-600 mt-0.5">
-                Accepted by {acceptance.client_name} on {fmtDate(acceptance.accepted_at)}.
-                Our team will be in touch shortly.
+                {isArabic ? AR.acceptedBy : 'Accepted by'} {acceptance.client_name} {isArabic ? AR.on : 'on'} {fmtDate(acceptance.accepted_at)}.
               </p>
             </div>
           )}
           {isDeclined && (
             <div className="mt-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3">
-              <p className="text-sm font-semibold text-red-800">Quote declined</p>
+              <p className="text-sm font-semibold text-red-800">{isArabic ? AR.declined : 'Quote declined'}</p>
             </div>
           )}
         </div>
@@ -180,37 +201,43 @@ export default async function QuotePortalPage({
         {/* Itinerary */}
         {quoteDays && quoteDays.length > 0 && (
           <section>
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Itinerary</h2>
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+              {isArabic ? AR.itinerary : 'Itinerary'}
+            </h2>
             <div className="space-y-3">
               {quoteDays.map((day: any) => {
                 const meals: string[] = day.meals ?? []
                 const dest = day.destination_snapshot as Record<string, string> | null
+                const mealLabels = isArabic ? MEAL_LABELS_AR : MEAL_LABELS
+                const dayTitle = isArabic && day.title_ar ? day.title_ar : (day.title || `${isArabic ? AR.day : 'Day'} ${day.day_number}`)
+                const dayDesc = isArabic && day.description_ar ? day.description_ar : day.description_en
+                const dayNotes = isArabic && day.client_notes_ar ? day.client_notes_ar : day.client_notes
                 return (
                   <div key={day.id} className="bg-white rounded-xl border border-gray-200 p-5">
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <p className="text-xs text-gray-400 font-medium mb-0.5">
-                          Day {day.day_number}
+                          {isArabic ? AR.day : 'Day'} {day.day_number}
                           {day.day_date ? ` · ${fmtDate(day.day_date)}` : ''}
                           {dest?.name ? ` · ${dest.name}` : ''}
                         </p>
-                        <h3 className="text-base font-semibold text-gray-900">{day.title || `Day ${day.day_number}`}</h3>
+                        <h3 className="text-base font-semibold text-gray-900">{dayTitle}</h3>
                       </div>
                       {meals.length > 0 && (
-                        <div className="flex gap-1 shrink-0">
+                        <div className="flex gap-1 shrink-0 flex-wrap justify-end">
                           {meals.map((m: string) => (
                             <span key={m} className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-medium">
-                              {MEAL_LABELS[m] ?? m}
+                              {mealLabels[m] ?? m}
                             </span>
                           ))}
                         </div>
                       )}
                     </div>
-                    {day.description_en && (
-                      <p className="text-sm text-gray-600 mt-2 leading-relaxed">{day.description_en}</p>
+                    {dayDesc && (
+                      <p className="text-sm text-gray-600 mt-2 leading-relaxed">{dayDesc}</p>
                     )}
-                    {day.client_notes && (
-                      <p className="text-sm text-[#4C5E2A] mt-2 bg-[#7A9A4A]/5 rounded-lg px-3 py-2">{day.client_notes}</p>
+                    {dayNotes && (
+                      <p className="text-sm text-[#4C5E2A] mt-2 bg-[#7A9A4A]/5 rounded-lg px-3 py-2">{dayNotes}</p>
                     )}
                   </div>
                 )
@@ -222,7 +249,9 @@ export default async function QuotePortalPage({
         {/* What's included */}
         {priceLines && priceLines.length > 0 && (
           <section>
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">What&apos;s Included</h2>
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+              {isArabic ? AR.included : "What's Included"}
+            </h2>
             <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-50">
               {priceLines.filter((l: any) => !l.is_optional).map((line: any) => (
                 <div key={line.id} className="px-5 py-3 flex items-center justify-between gap-4">
@@ -238,7 +267,9 @@ export default async function QuotePortalPage({
 
             {priceLines.some((l: any) => l.is_optional) && (
               <div className="mt-3">
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Optional Add-ons</p>
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                  {isArabic ? AR.optional : 'Optional Add-ons'}
+                </p>
                 <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-50">
                   {priceLines.filter((l: any) => l.is_optional).map((line: any) => (
                     <div key={line.id} className="px-5 py-3 flex items-center justify-between gap-4">
@@ -260,22 +291,24 @@ export default async function QuotePortalPage({
         {/* Price summary */}
         {totalSelling > 0 && (
           <section>
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Pricing</h2>
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+              {isArabic ? AR.pricing : 'Pricing'}
+            </h2>
             <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
               {sharingPp > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Per person (sharing)</span>
+                  <span className="text-gray-600">{isArabic ? AR.sharingPp : 'Per person (sharing)'}</span>
                   <span className="font-semibold text-gray-900">${fmt(sharingPp)}</span>
                 </div>
               )}
               {singlePp > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Per person (single room)</span>
+                  <span className="text-gray-600">{isArabic ? AR.singlePp : 'Per person (single room)'}</span>
                   <span className="font-semibold text-gray-900">${fmt(singlePp)}</span>
                 </div>
               )}
               <div className="flex justify-between text-base font-semibold border-t border-gray-100 pt-3">
-                <span className="text-gray-900">Total</span>
+                <span className="text-gray-900">{isArabic ? AR.total : 'Total'}</span>
                 <span className="text-gray-900">${fmt(totalSelling)} USD</span>
               </div>
             </div>
@@ -285,11 +318,12 @@ export default async function QuotePortalPage({
         {/* Accept */}
         {canAccept && (
           <section>
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Accept this Quote</h2>
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+              {isArabic ? AR.accept : 'Accept this Quote'}
+            </h2>
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <p className="text-sm text-gray-600 mb-5">
-                Ready to proceed? Confirm your name below and accept the quote to begin the booking process.
-                Our team will contact you within 24 hours to confirm details and arrange payment.
+                {isArabic ? AR.acceptBody : 'Ready to proceed? Confirm your name below and accept the quote to begin the booking process. Our team will contact you within 24 hours to confirm details and arrange payment.'}
               </p>
               <AcceptForm
                 deliveryId={delivery.id}
@@ -304,7 +338,7 @@ export default async function QuotePortalPage({
         {/* Contact */}
         {(settings?.email || settings?.whatsapp || settings?.phone) && (
           <div className="text-center text-sm text-gray-500 pb-6">
-            <p className="mb-1">Questions? Contact us:</p>
+            <p className="mb-1">{isArabic ? AR.contact : 'Questions? Contact us:'}</p>
             {settings.email && <span className="mx-2">{settings.email}</span>}
             {settings.whatsapp && <span className="mx-2">WhatsApp: {settings.whatsapp}</span>}
             {settings.phone && <span className="mx-2">{settings.phone}</span>}

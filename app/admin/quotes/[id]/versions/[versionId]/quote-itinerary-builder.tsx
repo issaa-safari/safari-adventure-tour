@@ -166,6 +166,7 @@ export default function QuoteItineraryBuilder({
   vehicles,
   staff,
   isLocked,
+  language = 'en',
 }: {
   quoteId: string
   versionId: string
@@ -180,6 +181,7 @@ export default function QuoteItineraryBuilder({
   vehicles: ContentItem[]
   staff: ContentItem[]
   isLocked: boolean
+  language?: 'en' | 'ar'
 }) {
   const router = useRouter()
 
@@ -190,11 +192,13 @@ export default function QuoteItineraryBuilder({
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
   const [arOpenIndices, setArOpenIndices] = useState<Set<number>>(
-    () => new Set(
-      initialQuoteDays
-        .map((d: any, i: number) => (d.title_ar || d.description_ar || d.client_notes_ar ? i : -1))
-        .filter((i: number) => i >= 0)
-    )
+    () => language === 'ar'
+      ? new Set(initialQuoteDays.map((_: any, i: number) => i))
+      : new Set(
+          initialQuoteDays
+            .map((d: any, i: number) => (d.title_ar || d.description_ar || d.client_notes_ar ? i : -1))
+            .filter((i: number) => i >= 0)
+        )
   )
   const [genCount, setGenCount] = useState<string>('')
 
@@ -214,12 +218,31 @@ export default function QuoteItineraryBuilder({
     const next = days.length
       ? Math.max(...days.map(d => d.dayNumber)) + 1
       : 1
+    const newIdx = days.length
     setDays(p => [...p, {
       _key: uid(), id: null, dayNumber: next, dayDate: '', title: '',
       descriptionEn: '', clientNotes: '',
       titleAr: '', descriptionAr: '', clientNotesAr: '',
       destinationId: null, destinationSnapshot: {}, meals: [], items: [],
     }])
+    if (language === 'ar') {
+      setArOpenIndices(prev => new Set([...prev, newIdx]))
+    }
+    setSaved(false)
+  }
+
+  function generateBlankDays(count: number) {
+    if (count < 1 || count > 60) return
+    setDays(Array.from({ length: count }, (_, i) => ({
+      _key: uid(), id: null,
+      dayNumber: i + 1, dayDate: '', title: '',
+      descriptionEn: '', clientNotes: '',
+      titleAr: '', descriptionAr: '', clientNotesAr: '',
+      destinationId: null, destinationSnapshot: {}, meals: [], items: [],
+    })))
+    if (language === 'ar') {
+      setArOpenIndices(new Set(Array.from({ length: count }, (_, i) => i)))
+    }
     setSaved(false)
   }
 
@@ -274,6 +297,9 @@ export default function QuoteItineraryBuilder({
   function prefillFromTour() {
     const mapped = fromTourDays(tourDays, destinations, accommodations, activities)
     setDays(mapped)
+    if (language === 'ar') {
+      setArOpenIndices(new Set(mapped.map((_: Day, i: number) => i)))
+    }
     setSaved(false)
   }
 
