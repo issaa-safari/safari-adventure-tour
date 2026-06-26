@@ -83,7 +83,7 @@ export default async function QuotePortalPage({
     { data: settings },
   ] = await Promise.all([
     admin.from('quote_versions')
-      .select('id, version_number, status, title, language, travel_start_date, travel_end_date, valid_until, total_selling_usd, sharing_price_per_person_usd, single_price_per_person_usd, client_snapshot')
+      .select('id, version_number, status, title, language, travel_start_date, travel_end_date, valid_until, total_selling_usd, sharing_price_per_person_usd, single_price_per_person_usd, cost_base_usd, default_markup_percent, client_snapshot')
       .eq('id', delivery.quote_version_id)
       .single(),
     admin.from('quotes')
@@ -115,11 +115,19 @@ export default async function QuotePortalPage({
     await admin.from('quote_versions').update({ status: 'viewed' }).eq('id', version.id)
   }
 
-  const { data: client } = await admin
-    .from('clients')
-    .select('first_name, last_name, email')
-    .eq('id', quote.client_id)
-    .single()
+  const [
+    { data: client },
+    { data: quoteTravellers },
+  ] = await Promise.all([
+    admin.from('clients')
+      .select('first_name, last_name, email')
+      .eq('id', (quote as any).client_id)
+      .single(),
+    admin.from('quote_travellers')
+      .select('id, traveller_category, age_band_snapshot, room_category, is_paying')
+      .eq('quote_version_id', delivery.quote_version_id)
+      .order('sort_order'),
+  ])
 
   const isArabic = (version as any)?.language === 'ar'
   const clientName = client ? `${client.first_name} ${client.last_name}`.trim() : 'Guest'
@@ -131,6 +139,25 @@ export default async function QuotePortalPage({
   const totalSelling = Number(version.total_selling_usd ?? 0)
   const sharingPp = Number(version.sharing_price_per_person_usd ?? 0)
   const singlePp = Number(version.single_price_per_person_usd ?? 0)
+  const costBase = Number((version as any).cost_base_usd ?? 0)
+  const markupPercent = Number((version as any).default_markup_percent ?? 0)
+  const hasQuoteLevelPricing = costBase > 0
+
+  // Group travellers by age band for per-type breakdown
+  type TGroup = { name: string; count: number; perPerson: number; total: number }
+  const tGroupMap: Record<string, TGroup> = {}
+  for (const t of (quoteTravellers ?? []) as any[]) {
+    if (!t.is_paying) continue
+    const band = t.age_band_snapshot as any
+    const key = band?.code ?? t.traveller_category ?? 'adult'
+    const bandName = band?.name ?? (t.traveller_category === 'adult' ? 'Adult' : 'Child')
+    const basePp = t.room_category === 'sharing' ? sharingPp : singlePp
+    const pp = basePp > 0 ? basePp * ((band?.default_percentage ?? 100) / 100) : 0
+    if (!tGroupMap[key]) tGroupMap[key] = { name: bandName, count: 0, perPerson: pp, total: 0 }
+    tGroupMap[key].count++
+    tGroupMap[key].total += pp
+  }
+  const travellerGroups = Object.values(tGroupMap)
 
   const companyName = settings?.company_name ?? 'Safari Adventures'
 
@@ -289,29 +316,100 @@ export default async function QuotePortalPage({
         )}
 
         {/* Price summary */}
-        {totalSelling > 0 && (
+        {(hasQuoteLevelPricing || totalSelling > 0) && (
           <section>
             <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
               {isArabic ? AR.pricing : 'Pricing'}
             </h2>
-            <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
-              {sharingPp > 0 && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">{isArabic ? AR.sharingPp : 'Per person (sharing)'}</span>
-                  <span className="font-semibold text-gray-900">${fmt(sharingPp)}</span>
+
+            {/* Cost base + markup breakdown */}
+            {hasQuoteLevelPricing && (
+              <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div className="divide-y divide-gray-50">
+                  <div className="flex justify-between items-center px-5 py-3 text-sm">
+                    <span className="text-gray-600">{isArabic ? 'التكلفة الأساسية' : 'Total Cost Base'}</span>
+                    <span className="font-semibold text-gray-900">${fmt(costBase)}</span>
+                  </div>
+                  {markupPercent > 0 && (
+                    <div className="flex justify-between items-center px-5 py-3 text-sm">
+                      <span className="text-gray-600">
+                        {isArabic ? `نسبة الربح (${markupPercent}%)` : `Markup (${markupPercent}%)`}
+                      </span>
+                      <span className="font-semibold text-gray-900">${fmt(costBase * markupPercent / 100)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center px-5 py-4 bg-[#f8fdf0]">
+                    <span className="text-base font-bold text-gray-900">
+                      {isArabic ? AR.total : 'Total in USD'}
+                    </span>
+                    <span className="text-base font-bold text-gray-900">
+                      ${fmt(costBase * (1 + markupPercent / 100))} USD
+                    </span>
+                  </div>
                 </div>
-              )}
-              {singlePp > 0 && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">{isArabic ? AR.singlePp : 'Per person (single room)'}</span>
-                  <span className="font-semibold text-gray-900">${fmt(singlePp)}</span>
-                </div>
-              )}
-              <div className="flex justify-between text-base font-semibold border-t border-gray-100 pt-3">
-                <span className="text-gray-900">{isArabic ? AR.total : 'Total'}</span>
-                <span className="text-gray-900">${fmt(totalSelling)} USD</span>
               </div>
-            </div>
+            )}
+
+            {/* Per-traveller-type breakdown */}
+            {!hasQuoteLevelPricing && travellerGroups.length > 0 && (
+              <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div className="grid grid-cols-3 px-5 py-2 border-b border-gray-100 bg-gray-50">
+                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                    {isArabic ? 'المسافر' : 'Traveller'}
+                  </span>
+                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide text-right">
+                    {isArabic ? 'للشخص' : 'Per Person'}
+                  </span>
+                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide text-right">
+                    {isArabic ? 'الإجمالي' : 'Total'}
+                  </span>
+                </div>
+                <div className="divide-y divide-gray-50">
+                  {travellerGroups.map((g, i) => (
+                    <div key={i} className="grid grid-cols-3 items-center px-5 py-3 text-sm">
+                      <span className="text-gray-700 font-medium">{g.count}x {g.name}</span>
+                      <span className="text-gray-600 text-right">
+                        {g.perPerson > 0 ? `$${fmt(g.perPerson)}` : '—'}
+                      </span>
+                      <span className="font-semibold text-gray-900 text-right">
+                        {g.total > 0 ? `$${fmt(g.total)}` : '—'}
+                      </span>
+                    </div>
+                  ))}
+                  <div className="grid grid-cols-3 items-center px-5 py-4 bg-[#f8fdf0]">
+                    <span className="text-base font-bold text-gray-900">
+                      {isArabic ? AR.total : 'Total in USD'}
+                    </span>
+                    <span />
+                    <span className="text-base font-bold text-gray-900 text-right">
+                      ${fmt(totalSelling)} USD
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Fallback: simple total */}
+            {!hasQuoteLevelPricing && travellerGroups.length === 0 && totalSelling > 0 && (
+              <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
+                {sharingPp > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">{isArabic ? AR.sharingPp : 'Per person (sharing)'}</span>
+                    <span className="font-semibold text-gray-900">${fmt(sharingPp)}</span>
+                  </div>
+                )}
+                {singlePp > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">{isArabic ? AR.singlePp : 'Per person (single room)'}</span>
+                    <span className="font-semibold text-gray-900">${fmt(singlePp)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-base font-semibold border-t border-gray-100 pt-3">
+                  <span className="text-gray-900">{isArabic ? AR.total : 'Total'}</span>
+                  <span className="text-gray-900">${fmt(totalSelling)} USD</span>
+                </div>
+              </div>
+            )}
           </section>
         )}
 
