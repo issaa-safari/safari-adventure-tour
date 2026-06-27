@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import PublicHeader from '@/components/public/header'
 import PublicFooter from '@/components/public/footer'
+import { useLocale } from '@/lib/use-locale'
 
 const G = '#7A9A4A'
 
@@ -34,6 +35,8 @@ async function submitQuoteRequest(formData: FormData) {
 
 function QuoteRequestFormContent() {
   const searchParams = useSearchParams()
+  const locale = useLocale()
+  const isAr = locale === 'ar'
   const tourId = searchParams.get('tour')
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
@@ -67,20 +70,42 @@ function QuoteRequestFormContent() {
         await submitQuoteRequest(formData)
         setSubmitted(true)
       } catch (err: any) {
-        setError(err.message || 'Failed to submit. Please try again.')
+        setError(err.message || t.failed)
       }
     })
   }
 
+  const t = isAr ? {
+    title: 'اطلب عرض السعر', subtitle: 'أخبرنا عن رحلة السفاري التي تحلم بها وسننشئ عرضاً مخصصاً لك.',
+    submitted: 'تم إرسال طلب عرض السعر!', thanks: 'شكراً! لقد استلمنا طلبك وسيتواصل معك فريقنا خلال 24 ساعة بعرض سعر مخصص.',
+    backHome: 'العودة للرئيسية',
+    firstName: 'الاسم الأول', lastName: 'اسم العائلة', email: 'البريد الإلكتروني', phone: 'الهاتف',
+    country: 'الدولة', tourType: 'نوع الرحلة',
+    selectTour: 'اختر جولة أو حدد مخصصة', custom: 'سفاري مخصص', guided: 'جولة جماعية بمرشد', luxury: 'رحلة فاخرة', adventure: 'سفاري مغامرة',
+    startDate: 'تاريخ البدء المفضل', duration: 'المدة (أيام)', groupSize: 'حجم المجموعة', budget: 'الميزانية (دولار)',
+    preferences: 'تفضيلات خاصة', preferencesPh: 'أخبرنا عن اهتماماتك أو ميزانيتك أو احتياجاتك الغذائية أو أي طلبات خاصة...',
+    sending: 'جارٍ الإرسال...', requestQuote: 'اطلب عرض السعر', cancel: 'إلغاء',
+    failed: 'فشل الإرسال. حاول مرة أخرى.',
+  } : {
+    title: 'Request Your Quote', subtitle: "Tell us about your dream safari and we'll create a personalized proposal just for you.",
+    submitted: 'Quote Request Submitted!', thanks: "Thank you! We've received your request and our team will be in touch within 24 hours with a personalized quote.",
+    backHome: 'Back to Home',
+    firstName: 'First Name', lastName: 'Last Name', email: 'Email', phone: 'Phone',
+    country: 'Country', tourType: 'Tour Type',
+    selectTour: 'Select a tour or choose custom', custom: 'Custom Safari', guided: 'Guided Group Tour', luxury: 'Luxury Escape', adventure: 'Adventure Safari',
+    startDate: 'Preferred Start Date', duration: 'Duration (days)', groupSize: 'Group Size', budget: 'Budget (USD)',
+    preferences: 'Special Preferences', preferencesPh: 'Tell us about your interests, budget, dietary needs, or any special requests...',
+    sending: 'Sending...', requestQuote: 'Request Quote', cancel: 'Cancel',
+    failed: 'Failed to submit. Please try again.',
+  }
+
   return (
-    <main>
+    <main dir={isAr ? 'rtl' : 'ltr'}>
       {/* Page Header */}
       <section className="bg-gradient-to-b from-gray-900 to-gray-800 text-white py-12 md:py-16">
         <div className="max-w-2xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Request Your Quote</h1>
-          <p className="text-lg text-gray-300">
-            Tell us about your dream safari and we'll create a personalized proposal just for you.
-          </p>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">{t.title}</h1>
+          <p className="text-lg text-gray-300">{t.subtitle}</p>
         </div>
       </section>
 
@@ -90,23 +115,21 @@ function QuoteRequestFormContent() {
           {submitted ? (
             <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
               <div className="text-5xl mb-4">✓</div>
-              <h2 className="text-2xl font-bold text-green-900 mb-3">Quote Request Submitted!</h2>
-              <p className="text-green-700 mb-6">
-                Thank you! We've received your request and our team will be in touch within 24 hours with a personalized quote.
-              </p>
+              <h2 className="text-2xl font-bold text-green-900 mb-3">{t.submitted}</h2>
+              <p className="text-green-700 mb-6">{t.thanks}</p>
               <Link
-                href="/"
+                href={`/?lang=${locale}`}
                 className="px-8 py-3 rounded-lg font-semibold text-white transition inline-block"
                 style={{ backgroundColor: G }}
               >
-                Back to Home
+                {t.backHome}
               </Link>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="bg-gray-50 rounded-xl p-8 border border-gray-200">
               <div className="grid md:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">First Name *</label>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">{t.firstName} *</label>
                   <input
                     type="text"
                     name="firstName"
@@ -117,7 +140,7 @@ function QuoteRequestFormContent() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">Last Name *</label>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">{t.lastName} *</label>
                   <input
                     type="text"
                     name="lastName"
@@ -131,7 +154,7 @@ function QuoteRequestFormContent() {
 
               <div className="grid md:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">Email *</label>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">{t.email} *</label>
                   <input
                     type="email"
                     name="email"
@@ -142,7 +165,7 @@ function QuoteRequestFormContent() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">Phone *</label>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">{t.phone} *</label>
                   <input
                     type="tel"
                     name="phone"
@@ -156,7 +179,7 @@ function QuoteRequestFormContent() {
 
               <div className="grid md:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">Country</label>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">{t.country}</label>
                   <input
                     type="text"
                     name="country"
@@ -166,25 +189,25 @@ function QuoteRequestFormContent() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">Tour Type</label>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">{t.tourType}</label>
                   <select
                     name="tourType"
                     value={formData.tourType}
                     onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
-                    <option value="">Select a tour or choose custom</option>
-                    <option value="custom">Custom Safari</option>
-                    <option value="guided">Guided Group Tour</option>
-                    <option value="luxury">Luxury Escape</option>
-                    <option value="adventure">Adventure Safari</option>
+                    <option value="">{t.selectTour}</option>
+                    <option value="custom">{t.custom}</option>
+                    <option value="guided">{t.guided}</option>
+                    <option value="luxury">{t.luxury}</option>
+                    <option value="adventure">{t.adventure}</option>
                   </select>
                 </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">Preferred Start Date</label>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">{t.startDate}</label>
                   <input
                     type="date"
                     name="startDate"
@@ -194,7 +217,7 @@ function QuoteRequestFormContent() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">Duration (days)</label>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">{t.duration}</label>
                   <input
                     type="number"
                     name="duration"
@@ -208,7 +231,7 @@ function QuoteRequestFormContent() {
 
               <div className="grid md:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">Group Size</label>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">{t.groupSize}</label>
                   <input
                     type="number"
                     name="groupSize"
@@ -219,7 +242,7 @@ function QuoteRequestFormContent() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">Budget (USD)</label>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">{t.budget}</label>
                   <input
                     type="number"
                     name="budget"
@@ -232,13 +255,13 @@ function QuoteRequestFormContent() {
               </div>
 
               <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-900 mb-2">Special Preferences</label>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">{t.preferences}</label>
                 <textarea
                   name="preferences"
                   value={formData.preferences}
                   onChange={handleChange}
                   rows={5}
-                  placeholder="Tell us about your interests, budget, dietary needs, or any special requests..."
+                  placeholder={t.preferencesPh}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
@@ -256,13 +279,13 @@ function QuoteRequestFormContent() {
                   className="flex-1 px-6 py-3 rounded-lg font-semibold text-white transition disabled:opacity-50"
                   style={{ backgroundColor: G }}
                 >
-                  {isPending ? 'Sending...' : 'Request Quote'}
+                  {isPending ? t.sending : t.requestQuote}
                 </button>
                 <Link
-                  href="/tours"
+                  href={`/tours?lang=${locale}`}
                   className="px-6 py-3 rounded-lg font-semibold border-2 border-gray-300 text-gray-900 hover:bg-gray-100 transition"
                 >
-                  Cancel
+                  {t.cancel}
                 </Link>
               </div>
             </form>
