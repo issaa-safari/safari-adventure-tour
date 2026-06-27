@@ -10,7 +10,14 @@ const STATUS_STYLES: Record<string, string> = {
   closed: 'bg-gray-100 text-gray-600',
 }
 
-export default async function DeparturesPage() {
+export default async function DeparturesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ show?: string }>
+}) {
+  const { show } = await searchParams
+  const showArchived = show === 'archived'
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/admin/login')
@@ -19,7 +26,7 @@ export default async function DeparturesPage() {
   const { data: departures } = await admin
     .from('departures')
     .select('*, tours (title_en, type)')
-    .eq('is_active', true)
+    .eq('is_active', showArchived ? false : true)
     .order('start_date', { ascending: true })
 
   return (
@@ -36,14 +43,40 @@ export default async function DeparturesPage() {
         </Link>
       </div>
 
+      {/* Tabs */}
+      <div className="flex gap-1 mb-6 border-b border-gray-200">
+        <Link
+          href="/admin/departures"
+          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+            !showArchived
+              ? 'border-[#7A9A4A] text-[#7A9A4A]'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
+          }`}>
+          Published
+        </Link>
+        <Link
+          href="/admin/departures?show=archived"
+          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+            showArchived
+              ? 'border-[#7A9A4A] text-[#7A9A4A]'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
+          }`}>
+          Archived
+        </Link>
+      </div>
+
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
         {!departures || departures.length === 0 ? (
           <div className="p-10 text-center">
-            <p className="text-sm text-gray-500 mb-4">No departures scheduled yet.</p>
-            <Link href="/admin/departures/new"
-              className="text-sm font-medium text-[#7A9A4A] hover:underline">
-              Schedule your first departure
-            </Link>
+            <p className="text-sm text-gray-500 mb-4">
+              {showArchived ? 'No archived departures.' : 'No departures scheduled yet.'}
+            </p>
+            {!showArchived && (
+              <Link href="/admin/departures/new"
+                className="text-sm font-medium text-[#7A9A4A] hover:underline">
+                Schedule your first departure
+              </Link>
+            )}
           </div>
         ) : (
           <table className="w-full text-sm">

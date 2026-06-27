@@ -19,5 +19,5 @@ export default async function DepartureEditPage({ params }: { params: Promise<{ 
 
   if (!departure) notFound()
 
-  return <DepartureEditForm departure={departure} />
+  return <DepartureEditForm departure={departure} departureId={id} />
 }

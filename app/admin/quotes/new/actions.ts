@@ -57,6 +57,61 @@ export async function createQuote(formData: FormData) {
       .eq('quote_id', newQuoteId)
   }
 
+  // Get the first version created
+  const { data: firstVersion } = await admin
+    .from('quote_versions')
+    .select('id')
+    .eq('quote_id', newQuoteId)
+    .order('version_number', { ascending: true })
+    .limit(1)
+    .single()
+
+  // Auto-populate travellers from request if linked
+  if (requestId && firstVersion) {
+    const { data: requestData } = await admin
+      .from('requests')
+      .select('group_size')
+      .eq('id', requestId)
+      .single()
+
+    if (requestData?.group_size) {
+      // Get adult age band (default)
+      const { data: adultBand } = await admin
+        .from('traveller_age_bands')
+        .select('id, name, code, min_age, max_age, default_pricing_method, default_percentage, default_fixed_amount_usd')
+        .eq('code', 'adult')
+        .limit(1)
+        .single()
+
+      if (adultBand) {
+        // Create traveller records
+        const travellers = Array.from({ length: requestData.group_size }, (_, i) => ({
+          quote_version_id: firstVersion.id,
+          display_name: `Traveller ${i + 1}`,
+          age_on_travel_date: null,
+          age_band_id: adultBand.id,
+          age_band_snapshot: {
+            id: adultBand.id,
+            name: adultBand.name,
+            code: adultBand.code,
+            min_age: adultBand.min_age,
+            max_age: adultBand.max_age,
+            default_pricing_method: adultBand.default_pricing_method,
+            default_percentage: adultBand.default_pricing_method === 'percentage' ? adultBand.default_percentage : null,
+            default_fixed_amount_usd: adultBand.default_pricing_method === 'fixed' ? adultBand.default_fixed_amount_usd : null,
+          },
+          traveller_category: adultBand.code,
+          room_category: 'sharing',
+          is_paying: true,
+          is_complimentary: false,
+          sort_order: i + 1,
+        }))
+
+        await admin.from('quote_travellers').insert(travellers)
+      }
+    }
+  }
+
   // redirect() outside try/catch — Next.js throws NEXT_REDIRECT internally
   // and it must not be caught
   redirect(`/admin/quotes/${newQuoteId}`)

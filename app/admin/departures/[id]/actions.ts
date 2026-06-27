@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
 
 export async function updateDeparture(id: string, formData: FormData) {
   const supabase = await createClient()
@@ -39,4 +40,31 @@ export async function updateDeparture(id: string, formData: FormData) {
   if (error) throw new Error(error.message)
 
   redirect('/admin/departures')
+}
+
+export async function toggleDeparturePublished(id: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/admin/login')
+
+  const admin = createAdminClient()
+
+  // Get current state
+  const { data: departure } = await admin
+    .from('departures')
+    .select('is_active')
+    .eq('id', id)
+    .single()
+
+  if (!departure) throw new Error('Departure not found.')
+
+  // Toggle
+  const { error } = await admin
+    .from('departures')
+    .update({ is_active: !departure.is_active })
+    .eq('id', id)
+
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/admin/departures')
 }

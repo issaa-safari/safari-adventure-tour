@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { updateDeparture } from './actions'
+import { updateDeparture, toggleDeparturePublished } from './actions'
 
 interface Departure {
   id: string
@@ -12,13 +12,16 @@ interface Departure {
   booked_seats: number
   price_usd: number
   status: string
+  is_active: boolean
   internal_notes: string | null
   tours: { title_en: string; type: string | null } | null
 }
 
-export default function DepartureEditForm({ departure }: { departure: Departure }) {
+export default function DepartureEditForm({ departure, departureId }: { departure: Departure; departureId: string }) {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [isActive, setIsActive] = useState(departure.is_active)
+  const [publishLoading, startPublishTransition] = useTransition()
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -140,7 +143,7 @@ export default function DepartureEditForm({ departure }: { departure: Departure 
           <p className="text-sm text-red-600 bg-red-50 rounded-md px-4 py-3">{error}</p>
         )}
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 items-center">
           <button
             type="submit"
             disabled={loading}
@@ -153,6 +156,25 @@ export default function DepartureEditForm({ departure }: { departure: Departure 
             className="rounded-md border border-gray-300 px-6 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
             Cancel
           </Link>
+          <div className="flex-1" />
+          <button
+            type="button"
+            disabled={publishLoading}
+            onClick={() => startPublishTransition(async () => {
+              try {
+                await toggleDeparturePublished(departureId)
+                setIsActive(!isActive)
+              } catch (err: any) {
+                setError(err.message ?? 'Failed to toggle published status')
+              }
+            })}
+            className={`rounded-md px-6 py-2.5 text-sm font-medium disabled:opacity-60 ${
+              isActive
+                ? 'bg-orange-100 text-orange-700 hover:bg-orange-200'
+                : 'bg-green-100 text-green-700 hover:bg-green-200'
+            }`}>
+            {publishLoading ? 'Updating…' : isActive ? 'Unpublish' : 'Publish'}
+          </button>
         </div>
       </form>
     </div>

@@ -56,6 +56,24 @@ export default async function DeparturesPage({
     .gte('start_date', new Date().toISOString().split('T')[0])
     .order('start_date')
 
+  // Load tour days for each tour (for itinerary details)
+  const tourIds = [...new Set((departures ?? []).map((d: any) => d.tour_id).filter(Boolean))]
+  let tourDaysMap: Record<string, any[]> = {}
+  if (tourIds.length > 0) {
+    const { data: allTourDays } = await admin
+      .from('tour_days')
+      .select('tour_id, day_number, title_en, title_ar, description_en, destination_id')
+      .in('tour_id', tourIds)
+      .order('day_number')
+    if (allTourDays) {
+      tourDaysMap = allTourDays.reduce((acc: Record<string, any[]>, day: any) => {
+        if (!acc[day.tour_id]) acc[day.tour_id] = []
+        acc[day.tour_id].push(day)
+        return acc
+      }, {})
+    }
+  }
+
   const t = locale === 'ar' ? {
     departures: 'الرحلات القادمة',
     bookNow: 'احجز الآن',
@@ -160,6 +178,25 @@ export default async function DeparturesPage({
                             <span className="font-semibold">{daysCount}</span> {t.days}
                           </div>
                         </div>
+
+                        {/* Itinerary Highlights */}
+                        {tourDaysMap[dep.tour_id] && tourDaysMap[dep.tour_id].length > 0 && (
+                          <div className="mb-4 p-3 rounded-lg bg-blue-50 border border-blue-100">
+                            <div className="text-xs font-semibold text-blue-900 mb-2 uppercase">Itinerary</div>
+                            <div className="space-y-1">
+                              {tourDaysMap[dep.tour_id].slice(0, 3).map((day: any, idx: number) => (
+                                <div key={idx} className="text-xs text-blue-800">
+                                  <span className="font-semibold">Day {day.day_number}:</span> {locale === 'ar' ? day.title_ar || day.title_en : day.title_en}
+                                </div>
+                              ))}
+                              {tourDaysMap[dep.tour_id].length > 3 && (
+                                <div className="text-xs text-blue-700 mt-1">
+                                  + {tourDaysMap[dep.tour_id].length - 3} more days
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
 
                         {/* Price */}
                         <div className="mb-4 p-3 rounded-lg" style={{ backgroundColor: `${G}15` }}>
