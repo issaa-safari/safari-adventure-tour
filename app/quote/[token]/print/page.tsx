@@ -19,7 +19,7 @@ const CSS = `
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; background: #fff; }
 body { font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size: 13px; }
-.page { max-width: 780px; margin: 0 auto; padding: 36px 40px; min-height: 280mm; position: relative; }
+.page { max-width: 780px; margin: 0 auto; padding: 28px 40px; position: relative; }
 .sec-bar { display: flex; align-items: center; margin-bottom: 24px; }
 .sec-pill { background: ${G}; color: #fff; font-size: 12px; font-weight: 700; padding: 5px 18px 5px 14px; border-radius: 20px 0 0 20px; white-space: nowrap; flex-shrink: 0; }
 .sec-line { flex: 1; height: 2px; background: #1a1a1a; }
@@ -67,6 +67,17 @@ body { font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size
 .pax-cell:last-child { border-right: none; }
 .pax-lbl { font-size: 10px; color: #777; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 2px; font-family: 'Helvetica Neue', Arial, sans-serif; }
 .pax-val { font-size: 13px; font-weight: 700; }
+.day-card { border: 1px solid #e6e6e6; border-radius: 10px; padding: 13px 16px; margin-bottom: 12px; }
+.day-card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+.day-pill { background: ${G}; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 12px; border-radius: 14px; white-space: nowrap; }
+.day-dest { font-size: 12px; color: #444; }
+.day-meals { margin-left: auto; font-size: 10px; color: #999; }
+.day-title { font-size: 14px; font-weight: 700; margin: 0 0 6px; }
+.day-desc { font-size: 12.5px; line-height: 1.7; color: #333; margin: 0 0 8px; }
+.day-line { font-size: 11.5px; color: #555; margin: 2px 0; }
+.day-line strong { color: #333; }
+.day-ico { margin-right: 5px; color: ${G}; }
+.day-notes { font-size: 11px; color: #666; font-style: italic; margin: 6px 0 0; }
 h1 { font-size: 30px; font-weight: 800; margin: 0 0 6px; line-height: 1.2; }
 h2 { font-size: 22px; font-weight: 800; margin: 0 0 14px; line-height: 1.2; }
 h3 { font-size: 15px; font-weight: 700; margin: 0 0 12px; }
@@ -111,7 +122,7 @@ export default async function QuotePrintPage({
       .select('id, quote_number, mode, client_id, tour_id')
       .eq('id', delivery.quote_id).single(),
     admin.from('quote_days')
-      .select('id, day_number, day_number_end, day_date, title, description_en, client_notes, title_ar, description_ar, client_notes_ar, destination_snapshot, meals')
+      .select('id, day_number, day_date, title, description_en, client_notes, title_ar, description_ar, client_notes_ar, destination_snapshot, meals')
       .eq('quote_version_id', delivery.quote_version_id)
       .order('day_number'),
     admin.from('quote_price_lines')
@@ -468,86 +479,55 @@ export default async function QuotePrintPage({
           </div>
         )}
 
-        {/* ── DAILY ITINERARY PAGES ── */}
-        {days.map((day: any, idx: number) => {
-          const dest = (day.destination_snapshot as any)?.name ?? ''
-          const accoms = accomByDay[day.id] ?? []
-          const acts = actsByDay[day.id] ?? []
-          const dayMeals: string[] = day.meals ?? []
-          const isLast = idx === days.length - 1
-          const dl = dayLabel(day)
-          const title = (isArabic && day.title_ar ? day.title_ar : day.title)
-            || (isLast ? (isArabic ? 'اليوم الأخير معنا' : 'The last day with us') : (dest || `Day ${day.day_number}`))
-          const desc = isArabic && day.description_ar ? day.description_ar : day.description_en
-          const notes = isArabic && day.client_notes_ar ? day.client_notes_ar : day.client_notes
-          const actLabel = acts.length > 1 ? (isArabic ? 'أنشطة' : 'Activities') : (isArabic ? 'نشاط' : 'Activity')
-
-          return (
-            <div key={day.id} className="page pb">
-              <div className="sec-bar">
-                <div className="sec-pill">{T.day} {dl}</div>
-                <div className="sec-line" />
-                {dest && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: '#444', paddingLeft: 10 }}>
-                    <span>📍</span><span>{dest}</span>
-                  </div>
-                )}
-              </div>
-
-              <h2>{title}</h2>
-
-              <div className="two-col">
-                <div>
-                  {desc && (
-                    <p style={{ fontSize: 13, lineHeight: 1.75, color: '#333', margin: '0 0 16px' }}>{desc}</p>
-                  )}
-                  {accoms.length > 0 && (
-                    <div className="accom-card nb">
-                      <span style={{ fontSize: 18 }}>🏠</span>
-                      <div>
-                        <div className="accom-meta">{T.dayCols[2]} | {T.day} {dl}</div>
-                        {accoms.map((a: string, ai: number) => (
-                          <div key={ai} className="accom-name">{a}</div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {notes && (
-                    <p style={{ fontSize: 12, color: '#666', fontStyle: 'italic', lineHeight: 1.6, margin: '8px 0 0' }}>{notes}</p>
-                  )}
-                </div>
-                <div>
-                  {acts.length > 0 && (
-                    <div className="box nb">
-                      <div className="box-title">{actLabel} <span>{T.day} {dl}</span></div>
-                      {acts.map((act: string, ai: number) => (
-                        <div key={ai} className="bullet">
-                          <em className="arrow">→</em>
-                          <span>{act}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {dayMeals.length > 0 && (
-                    <div className="box box-meal nb">
-                      <div className="box-title">🍴 {T.dayCols[3]} — <span>{T.day} {dl}</span></div>
-                      <div className="bullet">
-                        <em className="arrow">→</em>
-                        <span>{dayMeals.map((m: string) => ml[m] ?? m).join(', ')}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="ft">
-                <span>Page {itinStart + idx}</span>
-                <span>{quote.quote_number}</span>
-                <span>{companyName}</span>
-              </div>
+        {/* ── DAILY ITINERARY (flowing cards, fills pages) ── */}
+        {days.length > 0 && (
+          <div className="page pb">
+            <div className="sec-bar">
+              <div className="sec-pill">{T.dayByDay}</div>
+              <div className="sec-line" />
             </div>
-          )
-        })}
+
+            {days.map((day: any, idx: number) => {
+              const dest = (day.destination_snapshot as any)?.name ?? ''
+              const accoms = accomByDay[day.id] ?? []
+              const acts = actsByDay[day.id] ?? []
+              const dayMeals: string[] = day.meals ?? []
+              const isLast = idx === days.length - 1
+              const dl = dayLabel(day)
+              const title = (isArabic && day.title_ar ? day.title_ar : day.title)
+                || (isLast ? (isArabic ? 'اليوم الأخير معنا' : 'The last day with us') : (dest || `Day ${day.day_number}`))
+              const desc = isArabic && day.description_ar ? day.description_ar : day.description_en
+              const notes = isArabic && day.client_notes_ar ? day.client_notes_ar : day.client_notes
+              const actLabel = acts.length > 1 ? (isArabic ? 'أنشطة' : 'Activities') : (isArabic ? 'نشاط' : 'Activity')
+
+              return (
+                <div key={day.id} className="day-card nb">
+                  <div className="day-card-head">
+                    <span className="day-pill">{T.day} {dl}</span>
+                    {dest && <span className="day-dest">📍 {dest}</span>}
+                    {dayMeals.length > 0 && (
+                      <span className="day-meals">🍴 {dayMeals.map((m: string) => ml[m] ?? m).join(', ')}</span>
+                    )}
+                  </div>
+                  <h3 className="day-title">{title}</h3>
+                  {desc && <p className="day-desc">{desc}</p>}
+                  {accoms.length > 0 && (
+                    <p className="day-line"><span className="day-ico">🏠</span><strong>{T.dayCols[2]}:</strong> {accoms.join(' · ')}</p>
+                  )}
+                  {acts.length > 0 && (
+                    <p className="day-line"><span className="day-ico">→</span><strong>{actLabel}:</strong> {acts.join(' · ')}</p>
+                  )}
+                  {notes && <p className="day-notes">{notes}</p>}
+                </div>
+              )
+            })}
+
+            <div className="ft">
+              <span>{quote.quote_number}</span>
+              <span>{companyName}</span>
+            </div>
+          </div>
+        )}
 
         {/* ── PRICING PAGE ── */}
         <div className="page pb">
