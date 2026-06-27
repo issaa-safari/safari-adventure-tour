@@ -94,7 +94,7 @@ export default async function DepartureDetailPage({
   // Get tour days for itinerary (real schema columns)
   const { data: tourDays } = await admin
     .from('tour_days')
-    .select('id, day_number, day_number_end, title_en, title_ar, description_en, accommodation_id, meal_breakfast, meal_lunch, meal_dinner, distance_km')
+    .select('id, day_number, day_number_end, title_en, title_ar, description_en, description_ar, accommodation_id, meal_breakfast, meal_lunch, meal_dinner, distance_km')
     .eq('tour_id', departure.tour_id)
     .order('day_number')
 

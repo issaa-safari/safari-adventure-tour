@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { notFound } from 'next/navigation'
+import PrintToolbar from './print-toolbar'
 
 const MEAL_LABELS: Record<string, string> = { B: 'Breakfast', L: 'Lunch', D: 'Dinner' }
 const MEAL_LABELS_AR: Record<string, string> = { B: 'إفطار', L: 'غداء', D: 'عشاء' }
@@ -308,20 +309,7 @@ export default async function QuotePrintPage({
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&display=swap" />
       )}
 
-      <div className="no-print" style={{ position: 'fixed', top: 16, right: 16, zIndex: 50, display: 'flex', gap: 8 }}>
-        <button
-          onClick={() => (window as any).print()}
-          style={{ background: G, color: '#fff', border: 'none', borderRadius: 6, padding: '8px 18px', fontSize: 13, cursor: 'pointer', fontWeight: 600 }}
-        >
-          Print / Save PDF
-        </button>
-        <button
-          onClick={() => (window as any).history.back()}
-          style={{ background: '#fff', color: '#555', border: '1px solid #ddd', borderRadius: 6, padding: '8px 14px', fontSize: 13, cursor: 'pointer' }}
-        >
-          ← Back
-        </button>
-      </div>
+      <PrintToolbar />
 
       <div dir={isArabic ? 'rtl' : 'ltr'}>
 

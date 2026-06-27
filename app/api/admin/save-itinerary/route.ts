@@ -36,6 +36,7 @@ export async function POST(request: Request) {
       title_en: (d.title_en && d.title_en.trim()) || 'Untitled day',
       title_ar: d.title_ar || null,
       description_en: d.description_en || null,
+      description_ar: d.description_ar || null,
       destination_id: d.destination_id || null,
       accommodation_id: d.accommodation_id || null,
       accommodation_alt_id: d.accommodation_alt_id || null,
