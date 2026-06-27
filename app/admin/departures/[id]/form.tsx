@@ -6,6 +6,7 @@ import { updateDeparture, toggleDeparturePublished } from './actions'
 
 interface Departure {
   id: string
+  tour_id: string
   start_date: string
   end_date: string
   max_seats: number
@@ -14,10 +15,17 @@ interface Departure {
   status: string
   is_active: boolean
   internal_notes: string | null
-  tours: { title_en: string; type: string | null } | null
+  tours: {
+    id: string
+    title_en: string
+    title_ar: string
+    description_en: string
+    description_ar: string
+    type: string | null
+  } | null
 }
 
-export default function DepartureEditForm({ departure, departureId }: { departure: Departure; departureId: string }) {
+export default function DepartureEditForm({ departure, departureId, tourDays }: { departure: Departure; departureId: string; tourDays: any[] }) {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [isActive, setIsActive] = useState(departure.is_active)
@@ -48,10 +56,19 @@ export default function DepartureEditForm({ departure, departureId }: { departur
       </div>
 
       {departure.tours && (
-        <p className="text-sm text-gray-500 mb-6">
-          {departure.tours.title_en}
-          {departure.tours.type ? ` · ${departure.tours.type}` : ''}
-        </p>
+        <div className="mb-6">
+          <p className="text-sm text-gray-500 mb-2">
+            {departure.tours.title_en}
+            {departure.tours.type ? ` · ${departure.tours.type}` : ''}
+          </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm">
+            <p className="font-medium text-blue-900 mb-2">Frontend Preview</p>
+            <p className="text-blue-800 text-xs mb-3">{departure.tours.description_en}</p>
+            <p className="text-xs text-blue-700">
+              ✓ When published, clients will see the full itinerary with {tourDays.length} day{tourDays.length !== 1 ? 's' : ''}
+            </p>
+          </div>
+        </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -137,6 +154,45 @@ export default function DepartureEditForm({ departure, departureId }: { departur
               className={inputCls}
             />
           </div>
+        </div>
+
+        {/* Itinerary Status */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 className="font-semibold text-gray-900 mb-4">Itinerary Status</h3>
+          {tourDays && tourDays.length > 0 ? (
+            <div className="space-y-2">
+              <p className="text-sm text-gray-600 mb-4">
+                This departure includes <strong>{tourDays.length} day{tourDays.length !== 1 ? 's' : ''}</strong>:
+              </p>
+              <div className="space-y-1">
+                {tourDays.map((day: any) => (
+                  <div key={day.id} className="flex items-start gap-2 text-sm">
+                    <span className="text-green-600">✓</span>
+                    <span className="text-gray-700">
+                      <strong>Day {day.day_number}:</strong> {day.title_en}
+                      {day.description_en && <span className="text-gray-600"> — {day.description_en.substring(0, 50)}...</span>}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <Link
+                href={`/admin/tours/${departure.tours?.id}/days`}
+                className="inline-block text-sm font-medium text-[#7A9A4A] hover:underline mt-3"
+              >
+                → Edit Itinerary
+              </Link>
+            </div>
+          ) : (
+            <div className="text-sm text-gray-600">
+              <p className="mb-3">No itinerary days found for this tour.</p>
+              <Link
+                href={`/admin/tours/${departure.tours?.id}/days`}
+                className="inline-block font-medium text-[#7A9A4A] hover:underline"
+              >
+                → Create Tour Days
+              </Link>
+            </div>
+          )}
         </div>
 
         {error && (

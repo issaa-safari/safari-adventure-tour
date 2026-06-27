@@ -13,11 +13,28 @@ export default async function DepartureEditPage({ params }: { params: Promise<{ 
   const admin = createAdminClient()
   const { data: departure } = await admin
     .from('departures')
-    .select('*, tours (title_en, type)')
+    .select(`
+      *,
+      tours (
+        id,
+        title_en,
+        title_ar,
+        description_en,
+        description_ar,
+        type
+      )
+    `)
     .eq('id', id)
     .single()
 
   if (!departure) notFound()
 
-  return <DepartureEditForm departure={departure} departureId={id} />
+  // Get tour days for this departure's tour
+  const { data: tourDays } = await admin
+    .from('tour_days')
+    .select('*')
+    .eq('tour_id', departure.tour_id)
+    .order('day_number')
+
+  return <DepartureEditForm departure={departure} departureId={id} tourDays={tourDays || []} />
 }
