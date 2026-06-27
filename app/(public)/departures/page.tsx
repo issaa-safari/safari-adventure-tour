@@ -53,7 +53,7 @@ export default async function DeparturesPage({
        tour:tours(title_en, title_ar, description_en, destination_id)`
     )
     .eq('is_active', true)
-    .gte('start_date', new Date().toISOString().split('T')[0])
+    .gte('end_date', new Date().toISOString().split('T')[0])
     .order('start_date')
 
   // Load tour days for each tour (for itinerary details)
@@ -228,9 +228,9 @@ export default async function DeparturesPage({
                           )}
                         </div>
 
-                        {/* Book Button */}
+                        {/* View Details Button */}
                         <Link
-                          href={isAvailable ? `/departures/${dep.id}/book?lang=${locale}&tour=${encodeURIComponent(title)}&price=${dep.price_usd}` : '#'}
+                          href={`/departures/${dep.id}?lang=${locale}`}
                           className={`block text-center px-4 py-3 rounded-lg font-semibold transition ${
                             isAvailable
                               ? 'text-white hover:opacity-90'
@@ -238,7 +238,7 @@ export default async function DeparturesPage({
                           }`}
                           style={{ backgroundColor: isAvailable ? G : undefined }}
                         >
-                          {isAvailable ? t.bookNow : t.fullyBooked}
+                          {locale === 'ar' ? 'عرض التفاصيل' : 'View Details'}
                         </Link>
                       </div>
                     </div>
