@@ -37,14 +37,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Base price is invalid.' }, { status: 400 })
   }
 
+  const str = (v: any) => (typeof v === 'string' ? v.trim() || null : null)
+  const arr = (v: any) => (Array.isArray(v) ? v.map((x) => String(x)).filter(Boolean) : [])
+  const totalDistance = body.total_distance_km === null || body.total_distance_km === ''
+    ? null
+    : Number(body.total_distance_km)
+
   const updates = {
     title_en: titleEn,
-    title_ar: typeof body.title_ar === 'string' ? body.title_ar.trim() || null : null,
-    subtitle_en: typeof body.subtitle_en === 'string' ? body.subtitle_en.trim() || null : null,
-    overview_en: typeof body.overview_en === 'string' ? body.overview_en.trim() || null : null,
-    countries_visited: typeof body.countries_visited === 'string' ? body.countries_visited.trim() || null : null,
-    start_destination: typeof body.start_destination === 'string' ? body.start_destination.trim() || null : null,
-    end_destination: typeof body.end_destination === 'string' ? body.end_destination.trim() || null : null,
+    title_ar: str(body.title_ar),
+    subtitle_en: str(body.subtitle_en),
+    subtitle_ar: str(body.subtitle_ar),
+    overview_en: str(body.overview_en),
+    overview_ar: str(body.overview_ar),
+    countries_visited: str(body.countries_visited),
+    start_destination: str(body.start_destination),
+    end_destination: str(body.end_destination),
     status,
     featured: body.featured === true,
     show_on_website: body.show_on_website === true,
@@ -53,6 +61,21 @@ export async function POST(request: Request) {
     deposit_percent: depositPercent,
     difficulty_rating: difficultyRating,
     comfort_rating: comfortRating,
+    // Rich content (group_23)
+    terrain: str(body.terrain),
+    vehicle: str(body.vehicle),
+    accommodation_level: str(body.accommodation_level),
+    total_distance_km: totalDistance !== null && Number.isFinite(totalDistance) ? totalDistance : null,
+    hero_image_url: str(body.hero_image_url),
+    route_map_url: str(body.route_map_url),
+    gallery_urls: arr(body.gallery_urls),
+    highlights_en: arr(body.highlights_en),
+    highlights_ar: arr(body.highlights_ar),
+    included_en: arr(body.included_en),
+    included_ar: arr(body.included_ar),
+    excluded_en: arr(body.excluded_en),
+    excluded_ar: arr(body.excluded_ar),
+    faqs: Array.isArray(body.faqs) ? body.faqs : [],
   }
 
   const admin = createAdminClient()
