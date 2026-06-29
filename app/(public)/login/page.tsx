@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, Suspense } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import PublicHeader from '@/components/public/header'
@@ -23,6 +23,8 @@ function ClientLoginInner() {
   const router = useRouter()
   const locale = useLocale()
   const isAr = locale === 'ar'
+  const redirectParam = useSearchParams().get('redirect')
+  const destination = redirectParam || `/dashboard?lang=${locale}`
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
 
   useEffect(() => {
@@ -59,7 +61,7 @@ function ClientLoginInner() {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) { setError(error.message); setLoading(false); return }
-      router.push(`/dashboard?lang=${locale}`)
+      router.push(destination)
       router.refresh()
     } catch {
       setError(t.initError); setLoading(false)
@@ -73,7 +75,7 @@ function ClientLoginInner() {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: `${window.location.origin}/auth/callback` },
+        options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(destination)}` },
       })
       if (error) { setError(error.message); setLoading(false) }
     } catch {

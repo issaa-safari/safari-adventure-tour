@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useTransition, Suspense } from 'react'
+import { useState, useEffect, useTransition, Suspense } from 'react'
 import Link from 'next/link'
 import { useParams, useSearchParams } from 'next/navigation'
 import PublicHeader from '@/components/public/header'
 import PublicFooter from '@/components/public/footer'
+import { createClient } from '@/lib/supabase/client'
 
 const G = '#7A9A4A'
 
@@ -44,9 +45,34 @@ function BookingFormContent() {
   const [error, setError] = useState('')
   const [isPending, startTransition] = useTransition()
   const [groupSize, setGroupSize] = useState(1)
+  const [signedIn, setSignedIn] = useState<boolean | null>(null)
   const [travellers, setTravellers] = useState<Traveller[]>([
     { firstName: '', lastName: '', email: '', phone: '', dateOfBirth: '', nationality: '', passportNumber: '' }
   ])
+
+  // Auto-fill the first traveller from the signed-in account; otherwise flag that
+  // the visitor can sign in to book faster.
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      const u = data.user
+      if (!u) { setSignedIn(false); return }
+      setSignedIn(true)
+      setTravellers(prev => {
+        const copy = [...prev]
+        copy[0] = {
+          ...copy[0],
+          firstName: copy[0].firstName || (u.user_metadata?.first_name ?? ''),
+          lastName: copy[0].lastName || (u.user_metadata?.last_name ?? ''),
+          email: copy[0].email || (u.email ?? ''),
+          phone: copy[0].phone || (u.user_metadata?.phone ?? ''),
+        }
+        return copy
+      })
+    })
+  }, [])
+
+  const bookingPath = `/departures/${departureId}/book?lang=${locale}&price=${pricePerPerson}&tour=${encodeURIComponent(tourTitle)}`
 
   const t = locale === 'ar' ? {
     bookNow: 'احجز الآن',
@@ -134,6 +160,29 @@ function BookingFormContent() {
       {/* Booking Section */}
       <section className="py-16 md:py-20 bg-white">
         <div className="max-w-2xl mx-auto px-4">
+          {signedIn === false && !submitted && (
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-5 py-4">
+              <span className="text-sm text-blue-900">
+                {locale === 'ar'
+                  ? 'لديك حساب؟ سجّل الدخول للحجز بشكل أسرع وتعبئة بياناتك تلقائياً.'
+                  : 'Have an account? Sign in to book faster and auto-fill your details.'}
+              </span>
+              <Link
+                href={`/login?lang=${locale}&redirect=${encodeURIComponent(bookingPath)}`}
+                className="shrink-0 rounded-lg px-4 py-2 text-sm font-semibold text-white text-center"
+                style={{ backgroundColor: G }}
+              >
+                {locale === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
+              </Link>
+            </div>
+          )}
+          {signedIn === true && !submitted && (
+            <div className="mb-6 rounded-lg border border-green-200 bg-green-50 px-5 py-3 text-sm text-green-800">
+              {locale === 'ar'
+                ? '✓ تم تسجيل دخولك — تمت تعبئة بيانات المسافر الأول تلقائياً.'
+                : "✓ You're signed in — the first traveller has been filled in for you."}
+            </div>
+          )}
           {submitted ? (
             <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
               <div className="text-5xl mb-4">✓</div>

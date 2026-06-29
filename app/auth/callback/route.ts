@@ -10,5 +10,8 @@ export async function GET(request: NextRequest) {
     await supabase.auth.exchangeCodeForSession(code)
   }
 
-  return NextResponse.redirect(new URL('/dashboard', request.url))
+  // Return the user to where they started (e.g. a booking page), else the dashboard.
+  const next = searchParams.get('next')
+  const dest = next && next.startsWith('/') ? next : '/dashboard'
+  return NextResponse.redirect(new URL(dest, request.url))
 }

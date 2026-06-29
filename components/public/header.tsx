@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useSearchParams, usePathname, useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 
 const G = '#7A9A4A'
 
@@ -13,6 +14,25 @@ export default function PublicHeader() {
   const pathname = usePathname()
   const router = useRouter()
   const [currentLang, setCurrentLang] = useState('en')
+  const [signedIn, setSignedIn] = useState(false)
+
+  // Track auth state so the header shows Dashboard + Sign Out when logged in.
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => setSignedIn(!!data.user))
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      setSignedIn(!!session?.user)
+    })
+    return () => sub.subscription.unsubscribe()
+  }, [])
+
+  async function handleSignOut() {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    setSignedIn(false)
+    router.push(`/?lang=${currentLang}`)
+    router.refresh()
+  }
 
   useEffect(() => {
     setMounted(true)
@@ -105,9 +125,20 @@ export default function PublicHeader() {
           <Link href={getNavLink('/contact')} className="text-gray-600 hover:text-gray-900 text-sm font-medium">
             {currentLang === 'ar' ? 'اتصل بنا' : 'Contact'}
           </Link>
-          <Link href={getNavLink('/login')} className="text-gray-600 hover:text-gray-900 text-sm font-medium">
-            {currentLang === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
-          </Link>
+          {signedIn ? (
+            <>
+              <Link href={getNavLink('/dashboard')} className="text-gray-600 hover:text-gray-900 text-sm font-medium">
+                {currentLang === 'ar' ? 'حسابي' : 'Dashboard'}
+              </Link>
+              <button onClick={handleSignOut} className="text-gray-600 hover:text-gray-900 text-sm font-medium">
+                {currentLang === 'ar' ? 'تسجيل الخروج' : 'Sign Out'}
+              </button>
+            </>
+          ) : (
+            <Link href={getNavLink('/login')} className="text-gray-600 hover:text-gray-900 text-sm font-medium">
+              {currentLang === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
+            </Link>
+          )}
           <Link
             href={getNavLink('/quote-request')}
             className="px-5 py-2 rounded-lg font-medium text-white transition"
@@ -167,6 +198,20 @@ export default function PublicHeader() {
           <Link href={getNavLink('/contact')} className="block text-gray-600 hover:text-gray-900 text-sm font-medium py-2">
             {currentLang === 'ar' ? 'اتصل بنا' : 'Contact'}
           </Link>
+          {signedIn ? (
+            <>
+              <Link href={getNavLink('/dashboard')} className="block text-gray-600 hover:text-gray-900 text-sm font-medium py-2">
+                {currentLang === 'ar' ? 'حسابي' : 'Dashboard'}
+              </Link>
+              <button onClick={handleSignOut} className="block w-full text-left text-gray-600 hover:text-gray-900 text-sm font-medium py-2">
+                {currentLang === 'ar' ? 'تسجيل الخروج' : 'Sign Out'}
+              </button>
+            </>
+          ) : (
+            <Link href={getNavLink('/login')} className="block text-gray-600 hover:text-gray-900 text-sm font-medium py-2">
+              {currentLang === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
+            </Link>
+          )}
           <Link
             href={getNavLink('/quote-request')}
             className="block px-5 py-2 rounded-lg font-medium text-white text-center transition"

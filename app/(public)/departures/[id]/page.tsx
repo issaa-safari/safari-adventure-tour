@@ -273,7 +273,7 @@ export default async function DepartureDetailPage({
     groupSize: 'Group Size',
   }
 
-  const bookHref = `/departures/${id}/book?lang=${locale}`
+  const bookHref = `/departures/${id}/book?lang=${locale}&price=${departure.price_usd}&tour=${encodeURIComponent(title ?? '')}`
 
   return (
     <div dir={isAr ? 'rtl' : 'ltr'}>
