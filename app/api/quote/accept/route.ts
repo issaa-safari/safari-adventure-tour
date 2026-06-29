@@ -1,5 +1,64 @@
 import { createAdminClient } from '@/lib/supabase/admin'
+import { refreshClientTotals } from '@/lib/server/clients'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+
+// Turn an accepted quote into a confirmed booking so it shows up in Bookings
+// and Finance. Idempotent (one booking per quote) and fully best-effort —
+// requires the bookings.quote_id/client_id columns from migration group_27.
+async function createBookingFromAcceptedQuote(
+  admin: SupabaseClient,
+  quoteId: string,
+  versionId: string,
+) {
+  const { data: existing } = await admin
+    .from('bookings').select('id').eq('quote_id', quoteId).limit(1).maybeSingle()
+  if (existing?.id) return
+
+  const { data: quote } = await admin
+    .from('quotes').select('client_id, departure_id').eq('id', quoteId).single()
+  const { data: version } = await admin
+    .from('quote_versions').select('total_selling_usd').eq('id', versionId).single()
+  const { count } = await admin
+    .from('quote_travellers').select('id', { count: 'exact', head: true }).eq('quote_version_id', versionId)
+
+  const numTravellers = Math.max(1, count ?? 0)
+  const total = Number(version?.total_selling_usd ?? 0)
+
+  const { data: booking } = await admin
+    .from('bookings')
+    .insert({
+      quote_id: quoteId,
+      client_id: quote?.client_id ?? null,
+      departure_id: quote?.departure_id ?? null,
+      number_of_travellers: numTravellers,
+      total_price_usd: total,
+      status: 'confirmed',
+    })
+    .select('id')
+    .single()
+  if (!booking) return
+
+  try {
+    await admin.from('booking_payments').insert({
+      booking_id: booking.id, amount_usd: total, status: 'pending', notes: 'Accepted quote',
+    })
+  } catch { /* finance record best-effort */ }
+
+  if (quote?.departure_id) {
+    try {
+      const { data: dep } = await admin
+        .from('departures').select('booked_seats').eq('id', quote.departure_id).single()
+      if (dep) {
+        await admin.from('departures')
+          .update({ booked_seats: (dep.booked_seats ?? 0) + numTravellers })
+          .eq('id', quote.departure_id)
+      }
+    } catch { /* seat reservation best-effort */ }
+  }
+
+  if (quote?.client_id) await refreshClientTotals(admin, quote.client_id)
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -71,6 +130,13 @@ export async function POST(req: NextRequest) {
 
     // Update parent quote status
     await admin.from('quotes').update({ status: 'accepted' }).eq('id', quoteId)
+
+    // Promote the accepted quote into a confirmed booking (best-effort).
+    try {
+      await createBookingFromAcceptedQuote(admin, quoteId, versionId)
+    } catch (e) {
+      console.error('[quote/accept] booking creation skipped', e)
+    }
 
     return NextResponse.json({ ok: true })
   } catch (err: any) {

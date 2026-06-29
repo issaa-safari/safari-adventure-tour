@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
+import { findOrCreateClientByEmail, refreshClientTotals } from '@/lib/server/clients'
 
 export async function POST(
   request: NextRequest,
@@ -110,6 +111,25 @@ export async function POST(
       }
     } catch {
       // ignore — booking is already created; dashboard falls back to email match
+    }
+
+    // Firmly link the booking to a CRM client (find-or-create by lead traveller
+    // email), then refresh that client's booking totals. Best-effort: requires
+    // the bookings.client_id column from migration group_27.
+    try {
+      const lead = travellers[0]
+      const clientId = await findOrCreateClientByEmail(admin, {
+        email: lead?.email,
+        first_name: lead?.firstName,
+        last_name: lead?.lastName,
+        phone: lead?.phone,
+      })
+      if (clientId) {
+        await admin.from('bookings').update({ client_id: clientId }).eq('id', booking.id)
+        await refreshClientTotals(admin, clientId)
+      }
+    } catch {
+      // ignore — booking already created; client link is non-critical
     }
 
     // Update booked seats in departure

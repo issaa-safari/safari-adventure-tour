@@ -99,13 +99,16 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
           </div>
         </div>
         <div className="flex gap-2">
-          {/* Edit button — will link to version editor in Phase 2 */}
-          {latestVersion && (quote.status === 'draft' || quote.status === 'ready') && (
+          {/* Always allow opening the latest version to review the itinerary and
+              costing. While editable it's "Edit"; once sent/accepted it's "View". */}
+          {latestVersion && (
             <Link
               href={`/admin/quotes/${quote.id}/versions/${latestVersion.id}`}
               className="rounded-md px-4 py-2 text-sm font-medium text-white"
               style={{ backgroundColor: '#7A9A4A' }}>
-              Edit Version {latestVersion.version_number}
+              {quote.status === 'draft' || quote.status === 'ready'
+                ? `Edit Version ${latestVersion.version_number}`
+                : `View itinerary & costing (v${latestVersion.version_number})`}
             </Link>
           )}
         </div>

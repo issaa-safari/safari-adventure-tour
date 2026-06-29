@@ -50,23 +50,33 @@ export default async function ClientDetailPage({
     }
   })
 
-  // Bookings have no client_id column — they link to a person via traveller
-  // email. Match the client's email, then resolve the tour via departure → tour.
-  let bookings: any[] = []
+  // Bookings link to a client either firmly (bookings.client_id, group_27) or,
+  // for legacy website bookings, by traveller email. Gather IDs from both.
+  const bookingIdSet = new Set<string>()
+  try {
+    const { data: byClient } = await supabase.from('bookings').select('id').eq('client_id', id)
+    for (const b of (byClient ?? []) as { id: string }[]) bookingIdSet.add(b.id)
+  } catch {
+    // client_id column may not exist yet (pre group_27) — fall back to email
+  }
   if (client.email) {
     const { data: travellerRows } = await supabase
       .from('booking_travellers')
       .select('booking_id')
       .ilike('email', client.email)
-    const bookingIds = [...new Set((travellerRows ?? []).map((r: any) => r.booking_id))]
-    if (bookingIds.length > 0) {
-      const { data: bk } = await supabase
-        .from('bookings')
-        .select('id, total_price_usd, status, created_at, departures(start_date, tours(title_en, title_ar))')
-        .in('id', bookingIds)
-        .order('created_at', { ascending: false })
-      bookings = bk ?? []
+    for (const r of (travellerRows ?? []) as { booking_id: string }[]) {
+      if (r.booking_id) bookingIdSet.add(r.booking_id)
     }
+  }
+
+  let bookings: any[] = []
+  if (bookingIdSet.size > 0) {
+    const { data: bk } = await supabase
+      .from('bookings')
+      .select('id, total_price_usd, status, created_at, departures(start_date, tours(title_en, title_ar)), quotes(quote_number, tours(title_en, title_ar))')
+      .in('id', [...bookingIdSet])
+      .order('created_at', { ascending: false })
+    bookings = bk ?? []
   }
 
   const { data: logs } = await supabase
@@ -293,7 +303,7 @@ export default async function ClientDetailPage({
                     className="flex items-center justify-between p-3 rounded-md border border-gray-100 hover:border-[#7A9A4A] hover:bg-gray-50 transition">
                     <div>
                       <p className="text-sm font-medium text-gray-900">
-                        {booking.departures?.tours?.title_en ?? 'Tour'}
+                        {booking.departures?.tours?.title_en ?? booking.quotes?.tours?.title_en ?? 'Tour'}
                       </p>
                       <p className="text-xs text-gray-400">
                         {booking.departures?.start_date
