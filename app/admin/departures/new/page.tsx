@@ -11,7 +11,7 @@ export default async function NewDeparturePage() {
   const admin = createAdminClient()
   const { data: tours } = await admin
     .from('tours')
-    .select('id, title_en, type')
+    .select('id, title_en, type, base_price_usd, max_group_size')
     .order('title_en', { ascending: true })
 
   return <NewDepartureForm tours={tours ?? []} />

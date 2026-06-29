@@ -201,7 +201,11 @@ export default function TourEditForm({ tour }: { tour: any }) {
               <option value="archived">Archived</option>
             </select>
           </div>
-          <div><Label>Base Price (USD)</Label><input type="number" value={basePrice} onChange={e => setBasePrice(e.target.value)} className={inputCls} /></div>
+          <div>
+            <Label>Default / Starting Price (USD)</Label>
+            <input type="number" value={basePrice} onChange={e => setBasePrice(e.target.value)} className={inputCls} />
+            <p className="text-[11px] text-gray-400 mt-1">Suggested price — pre-fills new departures. The departure&apos;s own price is what shows on the website.</p>
+          </div>
           <div><Label>Max Group Size</Label><input type="number" value={maxGroupSize} onChange={e => setMaxGroupSize(Number(e.target.value))} className={inputCls} /></div>
           <div><Label>Deposit %</Label><input type="number" value={depositPercent} onChange={e => setDepositPercent(Number(e.target.value))} className={inputCls} /></div>
         </div>

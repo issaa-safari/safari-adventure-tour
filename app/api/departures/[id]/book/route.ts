@@ -86,6 +86,19 @@ export async function POST(
       )
     }
 
+    // Record the booking revenue in finance (status 'pending' until paid).
+    // Wrapped defensively so the booking still succeeds before group_25 is applied.
+    try {
+      await admin.from('booking_payments').insert({
+        booking_id: booking.id,
+        amount_usd: totalPrice,
+        status: 'pending',
+        notes: 'Website booking',
+      })
+    } catch {
+      // ignore — finance record is best-effort; booking is already created
+    }
+
     // If a client is signed in, link this booking to their account.
     // Wrapped defensively: if the user_id column hasn't been added yet
     // (migration group_22), the booking still succeeds via email matching.

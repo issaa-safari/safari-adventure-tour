@@ -7,6 +7,19 @@ import { createDeparture } from './actions'
 export default function NewDepartureForm({ tours }: { tours: any[] }) {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [price, setPrice] = useState('')
+  const [maxSeats, setMaxSeats] = useState('12')
+
+  // When a template is chosen, prefill the departure price from its base price
+  // (and seats from its max group size). The departure price stays editable and is
+  // the single source of truth shown on the website and charged at booking.
+  function onTourChange(tourId: string) {
+    const tour = tours.find(t => t.id === tourId)
+    if (tour?.base_price_usd != null && tour.base_price_usd !== '') {
+      setPrice(String(tour.base_price_usd))
+    }
+    if (tour?.max_group_size) setMaxSeats(String(tour.max_group_size))
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -36,7 +49,8 @@ export default function NewDepartureForm({ tours }: { tours: any[] }) {
         <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Tour</label>
-            <select name="tourId" required defaultValue="" className={inputCls}>
+            <select name="tourId" required defaultValue="" className={inputCls}
+              onChange={(e) => onTourChange(e.target.value)}>
               <option value="" disabled>Select a tour…</option>
               {tours.map((t) => (
                 <option key={t.id} value={t.id}>
@@ -60,7 +74,8 @@ export default function NewDepartureForm({ tours }: { tours: any[] }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Max Seats</label>
-              <input type="number" name="maxSeats" min={1} defaultValue={12} required className={inputCls} />
+              <input type="number" name="maxSeats" min={1} value={maxSeats}
+                onChange={(e) => setMaxSeats(e.target.value)} required className={inputCls} />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Booked Seats</label>
@@ -71,7 +86,9 @@ export default function NewDepartureForm({ tours }: { tours: any[] }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Price per Seat (USD)</label>
-              <input type="number" name="priceUsd" min={0} step="0.01" required placeholder="e.g. 4500" className={inputCls} />
+              <input type="number" name="priceUsd" min={0} step="0.01" required placeholder="e.g. 4500"
+                value={price} onChange={(e) => setPrice(e.target.value)} className={inputCls} />
+              <p className="text-[11px] text-gray-400 mt-1">Shown on the website &amp; charged at booking. Pre-filled from the template, editable per departure.</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
