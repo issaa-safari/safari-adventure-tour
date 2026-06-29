@@ -41,6 +41,7 @@ export async function POST(request: Request) {
       accommodation_id: d.accommodation_id || null,
       accommodation_alt_id: d.accommodation_alt_id || null,
       activity_ids: d.activity_ids || [],
+      activities: Array.isArray(d.activities) ? d.activities : [],
       meal_breakfast: !!d.meal_breakfast,
       meal_lunch: !!d.meal_lunch,
       meal_dinner: !!d.meal_dinner,

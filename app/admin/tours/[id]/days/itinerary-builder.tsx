@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ImageUpload } from '@/components/admin/image-upload'
+import ActivitiesModal, { DayActivity } from '@/components/admin/activities-modal'
 
 type Lookup = { id: string; name: string; destination_id?: string | null }
 
@@ -19,6 +20,7 @@ type Day = {
   accommodation_id: string | null
   accommodation_alt_id: string | null
   activity_ids: string[]
+  activities: DayActivity[]
   meal_breakfast: boolean
   meal_lunch: boolean
   meal_dinner: boolean
@@ -42,6 +44,7 @@ function blankDay(n: number): Day {
     accommodation_id: null,
     accommodation_alt_id: null,
     activity_ids: [],
+    activities: [],
     meal_breakfast: false,
     meal_lunch: false,
     meal_dinner: false,
@@ -81,6 +84,7 @@ export default function ItineraryBuilder({
       accommodation_id: d.accommodation_id,
       accommodation_alt_id: d.accommodation_alt_id ?? null,
       activity_ids: d.activity_ids ?? [],
+      activities: Array.isArray(d.activities) ? d.activities : [],
       meal_breakfast: d.meal_breakfast ?? false,
       meal_lunch: d.meal_lunch ?? false,
       meal_dinner: d.meal_dinner ?? false,
@@ -98,6 +102,7 @@ export default function ItineraryBuilder({
   const [error, setError] = useState('')
 
   const [arOpen, setArOpen] = useState<Set<number>>(new Set())
+  const [activityModal, setActivityModal] = useState<number | null>(null)
   const [adding, setAdding] = useState<{ index: number; kind: 'destination' | 'accommodation' | 'accommodation_alt' | 'activity' } | null>(null)
   const [newName, setNewName] = useState('')
   const [addingBusy, setAddingBusy] = useState(false)
@@ -200,10 +205,15 @@ export default function ItineraryBuilder({
   async function save() {
     setLoading(true); setError(''); setSaved(false)
     try {
+      // Keep activity_ids in sync with the structured activities for backward compat.
+      const payloadDays = days.map(d => ({
+        ...d,
+        activity_ids: d.activities.map(a => a.activity_id).filter(Boolean),
+      }))
       const res = await fetch('/api/admin/save-itinerary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tourId, days }),
+        body: JSON.stringify({ tourId, days: payloadDays }),
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Failed to save')
@@ -330,27 +340,24 @@ export default function ItineraryBuilder({
                   </div>
 
                   <div className="space-y-2">
-                    {dayActs.length > 0 && (
+                    {day.activities.length > 0 && (
                       <div className="flex flex-wrap gap-1">
-                        {dayActs.map((a) => (
-                          <span key={a.id} className="inline-flex items-center gap-1 text-xs bg-[#7A9A4A]/10 text-[#4C5E2A] px-2 py-0.5 rounded-full">
-                            {a.name}
-                            <button onClick={() => toggleActivity(i, a.id)} className="text-[#4C5E2A]/60 hover:text-[#4C5E2A]">×</button>
-                          </span>
-                        ))}
+                        {day.activities.map((da, ai) => {
+                          const act = activities.find(a => a.id === da.activity_id)
+                          return (
+                            <span key={ai} className="inline-flex items-center gap-1 text-xs bg-[#7A9A4A]/10 text-[#4C5E2A] px-2 py-0.5 rounded-full">
+                              {act?.name ?? 'Activity'}
+                              {da.moment ? <span className="opacity-60">· {da.moment}</span> : null}
+                              {da.optional ? <span className="text-amber-600">· optional</span> : null}
+                            </span>
+                          )
+                        })}
                       </div>
                     )}
-                    <select value=""
-                      onChange={(e) => {
-                        if (e.target.value === '__add__') { setAdding({ index: i, kind: 'activity' }); setNewName('') }
-                        else if (e.target.value) toggleActivity(i, e.target.value)
-                      }}
-                      className={inputCls}>
-                      <option value="">+ Add activity…</option>
-                      {availActs.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
-                      <option value="__add__">+ Add new activity…</option>
-                    </select>
-                    {adding?.index === i && adding.kind === 'activity' && <AddInline />}
+                    <button type="button" onClick={() => setActivityModal(i)}
+                      className="w-full rounded-md border border-dashed border-[#7A9A4A] text-[#4C5E2A] px-3 py-2 text-sm font-medium hover:bg-[#7A9A4A]/5">
+                      + Add Activities{day.activities.length > 0 ? ` (${day.activities.length})` : ''}
+                    </button>
                     <input type="text" value={day.title_en}
                       onChange={(e) => update(i, { title_en: e.target.value })}
                       placeholder="Day title (required)" className={inputCls} />
@@ -399,6 +406,18 @@ export default function ItineraryBuilder({
             })}
           </div>
         </div>
+      )}
+
+      {activityModal !== null && days[activityModal] && (
+        <ActivitiesModal
+          dayLabel={`Day ${days[activityModal].day_number}`}
+          value={days[activityModal].activities}
+          activities={activities}
+          destinations={destinations}
+          dayDestinationId={days[activityModal].destination_id}
+          onChange={(rows) => update(activityModal, { activities: rows })}
+          onClose={() => setActivityModal(null)}
+        />
       )}
 
       {days.length > 0 && (

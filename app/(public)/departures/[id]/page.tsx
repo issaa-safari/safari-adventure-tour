@@ -134,6 +134,38 @@ export default async function DepartureDetailPage({
     for (const d of dests ?? []) destDescMap[d.id] = { en: d.description_en, ar: d.description_ar }
   }
 
+  // Per-day activities (group_26) — fetched tolerantly and merged onto the days.
+  {
+    const { data: actRows, error } = await admin
+      .from('tour_days')
+      .select('id, activities')
+      .eq('tour_id', departure.tour_id)
+    if (!error && actRows) {
+      const m: Record<string, any[]> = {}
+      for (const r of actRows) m[r.id] = Array.isArray(r.activities) ? r.activities : []
+      for (const d of tourDays ?? []) (d as any).activities = m[d.id] ?? []
+    }
+  }
+
+  // Resolve activity names + bilingual descriptions from the Content library.
+  const actIds = [...new Set((tourDays ?? []).flatMap((d: any) => (d.activities ?? []).map((a: any) => a.activity_id)).filter(Boolean))]
+  const activityMap: Record<string, { name: string; en: string | null; ar: string | null }> = {}
+  if (actIds.length > 0) {
+    const { data: acts } = await admin
+      .from('activities')
+      .select('id, name, description_en, description_ar')
+      .in('id', actIds)
+    for (const a of acts ?? []) activityMap[a.id] = { name: a.name, en: a.description_en, ar: a.description_ar }
+  }
+
+  const momentLabel = (m: string) => {
+    const map: Record<string, { en: string; ar: string }> = {
+      morning: { en: 'Morning', ar: 'صباحاً' }, afternoon: { en: 'Afternoon', ar: 'بعد الظهر' },
+      evening: { en: 'Evening', ar: 'مساءً' }, night: { en: 'Night', ar: 'ليلاً' },
+    }
+    return map[m] ? (isAr ? map[m].ar : map[m].en) : ''
+  }
+
   // Resolve accommodation names for the days that have them
   const accomIds = [...new Set((tourDays ?? []).map((d: any) => d.accommodation_id).filter(Boolean))]
   const accomMap: Record<string, string> = {}
@@ -392,6 +424,33 @@ export default async function DepartureDetailPage({
                           <p className="text-gray-700 leading-relaxed mb-5 whitespace-pre-line">
                             {dayDesc}
                           </p>
+                        )}
+
+                        {Array.isArray(day.activities) && day.activities.length > 0 && (
+                          <div className="mb-5 border-t border-gray-100 pt-4">
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">🎯 {isAr ? 'الأنشطة' : 'Activities'}</p>
+                            <div className="space-y-3">
+                              {day.activities.map((da: any, ai: number) => {
+                                const info = activityMap[da.activity_id]
+                                if (!info) return null
+                                const desc = isAr ? (info.ar || info.en) : info.en
+                                const mom = da.moment ? momentLabel(da.moment) : ''
+                                return (
+                                  <div key={ai} className="flex items-start gap-2">
+                                    <span style={{ color: G }}>→</span>
+                                    <div>
+                                      <p className="text-gray-800 font-medium">
+                                        {info.name}
+                                        {mom && <span className="text-xs text-gray-400 font-normal"> · {mom}</span>}
+                                        {da.optional && <span className="text-xs text-amber-600 font-normal"> · {isAr ? 'اختياري' : 'optional'}</span>}
+                                      </p>
+                                      {desc && <p className="text-sm text-gray-600">{desc}</p>}
+                                    </div>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          </div>
                         )}
 
                         <div className="grid sm:grid-cols-3 gap-4 text-sm border-t border-gray-100 pt-4">
