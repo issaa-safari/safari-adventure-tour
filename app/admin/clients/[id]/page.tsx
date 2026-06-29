@@ -27,17 +27,47 @@ export default async function ClientDetailPage({
     .eq('client_id', id)
     .order('created_at', { ascending: false })
 
-  const { data: quotes } = await supabase
+  // Quotes carry client_id + tour_id, but the price lives on quote_versions
+  // (total_selling_usd) and the tour name on the related tour — join both.
+  const { data: quotesRaw } = await supabase
     .from('quotes')
-    .select('*')
+    .select('id, quote_number, status, tour_id, accepted_version_id, created_at, tours(title_en, title_ar), quote_versions(id, total_selling_usd, version_number)')
     .eq('client_id', id)
     .order('created_at', { ascending: false })
 
-  const { data: bookings } = await supabase
-    .from('bookings')
-    .select('*, tours(title_en)')
-    .eq('client_id', id)
-    .order('created_at', { ascending: false })
+  const quotes = (quotesRaw ?? []).map((q: any) => {
+    const versions = Array.isArray(q.quote_versions) ? q.quote_versions : []
+    const accepted = versions.find((v: any) => v.id === q.accepted_version_id)
+    const latest = [...versions].sort((a: any, b: any) => (b.version_number ?? 0) - (a.version_number ?? 0))[0]
+    const chosen = accepted || latest
+    return {
+      id: q.id,
+      quote_number: q.quote_number,
+      status: q.status,
+      created_at: q.created_at,
+      tour_title: q.tours?.title_en ?? null,
+      total: Number(chosen?.total_selling_usd ?? 0),
+    }
+  })
+
+  // Bookings have no client_id column — they link to a person via traveller
+  // email. Match the client's email, then resolve the tour via departure → tour.
+  let bookings: any[] = []
+  if (client.email) {
+    const { data: travellerRows } = await supabase
+      .from('booking_travellers')
+      .select('booking_id')
+      .ilike('email', client.email)
+    const bookingIds = [...new Set((travellerRows ?? []).map((r: any) => r.booking_id))]
+    if (bookingIds.length > 0) {
+      const { data: bk } = await supabase
+        .from('bookings')
+        .select('id, total_price_usd, status, created_at, departures(start_date, tours(title_en, title_ar))')
+        .in('id', bookingIds)
+        .order('created_at', { ascending: false })
+      bookings = bk ?? []
+    }
+  }
 
   const { data: logs } = await supabase
     .from('communication_logs')
@@ -226,22 +256,22 @@ export default async function ClientDetailPage({
             </h2>
             {quotes && quotes.length > 0 ? (
               <div className="space-y-2">
-                {quotes.map((quote: any) => (
-                  <div key={quote.id}
-                    className="flex items-center justify-between p-3 rounded-md border border-gray-100">
+                {quotes.map((quote) => (
+                  <Link key={quote.id} href={"/admin/quotes/" + quote.id}
+                    className="flex items-center justify-between p-3 rounded-md border border-gray-100 hover:border-[#7A9A4A] hover:bg-gray-50 transition">
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{quote.tour_title ?? 'Quote'}</p>
-                      <p className="text-xs text-gray-400 font-mono">{quote.reference}</p>
+                      <p className="text-sm font-medium text-gray-900">{quote.tour_title ?? 'Custom quote'}</p>
+                      <p className="text-xs text-gray-400 font-mono">{quote.quote_number}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-medium text-gray-900">
-                        ${Number(quote.total_price_usd ?? 0).toLocaleString()}
+                        ${quote.total.toLocaleString()}
                       </p>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 capitalize">
                         {quote.status}
                       </span>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             ) : (
@@ -259,23 +289,27 @@ export default async function ClientDetailPage({
             {bookings && bookings.length > 0 ? (
               <div className="space-y-2">
                 {bookings.map((booking: any) => (
-                  <div key={booking.id}
-                    className="flex items-center justify-between p-3 rounded-md border border-gray-100">
+                  <Link key={booking.id} href={"/admin/bookings/" + booking.id}
+                    className="flex items-center justify-between p-3 rounded-md border border-gray-100 hover:border-[#7A9A4A] hover:bg-gray-50 transition">
                     <div>
                       <p className="text-sm font-medium text-gray-900">
-                        {booking.tours?.title_en ?? 'Tour'}
+                        {booking.departures?.tours?.title_en ?? 'Tour'}
                       </p>
-                      <p className="text-xs text-gray-400 font-mono">{booking.reference}</p>
+                      <p className="text-xs text-gray-400">
+                        {booking.departures?.start_date
+                          ? new Date(booking.departures.start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                          : new Date(booking.created_at).toLocaleDateString('en-GB')}
+                      </p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-medium text-gray-900">
                         ${Number(booking.total_price_usd ?? 0).toLocaleString()}
                       </p>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 capitalize">
                         {booking.status}
                       </span>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             ) : (
