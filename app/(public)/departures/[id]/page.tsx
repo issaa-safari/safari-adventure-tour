@@ -395,14 +395,14 @@ export default async function DepartureDetailPage({
 
             <div className="space-y-6">
               {tourDays && tourDays.length > 0 ? (
-                tourDays.map((day: any) => {
+                tourDays.map((day: any, idx: number) => {
                   const dayTitle = isAr ? (day.title_ar || day.title_en) : day.title_en
                   const accomName = day.accommodation_id ? accomMap[day.accommodation_id] : null
                   const dd = day.destination_id ? destDescMap[day.destination_id] : null
                   const dayDesc = dd ? (isAr ? (dd.ar || dd.en) : dd.en) : null
                   return (
-                    <div key={day.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-                      <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-4">
+                    <details key={day.id} open={idx === 0} className="group bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+                      <summary className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden flex items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
                           <div className="flex items-center justify-center w-12 h-12 rounded-full bg-white/20 flex-shrink-0">
                             <span className="text-lg font-bold">{day.day_number}</span>
@@ -412,7 +412,8 @@ export default async function DepartureDetailPage({
                             <h3 className="text-xl font-bold">{dayTitle}</h3>
                           </div>
                         </div>
-                      </div>
+                        <span className="text-2xl leading-none transition-transform duration-200 group-open:rotate-180" aria-hidden="true">⌄</span>
+                      </summary>
 
                       {day.image_url && (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -472,7 +473,7 @@ export default async function DepartureDetailPage({
                           )}
                         </div>
                       </div>
-                    </div>
+                    </details>
                   )
                 })
               ) : (

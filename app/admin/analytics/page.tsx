@@ -51,6 +51,7 @@ export default async function AnalyticsPage() {
     { data: priceLinesByCategory },
     { data: allRequests },
     { data: acceptances },
+    { data: allBookings },
   ] = await Promise.all([
     admin.from('quote_versions').select('id, status, total_selling_usd, total_cost_usd, created_at, sent_at'),
     admin.from('quote_versions')
@@ -63,7 +64,28 @@ export default async function AnalyticsPage() {
       .select('cost_category, total_selling_usd, total_cost_usd, quote_version_id'),
     admin.from('requests').select('stage, created_at'),
     admin.from('quote_acceptances').select('accepted_at, quote_version_id'),
+    admin.from('bookings')
+      .select('status, total_price_usd, number_of_travellers, created_at, departures(tours(title_en))'),
   ])
+
+  // --- Website bookings (direct online bookings, separate from the quote flow) ---
+  const bookings = (allBookings ?? []).filter((b: any) => b.status !== 'cancelled')
+  const totalBookings = bookings.length
+  const bookingRevenue = bookings.reduce((s: number, b: any) => s + Number(b.total_price_usd ?? 0), 0)
+  const bookingTravellers = bookings.reduce((s: number, b: any) => s + Number(b.number_of_travellers ?? 0), 0)
+
+  // --- Top-performing tours by website bookings (count + revenue) ---
+  const tourStats: Record<string, { count: number; revenue: number }> = {}
+  for (const b of bookings as any[]) {
+    const title = b.departures?.tours?.title_en || 'Unknown tour'
+    if (!tourStats[title]) tourStats[title] = { count: 0, revenue: 0 }
+    tourStats[title].count++
+    tourStats[title].revenue += Number(b.total_price_usd ?? 0)
+  }
+  const topTours = Object.entries(tourStats)
+    .sort((a, b) => b[1].revenue - a[1].revenue)
+    .slice(0, 6)
+  const maxTourRevenue = Math.max(...topTours.map(([, s]) => s.revenue), 1)
 
   // --- Status distribution ---
   const statusCounts: Record<string, number> = {}
@@ -310,6 +332,64 @@ export default async function AnalyticsPage() {
                         className="h-full rounded-full"
                         style={{ width: `${Math.max(barPct, 1)}%`, backgroundColor: '#7A9A4A' }}
                       />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Website bookings + top tours */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        {/* Website bookings summary */}
+        <div className="bg-white rounded-lg border border-gray-200 p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-semibold text-gray-900">Website Bookings</h2>
+            <Link href="/admin/bookings" className="text-xs text-[#7A9A4A] hover:underline">View all</Link>
+          </div>
+          {totalBookings === 0 ? (
+            <p className="text-sm text-gray-400 py-8 text-center">No website bookings yet.</p>
+          ) : (
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <p className="text-2xl font-semibold text-gray-900">{fmt(totalBookings)}</p>
+                <p className="text-xs text-gray-500 mt-0.5">Bookings</p>
+              </div>
+              <div>
+                <p className="text-2xl font-semibold" style={{ color: '#7A9A4A' }}>${fmt(bookingRevenue)}</p>
+                <p className="text-xs text-gray-500 mt-0.5">Revenue</p>
+              </div>
+              <div>
+                <p className="text-2xl font-semibold text-gray-900">{fmt(bookingTravellers)}</p>
+                <p className="text-xs text-gray-500 mt-0.5">Travellers</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Top performing tours */}
+        <div className="bg-white rounded-lg border border-gray-200 p-5">
+          <h2 className="text-sm font-semibold text-gray-900 mb-4">Top Tours — by Booking Revenue</h2>
+          {topTours.length === 0 ? (
+            <p className="text-sm text-gray-400 py-8 text-center">No bookings to rank yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {topTours.map(([title, s]) => {
+                const barPct = Math.round((s.revenue / maxTourRevenue) * 100)
+                return (
+                  <div key={title}>
+                    <div className="flex justify-between text-xs text-gray-500 mb-1">
+                      <span className="font-medium text-gray-700 truncate pr-2">{title}</span>
+                      <span className="tabular-nums shrink-0">
+                        ${fmt(s.revenue)}
+                        <span className="text-gray-400 ml-2">{s.count} booking{s.count !== 1 ? 's' : ''}</span>
+                      </span>
+                    </div>
+                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: `${Math.max(barPct, 1)}%`, backgroundColor: '#7A9A4A' }} />
                     </div>
                   </div>
                 )
