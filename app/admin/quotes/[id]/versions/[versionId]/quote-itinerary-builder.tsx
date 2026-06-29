@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import ActivitiesModal, { DayActivity } from '@/components/admin/activities-modal'
+import CreateLookupDialog from '@/components/admin/create-lookup-dialog'
 import { createLookup } from '@/lib/create-lookup'
 
 type ContentItem = { id: string; name: string; [key: string]: unknown }
@@ -193,32 +194,25 @@ export default function QuoteItineraryBuilder({
   const [accommodations, setAccommodations] = useState<ContentItem[]>(accommodationsProp)
   const [activities, setActivities] = useState<ContentItem[]>(activitiesProp)
 
-  async function createDestinationInline(name: string) {
-    const it = await createLookup('destination', name)
+  const [creating, setCreating] = useState<null | { kind: 'destination' | 'accommodation'; row: number; alt?: boolean }>(null)
+
+  async function createDestinationInline(name: string, en: string, ar: string) {
+    const it = await createLookup('destination', name, { descriptionEn: en, descriptionAr: ar })
     setDestinations(p => [...p, it as any].sort((a, b) => (a.name as string).localeCompare(b.name as string)))
     return it
   }
-  async function createActivityInline(name: string) {
-    const it = await createLookup('activity', name)
+  async function createActivityInline(name: string, en: string, ar: string) {
+    const it = await createLookup('activity', name, { descriptionEn: en, descriptionAr: ar })
     setActivities(p => [...p, it as any].sort((a, b) => (a.name as string).localeCompare(b.name as string)))
     return it
   }
-  async function onDestSelect(i: number, val: string) {
-    if (val !== '__add__') { onDestChange(i, val); return }
-    const name = window.prompt('New destination name')?.trim()
-    if (!name) return
-    try { const it = await createDestinationInline(name); onDestChange(i, it.id) }
-    catch (e: any) { alert(e?.message ?? 'Failed to create destination') }
+  function onDestSelect(i: number, val: string) {
+    if (val === '__add__') { setCreating({ kind: 'destination', row: i }); return }
+    onDestChange(i, val)
   }
-  async function onAccomSelect(i: number, val: string, alt: boolean) {
-    if (val !== '__add__') { setAccom(i, val, alt); return }
-    const name = window.prompt('New accommodation name')?.trim()
-    if (!name) return
-    try {
-      const it = await createLookup('accommodation', name)
-      setAccommodations(p => [...p, it as any].sort((a, b) => (a.name as string).localeCompare(b.name as string)))
-      setAccom(i, it.id, alt)
-    } catch (e: any) { alert(e?.message ?? 'Failed to create accommodation') }
+  function onAccomSelect(i: number, val: string, alt: boolean) {
+    if (val === '__add__') { setCreating({ kind: 'accommodation', row: i, alt }); return }
+    setAccom(i, val, alt)
   }
 
   const [days, setDays] = useState<Day[]>(() =>
@@ -718,6 +712,23 @@ export default function QuoteItineraryBuilder({
           onClose={() => setActivityModal(null)}
           onCreateActivity={createActivityInline as any}
           onCreateDestination={createDestinationInline as any}
+        />
+      )}
+
+      {creating && (
+        <CreateLookupDialog
+          title={creating.kind === 'destination' ? 'New Destination' : 'New Accommodation'}
+          onClose={() => setCreating(null)}
+          onSubmit={async (name, en, ar) => {
+            if (creating.kind === 'destination') {
+              const it = await createDestinationInline(name, en, ar)
+              onDestChange(creating.row, it.id)
+            } else {
+              const it = await createLookup('accommodation', name, { descriptionEn: en, descriptionAr: ar })
+              setAccommodations(p => [...p, it as any].sort((a, b) => (a.name as string).localeCompare(b.name as string)))
+              setAccom(creating.row, it.id, !!creating.alt)
+            }
+          }}
         />
       )}
 

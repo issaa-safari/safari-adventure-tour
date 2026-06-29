@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import CreateLookupDialog from './create-lookup-dialog'
 
 const G = '#7A9A4A'
 
@@ -43,41 +44,24 @@ export default function ActivitiesModal({
   dayDestinationId: string | null
   onChange: (rows: DayActivity[]) => void
   onClose: () => void
-  onCreateActivity?: (name: string) => Promise<Lookup | null>
-  onCreateDestination?: (name: string) => Promise<Lookup | null>
+  onCreateActivity?: (name: string, descriptionEn: string, descriptionAr: string) => Promise<Lookup | null>
+  onCreateDestination?: (name: string, descriptionEn: string, descriptionAr: string) => Promise<Lookup | null>
 }) {
   const [rows, setRows] = useState<DayActivity[]>(value.length ? value : [newActivity(dayDestinationId)])
   const [extraAct, setExtraAct] = useState<Lookup[]>([])
   const [extraDest, setExtraDest] = useState<Lookup[]>([])
-  const [busy, setBusy] = useState(false)
+  const [creating, setCreating] = useState<null | { kind: 'activity' | 'destination'; row: number }>(null)
 
   const allActivities = [...activities, ...extraAct]
   const allDestinations = [...destinations, ...extraDest]
 
-  async function handleActivitySelect(i: number, val: string) {
-    if (val !== '__add__') { update(i, { activity_id: val }); return }
-    if (!onCreateActivity) return
-    const name = window.prompt('New activity name')?.trim()
-    if (!name) return
-    setBusy(true)
-    try {
-      const item = await onCreateActivity(name)
-      if (item) { setExtraAct(e => [...e, item]); update(i, { activity_id: item.id }) }
-    } catch (err: any) { alert(err?.message ?? 'Failed to create activity') }
-    finally { setBusy(false) }
+  function handleActivitySelect(i: number, val: string) {
+    if (val === '__add__') { if (onCreateActivity) setCreating({ kind: 'activity', row: i }); return }
+    update(i, { activity_id: val })
   }
-
-  async function handleLocationSelect(i: number, val: string) {
-    if (val !== '__add__') { update(i, { destination_id: val || null }); return }
-    if (!onCreateDestination) return
-    const name = window.prompt('New destination name')?.trim()
-    if (!name) return
-    setBusy(true)
-    try {
-      const item = await onCreateDestination(name)
-      if (item) { setExtraDest(e => [...e, item]); update(i, { destination_id: item.id }) }
-    } catch (err: any) { alert(err?.message ?? 'Failed to create destination') }
-    finally { setBusy(false) }
+  function handleLocationSelect(i: number, val: string) {
+    if (val === '__add__') { if (onCreateDestination) setCreating({ kind: 'destination', row: i }); return }
+    update(i, { destination_id: val || null })
   }
 
   const update = (i: number, patch: Partial<DayActivity>) =>
@@ -132,7 +116,7 @@ export default function ActivitiesModal({
                     </div>
                   </td>
                   <td className={cell}>
-                    <select className={sel} value={row.activity_id} disabled={busy}
+                    <select className={sel} value={row.activity_id}
                       onChange={e => handleActivitySelect(i, e.target.value)}>
                       <option value="">Select activity…</option>
                       {allActivities.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
@@ -140,7 +124,7 @@ export default function ActivitiesModal({
                     </select>
                   </td>
                   <td className={cell}>
-                    <select className={sel} value={row.destination_id ?? ''} disabled={busy}
+                    <select className={sel} value={row.destination_id ?? ''}
                       onChange={e => handleLocationSelect(i, e.target.value)}>
                       <option value="">{dayDestinationId ? 'Day destination' : '— none —'}</option>
                       {allDestinations.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
@@ -185,6 +169,22 @@ export default function ActivitiesModal({
           </button>
         </div>
       </div>
+
+      {creating && (
+        <CreateLookupDialog
+          title={creating.kind === 'activity' ? 'New Activity' : 'New Destination'}
+          onClose={() => setCreating(null)}
+          onSubmit={async (name, en, ar) => {
+            if (creating.kind === 'activity' && onCreateActivity) {
+              const item = await onCreateActivity(name, en, ar)
+              if (item) { setExtraAct(e => [...e, item]); update(creating.row, { activity_id: item.id }) }
+            } else if (creating.kind === 'destination' && onCreateDestination) {
+              const item = await onCreateDestination(name, en, ar)
+              if (item) { setExtraDest(e => [...e, item]); update(creating.row, { destination_id: item.id }) }
+            }
+          }}
+        />
+      )}
     </div>
   )
 }

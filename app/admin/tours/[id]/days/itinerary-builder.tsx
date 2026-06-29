@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ImageUpload } from '@/components/admin/image-upload'
 import ActivitiesModal, { DayActivity } from '@/components/admin/activities-modal'
+import CreateLookupDialog from '@/components/admin/create-lookup-dialog'
 import { createLookup } from '@/lib/create-lookup'
 
 type Lookup = { id: string; name: string; destination_id?: string | null }
@@ -105,8 +106,6 @@ export default function ItineraryBuilder({
   const [arOpen, setArOpen] = useState<Set<number>>(new Set())
   const [activityModal, setActivityModal] = useState<number | null>(null)
   const [adding, setAdding] = useState<{ index: number; kind: 'destination' | 'accommodation' | 'accommodation_alt' | 'activity' } | null>(null)
-  const [newName, setNewName] = useState('')
-  const [addingBusy, setAddingBusy] = useState(false)
 
   const inputCls = 'w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]'
 
@@ -162,45 +161,29 @@ export default function ItineraryBuilder({
     update(i, { activity_ids: has ? d.activity_ids.filter((a) => a !== actId) : [...d.activity_ids, actId] })
   }
 
-  async function confirmAdd() {
+  async function confirmAdd(name: string, en: string, ar: string) {
     if (!adding) return
-    const name = newName.trim()
-    if (!name) return
-    setAddingBusy(true)
-    try {
-      const dayDestId = days[adding.index]?.destination_id ?? null
-      const kindForApi = adding.kind === 'accommodation_alt' ? 'accommodation' : adding.kind
-      const res = await fetch('/api/admin/create-lookup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          kind: kindForApi,
-          name,
-          destinationId: kindForApi !== 'destination' ? dayDestId : null,
-        }),
-      })
-      const json = await res.json()
-      if (!res.ok) throw new Error(json.error || 'Failed to add')
-      const item = json.item as Lookup
-      if (adding.kind === 'destination') {
-        setDestinations((p) => [...p, item].sort((a, b) => a.name.localeCompare(b.name)))
-        update(adding.index, { destination_id: item.id })
-      } else if (adding.kind === 'accommodation') {
-        setAccommodations((p) => [...p, item].sort((a, b) => a.name.localeCompare(b.name)))
-        update(adding.index, { accommodation_id: item.id })
-      } else if (adding.kind === 'accommodation_alt') {
-        setAccommodations((p) => [...p, item].sort((a, b) => a.name.localeCompare(b.name)))
-        update(adding.index, { accommodation_alt_id: item.id })
-      } else if (adding.kind === 'activity') {
-        setActivities((p) => [...p, item].sort((a, b) => a.name.localeCompare(b.name)))
-        toggleActivity(adding.index, item.id)
-      }
-      setAdding(null); setNewName('')
-    } catch (err: any) {
-      setError(err.message)
-    } finally {
-      setAddingBusy(false)
+    const dayDestId = days[adding.index]?.destination_id ?? null
+    const kindForApi = (adding.kind === 'accommodation_alt' ? 'accommodation' : adding.kind) as 'destination' | 'accommodation' | 'activity'
+    const item = await createLookup(kindForApi, name, {
+      destinationId: kindForApi !== 'destination' ? dayDestId : null,
+      descriptionEn: en,
+      descriptionAr: ar,
+    }) as Lookup
+    if (adding.kind === 'destination') {
+      setDestinations((p) => [...p, item].sort((a, b) => a.name.localeCompare(b.name)))
+      update(adding.index, { destination_id: item.id })
+    } else if (adding.kind === 'accommodation') {
+      setAccommodations((p) => [...p, item].sort((a, b) => a.name.localeCompare(b.name)))
+      update(adding.index, { accommodation_id: item.id })
+    } else if (adding.kind === 'accommodation_alt') {
+      setAccommodations((p) => [...p, item].sort((a, b) => a.name.localeCompare(b.name)))
+      update(adding.index, { accommodation_alt_id: item.id })
+    } else if (adding.kind === 'activity') {
+      setActivities((p) => [...p, item].sort((a, b) => a.name.localeCompare(b.name)))
+      toggleActivity(adding.index, item.id)
     }
+    setAdding(null)
   }
 
   async function save() {
@@ -225,21 +208,6 @@ export default function ItineraryBuilder({
     } finally {
       setLoading(false)
     }
-  }
-
-  function AddInline() {
-    return (
-      <div className="flex gap-1 mt-1">
-        <input autoFocus value={newName} onChange={(e) => setNewName(e.target.value)}
-          placeholder="New name" className={inputCls} />
-        <button onClick={confirmAdd} disabled={addingBusy}
-          className="rounded-md px-2 text-xs text-white" style={{ backgroundColor: '#7A9A4A' }}>
-          {addingBusy ? '…' : 'Add'}
-        </button>
-        <button onClick={() => { setAdding(null); setNewName('') }}
-          className="rounded-md border border-gray-300 px-2 text-xs text-gray-600">×</button>
-      </div>
-    )
   }
 
   const MealPill = ({ on, label, onClick }: { on: boolean; label: string; onClick: () => void }) => (
@@ -296,7 +264,7 @@ export default function ItineraryBuilder({
                   <div>
                     <select value={day.destination_id ?? ''}
                       onChange={(e) => {
-                        if (e.target.value === '__add__') { setAdding({ index: i, kind: 'destination' }); setNewName('') }
+                        if (e.target.value === '__add__') setAdding({ index: i, kind: 'destination' })
                         else update(i, { destination_id: e.target.value || null })
                       }}
                       className={inputCls}>
@@ -304,13 +272,12 @@ export default function ItineraryBuilder({
                       {destinations.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
                       <option value="__add__">+ Add new…</option>
                     </select>
-                    {adding?.index === i && adding.kind === 'destination' && <AddInline />}
                   </div>
 
                   <div className="space-y-2">
                     <select value={day.accommodation_id ?? ''}
                       onChange={(e) => {
-                        if (e.target.value === '__add__') { setAdding({ index: i, kind: 'accommodation' }); setNewName('') }
+                        if (e.target.value === '__add__') setAdding({ index: i, kind: 'accommodation' })
                         else update(i, { accommodation_id: e.target.value || null })
                       }}
                       className={inputCls}>
@@ -318,7 +285,6 @@ export default function ItineraryBuilder({
                       {accommodations.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
                       <option value="__add__">+ Add new…</option>
                     </select>
-                    {adding?.index === i && adding.kind === 'accommodation' && <AddInline />}
 
                     <select value={nightsOf(day)} onChange={(e) => setNights(i, Number(e.target.value))}
                       className="rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-700 bg-white">
@@ -329,7 +295,7 @@ export default function ItineraryBuilder({
 
                     <select value={day.accommodation_alt_id ?? ''}
                       onChange={(e) => {
-                        if (e.target.value === '__add__') { setAdding({ index: i, kind: 'accommodation_alt' }); setNewName('') }
+                        if (e.target.value === '__add__') setAdding({ index: i, kind: 'accommodation_alt' })
                         else update(i, { accommodation_alt_id: e.target.value || null })
                       }}
                       className={inputCls + ' text-gray-500'}>
@@ -337,7 +303,6 @@ export default function ItineraryBuilder({
                       {accommodations.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
                       <option value="__add__">+ Add new…</option>
                     </select>
-                    {adding?.index === i && adding.kind === 'accommodation_alt' && <AddInline />}
                   </div>
 
                   <div className="space-y-2">
@@ -409,6 +374,19 @@ export default function ItineraryBuilder({
         </div>
       )}
 
+      {adding && (
+        <CreateLookupDialog
+          title={
+            adding.kind === 'destination' ? 'New Destination'
+              : adding.kind === 'activity' ? 'New Activity'
+              : adding.kind === 'accommodation_alt' ? 'New Alternative Accommodation'
+              : 'New Accommodation'
+          }
+          onSubmit={(name, en, ar) => confirmAdd(name, en, ar)}
+          onClose={() => setAdding(null)}
+        />
+      )}
+
       {activityModal !== null && days[activityModal] && (
         <ActivitiesModal
           dayLabel={`Day ${days[activityModal].day_number}`}
@@ -418,13 +396,13 @@ export default function ItineraryBuilder({
           dayDestinationId={days[activityModal].destination_id}
           onChange={(rows) => update(activityModal, { activities: rows })}
           onClose={() => setActivityModal(null)}
-          onCreateActivity={async (name) => {
-            const it = await createLookup('activity', name)
+          onCreateActivity={async (name, en, ar) => {
+            const it = await createLookup('activity', name, { descriptionEn: en, descriptionAr: ar })
             setActivities(p => [...p, it].sort((a, b) => a.name.localeCompare(b.name)))
             return it
           }}
-          onCreateDestination={async (name) => {
-            const it = await createLookup('destination', name)
+          onCreateDestination={async (name, en, ar) => {
+            const it = await createLookup('destination', name, { descriptionEn: en, descriptionAr: ar })
             setDestinations(p => [...p, it].sort((a, b) => a.name.localeCompare(b.name)))
             return it
           }}
