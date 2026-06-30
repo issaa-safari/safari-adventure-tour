@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { createVehicle } from './actions'
 
-const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]'
+const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]'
 
 export default function NewVehicleForm() {
   const [error, setError] = useState('')
@@ -79,7 +79,7 @@ export default function NewVehicleForm() {
               type="button"
               onClick={() => setIsActive(!isActive)}
               className={'relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ' +
-                (isActive ? 'bg-[#7A9A4A]' : 'bg-gray-300')}>
+                (isActive ? 'bg-[var(--olive)]' : 'bg-gray-300')}>
               <span className={'inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ' +
                 (isActive ? 'translate-x-4' : 'translate-x-0')} />
             </button>
@@ -94,7 +94,7 @@ export default function NewVehicleForm() {
             type="submit"
             disabled={loading}
             className="rounded-md px-6 py-2.5 text-sm font-medium text-white disabled:opacity-60"
-            style={{ backgroundColor: '#7A9A4A' }}>
+            style={{ backgroundColor: 'var(--olive)' }}>
             {loading ? 'Creating…' : 'Create Vehicle'}
           </button>
           <Link href="/admin/content/vehicles"

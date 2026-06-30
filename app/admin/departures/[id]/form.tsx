@@ -44,7 +44,7 @@ export default function DepartureEditForm({ departure, departureId, tourDays }: 
     }
   }
 
-  const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]'
+  const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]'
 
   return (
     <div className="p-6 max-w-xl mx-auto">
@@ -174,7 +174,7 @@ export default function DepartureEditForm({ departure, departureId, tourDays }: 
               </div>
               <Link
                 href={`/admin/tours/${departure.tours?.id}/days`}
-                className="inline-block text-sm font-medium text-[#7A9A4A] hover:underline mt-3"
+                className="inline-block text-sm font-medium text-[var(--olive)] hover:underline mt-3"
               >
                 → Edit Itinerary
               </Link>
@@ -184,7 +184,7 @@ export default function DepartureEditForm({ departure, departureId, tourDays }: 
               <p className="mb-3">No itinerary days found for this tour.</p>
               <Link
                 href={`/admin/tours/${departure.tours?.id}/days`}
-                className="inline-block font-medium text-[#7A9A4A] hover:underline"
+                className="inline-block font-medium text-[var(--olive)] hover:underline"
               >
                 → Create Tour Days
               </Link>
@@ -201,7 +201,7 @@ export default function DepartureEditForm({ departure, departureId, tourDays }: 
             type="submit"
             disabled={loading}
             className="rounded-md px-6 py-2.5 text-sm font-medium text-white disabled:opacity-60"
-            style={{ backgroundColor: '#7A9A4A' }}>
+            style={{ backgroundColor: 'var(--olive)' }}>
             {loading ? 'Saving…' : 'Save Changes'}
           </button>
           <Link

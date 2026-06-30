@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ImageUpload, GalleryUpload } from '@/components/admin/image-upload'
 
-const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]'
+const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]'
 
 const linesToArr = (s: string) => s.split('\n').map(l => l.trim()).filter(Boolean)
 const arrToLines = (a: any) => (Array.isArray(a) ? a.join('\n') : '')
@@ -144,8 +144,8 @@ export default function TourEditForm({ tour }: { tour: any }) {
           <div><Label>Total Distance (km)</Label><input type="number" value={totalDistanceKm} onChange={e => setTotalDistanceKm(e.target.value)} className={inputCls} /></div>
         </div>
         <div className="grid sm:grid-cols-2 gap-4">
-          <div><Label>Difficulty ({difficultyRating}/10)</Label><input type="range" min={1} max={10} value={difficultyRating} onChange={e => setDifficultyRating(Number(e.target.value))} className="w-full accent-[#7A9A4A]" /></div>
-          <div><Label>Comfort ({comfortRating}/10)</Label><input type="range" min={1} max={10} value={comfortRating} onChange={e => setComfortRating(Number(e.target.value))} className="w-full accent-[#7A9A4A]" /></div>
+          <div><Label>Difficulty ({difficultyRating}/10)</Label><input type="range" min={1} max={10} value={difficultyRating} onChange={e => setDifficultyRating(Number(e.target.value))} className="w-full accent-[var(--olive)]" /></div>
+          <div><Label>Comfort ({comfortRating}/10)</Label><input type="range" min={1} max={10} value={comfortRating} onChange={e => setComfortRating(Number(e.target.value))} className="w-full accent-[var(--olive)]" /></div>
         </div>
       </Section>
 
@@ -187,7 +187,7 @@ export default function TourEditForm({ tour }: { tour: any }) {
             </div>
           ))}
           <button type="button" onClick={() => setFaqs([...faqs, { q_en: '', a_en: '', q_ar: '', a_ar: '' }])}
-            className="text-sm font-medium text-[#7A9A4A] hover:underline">+ Add FAQ</button>
+            className="text-sm font-medium text-[var(--olive)] hover:underline">+ Add FAQ</button>
         </div>
       </Section>
 
@@ -221,7 +221,7 @@ export default function TourEditForm({ tour }: { tour: any }) {
       <div className="sticky bottom-4">
         <button type="submit" disabled={loading}
           className="rounded-md px-6 py-2.5 text-sm font-medium text-white shadow-lg disabled:opacity-60"
-          style={{ backgroundColor: '#7A9A4A' }}>
+          style={{ backgroundColor: 'var(--olive)' }}>
           {loading ? 'Saving...' : 'Save Changes'}
         </button>
       </div>

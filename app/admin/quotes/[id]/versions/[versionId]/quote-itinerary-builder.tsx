@@ -54,20 +54,20 @@ const ITEM_LABELS: Record<string, string> = {
 }
 const ITEM_COLORS: Record<string, string> = {
   accommodation: 'bg-blue-50 text-blue-700',
-  activity:      'bg-[#7A9A4A]/10 text-[#4C5E2A]',
+  activity:      'bg-[var(--olive)]/10 text-[var(--olive-dk)]',
   vehicle:       'bg-amber-50 text-amber-700',
   staff:         'bg-purple-50 text-purple-700',
 }
 
 const uid = () => Math.random().toString(36).slice(2)
 
-const inputCls = 'w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]'
-const smallSelectCls = 'w-full rounded border border-gray-200 px-1.5 py-1 text-xs text-gray-600 bg-white focus:outline-none focus:ring-1 focus:ring-[#7A9A4A]'
+const inputCls = 'w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]'
+const smallSelectCls = 'w-full rounded border border-gray-200 px-1.5 py-1 text-xs text-gray-600 bg-white focus:outline-none focus:ring-1 focus:ring-[var(--olive)]'
 
 const MealPill = ({ on, label, onClick }: { on: boolean; label: string; onClick: () => void }) => (
   <button type="button" onClick={onClick}
     className={'h-7 w-7 rounded-md text-xs font-semibold border transition ' +
-      (on ? 'bg-[#7A9A4A] text-white border-[#7A9A4A]' : 'bg-white text-gray-400 border-gray-300')}>
+      (on ? 'bg-[var(--olive)] text-white border-[var(--olive)]' : 'bg-white text-gray-400 border-gray-300')}>
     {label}
   </button>
 )
@@ -452,7 +452,7 @@ export default function QuoteItineraryBuilder({
               type="button"
               onClick={prefillFromTour}
               className="rounded-md px-4 py-2 text-sm font-medium text-white"
-              style={{ backgroundColor: '#7A9A4A' }}
+              style={{ backgroundColor: 'var(--olive)' }}
             >
               Pre-fill from tour template ({tourDays.length} days)
             </button>
@@ -462,7 +462,7 @@ export default function QuoteItineraryBuilder({
               type="button"
               onClick={() => generateBlankDays(tripDays)}
               className="rounded-md px-4 py-2 text-sm font-medium text-white"
-              style={{ backgroundColor: '#C9A84C' }}
+              style={{ backgroundColor: 'var(--gold)' }}
             >
               Generate {tripDays} blank days (from trip dates)
             </button>
@@ -473,7 +473,7 @@ export default function QuoteItineraryBuilder({
               placeholder="Days"
               value={genCount}
               onChange={e => setGenCount(e.target.value)}
-              className="w-20 rounded-md border border-gray-300 px-2 py-2 text-sm text-center focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]"
+              className="w-20 rounded-md border border-gray-300 px-2 py-2 text-sm text-center focus:outline-none focus:ring-2 focus:ring-[var(--olive)]"
             />
             <button
               type="button"
@@ -578,13 +578,13 @@ export default function QuoteItineraryBuilder({
               {/* Activities & Details */}
               <div className="space-y-1.5">
                 <button type="button" onClick={() => setActivityModal(i)} disabled={isLocked}
-                  className="w-full rounded-md border border-dashed border-[#7A9A4A] text-[#4C5E2A] px-2 py-1 text-xs font-medium hover:bg-[#7A9A4A]/5 disabled:opacity-50">
+                  className="w-full rounded-md border border-dashed border-[var(--olive)] text-[var(--olive-dk)] px-2 py-1 text-xs font-medium hover:bg-[var(--olive)]/5 disabled:opacity-50">
                   + Add Activities{day.items.filter(it => it.itemType === 'activity').length > 0 ? ` (${day.items.filter(it => it.itemType === 'activity').length})` : ''}
                 </button>
                 {day.items.filter(it => it.itemType === 'activity').length > 0 && (
                   <div className="flex flex-wrap gap-1">
                     {day.items.filter(it => it.itemType === 'activity').map(item => (
-                      <span key={item._key} className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium bg-[#7A9A4A]/10 text-[#4C5E2A]">
+                      <span key={item._key} className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium bg-[var(--olive)]/10 text-[var(--olive-dk)]">
                         {item.titleSnapshot}
                         {(item.contentSnapshot?.moment as string) ? <span className="opacity-60">· {item.contentSnapshot.moment as string}</span> : null}
                         {item.contentSnapshot?.optional ? <span className="text-amber-600">· opt</span> : null}
@@ -609,7 +609,7 @@ export default function QuoteItineraryBuilder({
                   onClick={() => setArOpenIndices(prev => {
                     const next = new Set(prev); next.has(i) ? next.delete(i) : next.add(i); return next
                   })}
-                  className="text-[10px] text-gray-400 hover:text-[#7A9A4A] transition">
+                  className="text-[10px] text-gray-400 hover:text-[var(--olive)] transition">
                   {arOpenIndices.has(i) ? '▲ Hide Arabic' : '🇸🇦 + Arabic'}
                 </button>
                 {arOpenIndices.has(i) && (
@@ -739,7 +739,7 @@ export default function QuoteItineraryBuilder({
         <div className="sticky bottom-4">
           <button type="button" onClick={save} disabled={loading}
             className="rounded-md px-6 py-2.5 text-sm font-medium text-white shadow-lg disabled:opacity-60"
-            style={{ backgroundColor: '#7A9A4A' }}>
+            style={{ backgroundColor: 'var(--olive)' }}>
             {loading ? 'Saving…' : 'Save Itinerary'}
           </button>
         </div>

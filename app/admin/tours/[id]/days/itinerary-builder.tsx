@@ -107,7 +107,7 @@ export default function ItineraryBuilder({
   const [activityModal, setActivityModal] = useState<number | null>(null)
   const [adding, setAdding] = useState<{ index: number; kind: 'destination' | 'accommodation' | 'accommodation_alt' | 'activity' } | null>(null)
 
-  const inputCls = 'w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]'
+  const inputCls = 'w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]'
 
   function update(i: number, patch: Partial<Day>) {
     setDays((prev) => prev.map((d, idx) => (idx === i ? { ...d, ...patch } : d)))
@@ -213,7 +213,7 @@ export default function ItineraryBuilder({
   const MealPill = ({ on, label, onClick }: { on: boolean; label: string; onClick: () => void }) => (
     <button type="button" onClick={onClick}
       className={'h-7 w-7 rounded-md text-xs font-semibold border ' +
-        (on ? 'bg-[#7A9A4A] text-white border-[#7A9A4A]' : 'bg-white text-gray-400 border-gray-300')}>
+        (on ? 'bg-[var(--olive)] text-white border-[var(--olive)]' : 'bg-white text-gray-400 border-gray-300')}>
       {label}
     </button>
   )
@@ -224,7 +224,7 @@ export default function ItineraryBuilder({
         <div className="bg-white rounded-lg border border-gray-200 p-10 text-center space-y-4">
           <p className="text-sm text-gray-500">No itinerary days yet.</p>
           <div className="flex items-center justify-center gap-3">
-            <button onClick={generateDays} className="rounded-md px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: '#7A9A4A' }}>
+            <button onClick={generateDays} className="rounded-md px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: 'var(--olive)' }}>
               Generate {durationDays} blank days
             </button>
             <button onClick={addDay} className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
@@ -311,7 +311,7 @@ export default function ItineraryBuilder({
                         {day.activities.map((da, ai) => {
                           const act = activities.find(a => a.id === da.activity_id)
                           return (
-                            <span key={ai} className="inline-flex items-center gap-1 text-xs bg-[#7A9A4A]/10 text-[#4C5E2A] px-2 py-0.5 rounded-full">
+                            <span key={ai} className="inline-flex items-center gap-1 text-xs bg-[var(--olive)]/10 text-[var(--olive-dk)] px-2 py-0.5 rounded-full">
                               {act?.name ?? 'Activity'}
                               {da.moment ? <span className="opacity-60">· {da.moment}</span> : null}
                               {da.optional ? <span className="text-amber-600">· optional</span> : null}
@@ -321,7 +321,7 @@ export default function ItineraryBuilder({
                       </div>
                     )}
                     <button type="button" onClick={() => setActivityModal(i)}
-                      className="w-full rounded-md border border-dashed border-[#7A9A4A] text-[#4C5E2A] px-3 py-2 text-sm font-medium hover:bg-[#7A9A4A]/5">
+                      className="w-full rounded-md border border-dashed border-[var(--olive)] text-[var(--olive-dk)] px-3 py-2 text-sm font-medium hover:bg-[var(--olive)]/5">
                       + Add Activities{day.activities.length > 0 ? ` (${day.activities.length})` : ''}
                     </button>
                     <input type="text" value={day.title_en}
@@ -337,7 +337,7 @@ export default function ItineraryBuilder({
                         next.has(i) ? next.delete(i) : next.add(i)
                         return next
                       })}
-                      className="text-[10px] text-gray-400 hover:text-[#7A9A4A] transition">
+                      className="text-[10px] text-gray-400 hover:text-[var(--olive)] transition">
                       {arOpen.has(i) ? '▲ Hide Arabic' : '🇸🇦 + Arabic title'}
                     </button>
                     {arOpen.has(i) && (
@@ -423,7 +423,7 @@ export default function ItineraryBuilder({
         <div className="sticky bottom-4">
           <button onClick={save} disabled={loading}
             className="rounded-md px-6 py-2.5 text-sm font-medium text-white shadow-lg disabled:opacity-60"
-            style={{ backgroundColor: '#7A9A4A' }}>
+            style={{ backgroundColor: 'var(--olive)' }}>
             {loading ? 'Saving…' : 'Save Itinerary'}
           </button>
         </div>

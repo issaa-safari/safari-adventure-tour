@@ -99,7 +99,7 @@ export default async function ClientDetailPage({
 
       <div className="bg-white rounded-lg border border-gray-200 p-5 mb-6">
         <div className="flex items-start gap-4">
-          <div className="h-14 w-14 rounded-full bg-[#7A9A4A]/10 flex items-center justify-center text-xl font-semibold text-[#4C5E2A] shrink-0">
+          <div className="h-14 w-14 rounded-full bg-[var(--olive)]/10 flex items-center justify-center text-xl font-semibold text-[var(--olive-dk)] shrink-0">
             {initials}
           </div>
           <div className="flex-1">
@@ -109,7 +109,7 @@ export default async function ClientDetailPage({
                 <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Arabic</span>
               )}
               {client.total_bookings >= 2 && (
-                <span className="text-xs bg-[#7A9A4A]/10 text-[#4C5E2A] px-2 py-0.5 rounded-full">Repeat Booker</span>
+                <span className="text-xs bg-[var(--olive)]/10 text-[var(--olive-dk)] px-2 py-0.5 rounded-full">Repeat Booker</span>
               )}
             </div>
             <p className="text-gray-500 text-sm mt-1">{client.email}</p>
@@ -117,7 +117,7 @@ export default async function ClientDetailPage({
               {client.phone && (
                 <a href={`tel:${client.phone}`}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition"
-                  style={{ backgroundColor: '#F0F4ED', color: '#3D5229', border: '1px solid #C5D9B0' }}>
+                  style={{ backgroundColor: 'var(--admin-bg)', color: 'var(--olive-dk)', border: '1px solid var(--olive-lt)' }}>
                   📞 {client.phone}
                 </a>
               )}
@@ -162,7 +162,7 @@ export default async function ClientDetailPage({
               {client.phone && (
                 <div>
                   <p className="text-xs text-gray-400">Phone</p>
-                  <a href={`tel:${client.phone}`} className="text-[#5C7A3E] hover:underline text-sm">{client.phone}</a>
+                  <a href={`tel:${client.phone}`} className="text-[var(--olive-dk)] hover:underline text-sm">{client.phone}</a>
                 </div>
               )}
               {client.whatsapp && (
@@ -170,7 +170,7 @@ export default async function ClientDetailPage({
                   <p className="text-xs text-gray-400">WhatsApp</p>
                   <a href={`https://wa.me/${client.whatsapp.replace(/\D/g, '')}`}
                     target="_blank" rel="noopener noreferrer"
-                    className="text-[#5C7A3E] hover:underline text-sm">{client.whatsapp}</a>
+                    className="text-[var(--olive-dk)] hover:underline text-sm">{client.whatsapp}</a>
                 </div>
               )}
               {client.country && (
@@ -215,7 +215,7 @@ export default async function ClientDetailPage({
               <Link
                 href="/admin/requests/new"
                 className="block w-full rounded-md px-3 py-2 text-sm font-medium text-white text-center"
-                style={{ backgroundColor: '#7A9A4A' }}>
+                style={{ backgroundColor: 'var(--olive)' }}>
                 + New Request
               </Link>
             </div>
@@ -234,7 +234,7 @@ export default async function ClientDetailPage({
               <div className="space-y-2">
                 {requests.map((req: any) => (
                   <Link key={req.id} href={"/admin/requests/" + req.id}
-                    className="flex items-center justify-between p-3 rounded-md border border-gray-100 hover:border-[#7A9A4A] hover:bg-gray-50 transition">
+                    className="flex items-center justify-between p-3 rounded-md border border-gray-100 hover:border-[var(--olive)] hover:bg-gray-50 transition">
                     <div>
                       <p className="text-sm font-medium text-gray-900">
                         {req.tours?.title_en ?? 'No tour selected'}
@@ -268,7 +268,7 @@ export default async function ClientDetailPage({
               <div className="space-y-2">
                 {quotes.map((quote) => (
                   <Link key={quote.id} href={"/admin/quotes/" + quote.id}
-                    className="flex items-center justify-between p-3 rounded-md border border-gray-100 hover:border-[#7A9A4A] hover:bg-gray-50 transition">
+                    className="flex items-center justify-between p-3 rounded-md border border-gray-100 hover:border-[var(--olive)] hover:bg-gray-50 transition">
                     <div>
                       <p className="text-sm font-medium text-gray-900">{quote.tour_title ?? 'Custom quote'}</p>
                       <p className="text-xs text-gray-400 font-mono">{quote.quote_number}</p>
@@ -300,7 +300,7 @@ export default async function ClientDetailPage({
               <div className="space-y-2">
                 {bookings.map((booking: any) => (
                   <Link key={booking.id} href={"/admin/bookings/" + booking.id}
-                    className="flex items-center justify-between p-3 rounded-md border border-gray-100 hover:border-[#7A9A4A] hover:bg-gray-50 transition">
+                    className="flex items-center justify-between p-3 rounded-md border border-gray-100 hover:border-[var(--olive)] hover:bg-gray-50 transition">
                     <div>
                       <p className="text-sm font-medium text-gray-900">
                         {booking.departures?.tours?.title_en ?? booking.quotes?.tours?.title_en ?? 'Tour'}

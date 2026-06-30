@@ -3,13 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { toggleDeparturePublished } from './[id]/actions'
-
-const STATUS_STYLES: Record<string, string> = {
-  available: 'bg-green-100 text-green-700',
-  full: 'bg-amber-100 text-amber-700',
-  cancelled: 'bg-red-100 text-red-700',
-  closed: 'bg-gray-100 text-gray-600',
-}
+import StatusBadge from '@/components/admin/status-badge'
 
 export default async function DeparturesPage({
   searchParams,
@@ -39,7 +33,7 @@ export default async function DeparturesPage({
         </div>
         <Link href="/admin/departures/new"
           className="rounded-md px-4 py-2 text-sm font-medium text-white"
-          style={{ backgroundColor: '#7A9A4A' }}>
+          style={{ backgroundColor: 'var(--olive)' }}>
           + New Departure
         </Link>
       </div>
@@ -50,7 +44,7 @@ export default async function DeparturesPage({
           href="/admin/departures"
           className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
             !showArchived
-              ? 'border-[#7A9A4A] text-[#7A9A4A]'
+              ? 'border-[var(--olive)] text-[var(--olive)]'
               : 'border-transparent text-gray-500 hover:text-gray-700'
           }`}>
           Published
@@ -59,7 +53,7 @@ export default async function DeparturesPage({
           href="/admin/departures?show=archived"
           className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
             showArchived
-              ? 'border-[#7A9A4A] text-[#7A9A4A]'
+              ? 'border-[var(--olive)] text-[var(--olive)]'
               : 'border-transparent text-gray-500 hover:text-gray-700'
           }`}>
           Archived
@@ -74,7 +68,7 @@ export default async function DeparturesPage({
             </p>
             {!showArchived && (
               <Link href="/admin/departures/new"
-                className="text-sm font-medium text-[#7A9A4A] hover:underline">
+                className="text-sm font-medium text-[var(--olive)] hover:underline">
                 Schedule your first departure
               </Link>
             )}
@@ -117,10 +111,7 @@ export default async function DeparturesPage({
                       ${Number(dep.price_usd).toLocaleString()}
                     </td>
                     <td className="px-4 py-3">
-                      <span className={'text-xs px-2 py-0.5 rounded-full font-medium ' +
-                        (STATUS_STYLES[dep.status] ?? 'bg-gray-100 text-gray-600')}>
-                        {dep.status}
-                      </span>
+                      <StatusBadge status={dep.status} />
                     </td>
                     <td className="px-4 py-3">
                       <form action={async () => { 'use server'; await toggleDeparturePublished(dep.id) }}>
@@ -141,7 +132,7 @@ export default async function DeparturesPage({
                     </td>
                     <td className="px-4 py-3 text-right">
                       <Link href={"/admin/departures/" + dep.id}
-                        className="text-xs text-[#7A9A4A] hover:underline">
+                        className="text-xs text-[var(--olive)] hover:underline">
                         Edit
                       </Link>
                     </td>

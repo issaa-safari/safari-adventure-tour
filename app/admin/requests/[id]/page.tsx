@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
+import StatusBadge from '@/components/admin/status-badge'
 import StageSelector from './stage-selector'
 import CommunicationLog from './communication-log'
 import TaskManager from './task-manager'
@@ -15,18 +16,6 @@ const STAGES = [
   { key: 'completed', label: 'Completed' },
   { key: 'not_booked', label: 'Not Booked' },
 ]
-
-const VERSION_STATUS_STYLES: Record<string, string> = {
-  draft:      'bg-gray-100 text-gray-600',
-  ready:      'bg-blue-100 text-blue-700',
-  sent:       'bg-purple-100 text-purple-700',
-  viewed:     'bg-indigo-100 text-indigo-700',
-  accepted:   'bg-green-100 text-green-700',
-  declined:   'bg-red-100 text-red-700',
-  expired:    'bg-amber-100 text-amber-700',
-  superseded: 'bg-gray-100 text-gray-400',
-  cancelled:  'bg-gray-100 text-gray-500',
-}
 
 const STATUS_ORDER = ['draft','ready','sent','viewed','accepted','declined','expired','superseded','cancelled']
 
@@ -118,7 +107,7 @@ export default async function RequestDetailPage({
           <div className="flex items-start justify-between gap-4 mt-2 mb-3">
             <div>
               <h1 className="text-base font-semibold text-gray-900">
-                Request from <span className="text-[#7A9A4A]">{clientName}</span>
+                Request from <span className="text-[var(--olive)]">{clientName}</span>
                 {request.priority && (
                   <span className="ml-2 text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full align-middle">Priority</span>
                 )}
@@ -139,7 +128,7 @@ export default async function RequestDetailPage({
             <Link
               href={`/admin/quotes/new?request=${id}`}
               className="shrink-0 rounded-md px-4 py-2 text-sm font-medium text-white"
-              style={{ backgroundColor: '#7A9A4A' }}>
+              style={{ backgroundColor: 'var(--olive)' }}>
               + Create Quote
             </Link>
           </div>
@@ -158,14 +147,14 @@ export default async function RequestDetailPage({
                 href={`/admin/requests/${id}?tab=${t.key}`}
                 className={`px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 -mb-px transition-colors ${
                   activeTab === t.key
-                    ? 'border-[#7A9A4A] text-[#7A9A4A]'
+                    ? 'border-[var(--olive)] text-[var(--olive)]'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}>
                 {t.label}
                 {t.count !== null && (
                   <span className={`ml-1.5 text-xs rounded-full px-1.5 py-0.5 ${
                     activeTab === t.key
-                      ? 'bg-[#7A9A4A]/10 text-[#7A9A4A]'
+                      ? 'bg-[var(--olive)]/10 text-[var(--olive)]'
                       : 'bg-gray-100 text-gray-500'
                   }`}>
                     {t.count}
@@ -189,7 +178,7 @@ export default async function RequestDetailPage({
                   <h2 className="text-sm font-semibold text-gray-900">Client</h2>
                   {client && (
                     <Link href={`/admin/clients/${client.id}`}
-                      className="text-xs text-[#7A9A4A] hover:underline">
+                      className="text-xs text-[var(--olive)] hover:underline">
                       View profile
                     </Link>
                   )}
@@ -281,7 +270,7 @@ export default async function RequestDetailPage({
                 <Link
                   href={`/admin/quotes/new?request=${id}`}
                   className="inline-block rounded-md px-4 py-2 text-sm font-medium text-white"
-                  style={{ backgroundColor: '#7A9A4A' }}>
+                  style={{ backgroundColor: 'var(--olive)' }}>
                   Create First Quote
                 </Link>
               </div>
@@ -302,10 +291,7 @@ export default async function RequestDetailPage({
                               <span className="text-sm font-semibold text-gray-900 font-mono">
                                 #{quote.quote_number}.{version.version_number}
                               </span>
-                              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                                VERSION_STATUS_STYLES[version.status] ?? 'bg-gray-100 text-gray-600'}`}>
-                                {version.status}
-                              </span>
+                              <StatusBadge status={version.status} />
                             </div>
                             {(version.title || (quote.tours as any)?.title_en) && (
                               <p className="text-sm text-gray-600 truncate">
@@ -325,7 +311,7 @@ export default async function RequestDetailPage({
                             <Link
                               href={`/admin/quotes/${quote.id}/versions/${version.id}`}
                               className="rounded-md px-3 py-1.5 text-xs font-medium text-white"
-                              style={{ backgroundColor: '#7A9A4A' }}>
+                              style={{ backgroundColor: 'var(--olive)' }}>
                               Edit Quote
                             </Link>
                             <Link
@@ -341,7 +327,7 @@ export default async function RequestDetailPage({
                 ))}
                 <Link
                   href={`/admin/quotes/new?request=${id}`}
-                  className="text-sm font-medium text-[#7A9A4A] hover:text-[#4C5E2A]">
+                  className="text-sm font-medium text-[var(--olive)] hover:text-[var(--olive-dk)]">
                   + Create Another Quote
                 </Link>
               </>
@@ -359,7 +345,7 @@ export default async function RequestDetailPage({
                   <div className="flex justify-between">
                     <span className="text-gray-500">Tour</span>
                     <Link href={`/admin/tours/${request.tour_id}`}
-                      className="text-[#7A9A4A] hover:underline font-medium text-right max-w-[260px]">
+                      className="text-[var(--olive)] hover:underline font-medium text-right max-w-[260px]">
                       {linkedTour.title_en}
                     </Link>
                   </div>

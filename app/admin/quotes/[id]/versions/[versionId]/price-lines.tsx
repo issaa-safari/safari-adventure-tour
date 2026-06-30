@@ -94,7 +94,7 @@ function toLocal(line: PriceLine, defaultMarkup: number): LocalLine {
   }
 }
 
-const cellCls = 'w-full bg-transparent border-0 border-b border-transparent focus:border-[#7A9A4A] focus:outline-none px-1 py-0.5 text-sm text-gray-900 placeholder-gray-300 transition-colors hover:border-gray-300'
+const cellCls = 'w-full bg-transparent border-0 border-b border-transparent focus:border-[var(--olive)] focus:outline-none px-1 py-0.5 text-sm text-gray-900 placeholder-gray-300 transition-colors hover:border-gray-300'
 const numCls  = cellCls + ' text-right tabular-nums'
 
 function blankForm(category: string, defaultMarkup = 20) {
@@ -316,7 +316,7 @@ export default function PriceLinesEditor({
                     value={line.costCategory}
                     onChange={e => updateLocal(line.id, { costCategory: e.target.value })}
                     onBlur={() => autoSave(line)}
-                    className={`text-xs rounded border px-1 py-0.5 font-medium focus:outline-none focus:ring-1 focus:ring-[#7A9A4A] ${CATEGORY_COLORS[line.costCategory] ?? 'bg-gray-100 text-gray-600 border-gray-200'}`}
+                    className={`text-xs rounded border px-1 py-0.5 font-medium focus:outline-none focus:ring-1 focus:ring-[var(--olive)] ${CATEGORY_COLORS[line.costCategory] ?? 'bg-gray-100 text-gray-600 border-gray-200'}`}
                   >
                     {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                   </select>
@@ -375,7 +375,7 @@ export default function PriceLinesEditor({
                     value={line.pricingUnit}
                     onChange={e => updateLocal(line.id, { pricingUnit: e.target.value })}
                     onBlur={() => autoSave(line)}
-                    className="text-xs rounded border border-transparent hover:border-gray-300 focus:border-[#7A9A4A] focus:outline-none px-1 py-0.5 bg-transparent text-gray-600 w-full"
+                    className="text-xs rounded border border-transparent hover:border-gray-300 focus:border-[var(--olive)] focus:outline-none px-1 py-0.5 bg-transparent text-gray-600 w-full"
                   >
                     {UNITS.map(u => <option key={u.value} value={u.value}>{u.label}</option>)}
                   </select>
@@ -432,7 +432,7 @@ export default function PriceLinesEditor({
                         updateLocal(line.id, { isOptional: e.target.checked })
                         setTimeout(() => autoSave({ ...line, isOptional: e.target.checked }), 0)
                       }}
-                      className="h-3 w-3 rounded border-gray-300 text-[#7A9A4A]"
+                      className="h-3 w-3 rounded border-gray-300 text-[var(--olive)]"
                     />
                     Optional add-on
                   </label>
@@ -451,7 +451,7 @@ export default function PriceLinesEditor({
       {addingCategory && !isLocked && (
         <div className="border-t border-gray-100 px-4 py-3 bg-gray-50/60 space-y-2">
           <input
-            className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#7A9A4A] bg-white"
+            className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--olive)] bg-white"
             value={addForm.description}
             onChange={e => setAddForm(v => ({ ...v, description: e.target.value }))}
             placeholder="Description…"
@@ -459,7 +459,7 @@ export default function PriceLinesEditor({
           />
           <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
             <select
-              className="rounded border border-gray-200 px-1.5 py-1 text-xs text-gray-600 bg-white focus:outline-none focus:ring-1 focus:ring-[#7A9A4A]"
+              className="rounded border border-gray-200 px-1.5 py-1 text-xs text-gray-600 bg-white focus:outline-none focus:ring-1 focus:ring-[var(--olive)]"
               value={addForm.costCategory}
               onChange={e => setAddForm(v => ({ ...v, costCategory: e.target.value }))}
             >
@@ -467,7 +467,7 @@ export default function PriceLinesEditor({
             </select>
             <input
               type="number" min="0.01" step="0.01"
-              className="w-16 text-center rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#7A9A4A] bg-white"
+              className="w-16 text-center rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--olive)] bg-white"
               value={addForm.quantity}
               onChange={e => setAddForm(v => ({ ...v, quantity: e.target.value }))}
               title="Quantity"
@@ -477,14 +477,14 @@ export default function PriceLinesEditor({
               <span className="text-gray-400">$</span>
               <input
                 type="number" min="0" step="0.01"
-                className="w-24 rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#7A9A4A] bg-white"
+                className="w-24 rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--olive)] bg-white"
                 value={addForm.unitCostUsd}
                 onChange={e => setAddForm(v => ({ ...v, unitCostUsd: e.target.value }))}
                 placeholder="0.00"
               />
             </div>
             <select
-              className="rounded border border-gray-200 px-1.5 py-1 text-xs text-gray-600 bg-white focus:outline-none focus:ring-1 focus:ring-[#7A9A4A]"
+              className="rounded border border-gray-200 px-1.5 py-1 text-xs text-gray-600 bg-white focus:outline-none focus:ring-1 focus:ring-[var(--olive)]"
               value={addForm.pricingUnit}
               onChange={e => setAddForm(v => ({ ...v, pricingUnit: e.target.value }))}
             >
@@ -494,7 +494,7 @@ export default function PriceLinesEditor({
             <div className="flex items-center gap-0.5">
               <input
                 type="number" min="0" step="0.5"
-                className="w-14 text-center rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#7A9A4A] bg-white"
+                className="w-14 text-center rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--olive)] bg-white"
                 value={addForm.markupPercent}
                 onChange={e => setAddForm(v => ({ ...v, markupPercent: e.target.value }))}
               />
@@ -513,7 +513,7 @@ export default function PriceLinesEditor({
                 type="checkbox"
                 checked={addForm.isOptional}
                 onChange={e => setAddForm(v => ({ ...v, isOptional: e.target.checked }))}
-                className="h-3.5 w-3.5 rounded border-gray-300 text-[#7A9A4A]"
+                className="h-3.5 w-3.5 rounded border-gray-300 text-[var(--olive)]"
               />
               Optional add-on
             </label>
@@ -521,7 +521,7 @@ export default function PriceLinesEditor({
               {entities && (
                 <button type="button"
                   onClick={() => { setAddingCategory(null); setShowRatePicker(true) }}
-                  className="text-xs text-[#7A9A4A] hover:text-[#4C5E2A]">
+                  className="text-xs text-[var(--olive)] hover:text-[var(--olive-dk)]">
                   ⚡ Rate card
                 </button>
               )}
@@ -535,7 +535,7 @@ export default function PriceLinesEditor({
                 onClick={handleAdd}
                 disabled={addPending || !addForm.description.trim() || !addForm.unitCostUsd}
                 className="text-xs font-medium text-white px-3 py-1 rounded disabled:opacity-50"
-                style={{ backgroundColor: '#7A9A4A' }}
+                style={{ backgroundColor: 'var(--olive)' }}
               >
                 {addPending ? '…' : 'Add'}
               </button>
@@ -580,7 +580,7 @@ export default function PriceLinesEditor({
             <button
               type="button"
               onClick={() => { setShowRatePicker(true); setAddError('') }}
-              className="w-full text-left px-4 py-2.5 text-sm text-[#7A9A4A] hover:bg-[#7A9A4A]/5 transition-colors border-t border-gray-100"
+              className="w-full text-left px-4 py-2.5 text-sm text-[var(--olive)] hover:bg-[var(--olive)]/5 transition-colors border-t border-gray-100"
             >
               ⚡ From rate card…
             </button>
@@ -594,7 +594,7 @@ export default function PriceLinesEditor({
           <span className="text-xs text-gray-500">Set all markups to:</span>
           <input
             type="number" min="0" step="0.5"
-            className="w-16 text-center rounded border border-gray-300 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-[#7A9A4A]"
+            className="w-16 text-center rounded border border-gray-300 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--olive)]"
             value={bulkMarkup}
             onChange={e => setBulkMarkup(e.target.value)}
             placeholder="%"
@@ -616,7 +616,7 @@ export default function PriceLinesEditor({
               })
             }}
             className="text-xs font-medium text-white px-3 py-1 rounded disabled:opacity-40"
-            style={{ backgroundColor: '#C9A84C' }}
+            style={{ backgroundColor: 'var(--gold)' }}
           >
             {bulkPending ? '…' : 'Apply to all'}
           </button>

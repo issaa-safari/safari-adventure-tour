@@ -37,7 +37,7 @@ export default function AdminLoginPage() {
       <div
         className="hidden lg:flex lg:w-1/2 relative items-end p-12"
         style={{
-          backgroundImage: 'linear-gradient(160deg, #2F3B1F 0%, #4C5E2A 45%, #7A9A4A 100%)',
+          backgroundImage: 'linear-gradient(160deg, #2F3B1F 0%, var(--olive-dk) 45%, var(--olive) 100%)',
         }}
       >
         <div className="absolute inset-0 bg-black/20" />
@@ -54,7 +54,7 @@ export default function AdminLoginPage() {
       <div className="flex w-full lg:w-1/2 items-center justify-center bg-white px-6 py-12">
         <div className="w-full max-w-sm">
           <div className="mb-8">
-            <div className="h-10 w-10 rounded-lg mb-6" style={{ backgroundColor: '#7A9A4A' }} />
+            <div className="h-10 w-10 rounded-lg mb-6" style={{ backgroundColor: 'var(--olive)' }} />
             <h1 className="text-2xl font-semibold text-gray-900">Admin Login</h1>
             <p className="text-sm text-gray-500 mt-1">
               Sign in to manage Safari Adventure Tour
@@ -69,7 +69,7 @@ export default function AdminLoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#7A9A4A] focus:border-[#7A9A4A]"
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--olive)] focus:border-[var(--olive)]"
                 placeholder="you@safariadventuretour.com"
               />
             </div>
@@ -81,7 +81,7 @@ export default function AdminLoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A] focus:border-[#7A9A4A]"                placeholder="••••••••"
+className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)] focus:border-[var(--olive)]"                placeholder="••••••••"
               />
             </div>
 
@@ -105,7 +105,7 @@ className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-
             <button
               type="submit"
               disabled={loading}
-className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A] focus:border-[#7A9A4A]"              style={{ backgroundColor: '#7A9A4A' }}
+className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)] focus:border-[var(--olive)]"              style={{ backgroundColor: 'var(--olive)' }}
             >
               {loading ? 'Signing in…' : 'Sign In'}
             </button>

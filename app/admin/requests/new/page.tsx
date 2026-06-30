@@ -38,37 +38,37 @@ export default function NewRequestPage() {
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
               <input type="email" name="email" required placeholder="client@email.com"
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]" />
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
               <input type="text" name="firstName" required
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]" />
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
               <input type="text" name="lastName" required
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]" />
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
               <input type="text" name="phone"
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]" />
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp</label>
               <input type="text" name="whatsapp"
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]" />
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
               <input type="text" name="country"
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]" />
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Language</label>
               <select name="language" defaultValue="en"
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]">
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]">
                 <option value="en">English</option>
                 <option value="ar">Arabic</option>
               </select>
@@ -82,12 +82,12 @@ export default function NewRequestPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Client Message</label>
               <textarea name="clientQuestion" rows={3}
                 placeholder="Paste their WhatsApp message or email here..."
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]" />
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Source</label>
               <select name="source" defaultValue=""
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]">
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]">
                 <option value="">Select source...</option>
                 <option value="whatsapp">WhatsApp</option>
                 <option value="website">Website</option>
@@ -103,7 +103,7 @@ export default function NewRequestPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Start Date</label>
               <input type="date" name="preferredDate"
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]" />
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Travelers</label>
@@ -111,17 +111,17 @@ export default function NewRequestPage() {
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Adults</label>
                   <input type="number" name="adults" min={1} defaultValue={2}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]" />
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]" />
                 </div>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Children 12-18</label>
                   <input type="number" name="childrenOlder" min={0} defaultValue={0}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]" />
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]" />
                 </div>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Children 2-12</label>
                   <input type="number" name="childrenYounger" min={0} defaultValue={0}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]" />
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]" />
                 </div>
               </div>
             </div>
@@ -141,7 +141,7 @@ export default function NewRequestPage() {
         <div className="flex gap-3">
           <button type="submit" disabled={loading}
             className="rounded-md px-6 py-2.5 text-sm font-medium text-white disabled:opacity-60"
-            style={{ backgroundColor: '#7A9A4A' }}>
+            style={{ backgroundColor: 'var(--olive)' }}>
             {loading ? 'Saving...' : 'Save Request'}
           </button>
           <Link href="/admin/requests"

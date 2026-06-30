@@ -35,7 +35,7 @@ export default async function ParksPage() {
         <Link
           href="/admin/content/parks/new"
           className="rounded-md px-4 py-2 text-sm font-medium text-white"
-          style={{ backgroundColor: '#7A9A4A' }}>
+          style={{ backgroundColor: 'var(--olive)' }}>
           + New Park
         </Link>
       </div>
@@ -44,7 +44,7 @@ export default async function ParksPage() {
         {(parks ?? []).length === 0 ? (
           <div className="p-10 text-center">
             <p className="text-sm text-gray-500 mb-4">No parks or reserves yet.</p>
-            <Link href="/admin/content/parks/new" className="text-sm font-medium text-[#7A9A4A] hover:underline">
+            <Link href="/admin/content/parks/new" className="text-sm font-medium text-[var(--olive)] hover:underline">
               Add your first park
             </Link>
           </div>
@@ -77,7 +77,7 @@ export default async function ParksPage() {
                     <Link
                       href={'/admin/content/parks/' + park.id}
                       className="text-xs font-medium text-white rounded-md px-3 py-1.5"
-                      style={{ backgroundColor: '#7A9A4A' }}>
+                      style={{ backgroundColor: 'var(--olive)' }}>
                       Edit
                     </Link>
                   </td>

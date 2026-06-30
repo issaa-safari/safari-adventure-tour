@@ -23,7 +23,7 @@ export default async function SupplierRatesPage() {
           <h1 className="text-lg font-semibold text-gray-900">Supplier Rates</h1>
           <p className="text-sm text-gray-500 mt-0.5">Seasonal reusable costs used by the Quote Builder</p>
         </div>
-        <Link href="/admin/content/rates/new" className="rounded-md px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: '#7A9A4A' }}>
+        <Link href="/admin/content/rates/new" className="rounded-md px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: 'var(--olive)' }}>
           + New Rate Card
         </Link>
       </div>
@@ -32,7 +32,7 @@ export default async function SupplierRatesPage() {
         {!cards?.length ? (
           <div className="p-10 text-center">
             <p className="text-sm text-gray-500 mb-3">No supplier rate cards yet.</p>
-            <Link href="/admin/content/rates/new" className="text-sm font-medium text-[#7A9A4A] hover:underline">Create the first rate card</Link>
+            <Link href="/admin/content/rates/new" className="text-sm font-medium text-[var(--olive)] hover:underline">Create the first rate card</Link>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -60,7 +60,7 @@ export default async function SupplierRatesPage() {
                     </td>
                     <td className="px-4 py-3 text-gray-600">{card.supplier_rates?.[0]?.count ?? 0}</td>
                     <td className="px-4 py-3"><span className={'text-xs px-2 py-0.5 rounded-full font-medium ' + (card.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500')}>{card.is_active ? 'Active' : 'Inactive'}</span></td>
-                    <td className="px-4 py-3 text-right"><Link href={`/admin/content/rates/${card.id}`} className="text-sm font-medium text-[#7A9A4A] hover:underline">Edit</Link></td>
+                    <td className="px-4 py-3 text-right"><Link href={`/admin/content/rates/${card.id}`} className="text-sm font-medium text-[var(--olive)] hover:underline">Edit</Link></td>
                   </tr>
                 ))}
               </tbody>

@@ -16,8 +16,8 @@ type Rate = {
   pricing_unit: string; amount: number; min_group_size: number | null; max_group_size: number | null
 }
 
-const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]'
-const smallInputCls = 'w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]'
+const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]'
+const smallInputCls = 'w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]'
 const linkedTypes = new Set(['accommodation', 'activity', 'vehicle', 'staff', 'destination'])
 const roomCategories = ['sharing', 'single', 'triple', 'extra_bed', 'no_bed']
 
@@ -79,13 +79,13 @@ export default function RateCardEditor({ card, rates, ageBands, entities }: { ca
           <div><label className="block text-sm font-medium text-gray-700 mb-1">Valid To</label><input type="date" name="validTo" defaultValue={card.valid_to} required className={inputCls} /></div>
         </div>
         <div><label className="block text-sm font-medium text-gray-700 mb-1">Notes</label><textarea name="notes" defaultValue={card.notes ?? ''} rows={2} className={inputCls} /></div>
-        <div className="flex items-center justify-between"><label className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)} className="accent-[#7A9A4A]" />Active</label><button disabled={pending} className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60" style={{ backgroundColor: '#7A9A4A' }}>Save Card</button></div>
+        <div className="flex items-center justify-between"><label className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)} className="accent-[var(--olive)]" />Active</label><button disabled={pending} className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60" style={{ backgroundColor: 'var(--olive)' }}>Save Card</button></div>
       </form>
 
       <section className="space-y-3">
         <div><h2 className="text-sm font-semibold text-gray-900">Rates</h2><p className="text-xs text-gray-500">Use blank traveller or room categories when the rate applies to all.</p></div>
-        {rates.map(rate => <form key={rate.id} onSubmit={event => rateSubmit(event, rate.id)} className="bg-white rounded-lg border border-gray-200 p-4"><div className="grid grid-cols-2 md:grid-cols-7 gap-2"><RateFields rate={rate} ageBands={ageBands} /></div><div className="flex justify-end gap-2 mt-3"><button type="button" onClick={() => removeRate(rate.id)} disabled={pending} className="text-xs text-red-600 px-3 py-1.5">Delete</button><button disabled={pending} className="rounded-md px-3 py-1.5 text-xs font-medium text-white" style={{ backgroundColor: '#7A9A4A' }}>Save Rate</button></div></form>)}
-        <form onSubmit={event => rateSubmit(event)} className="bg-[#7A9A4A]/5 rounded-lg border border-[#7A9A4A]/30 p-4"><p className="text-sm font-medium text-gray-700 mb-3">Add Rate</p><div className="grid grid-cols-2 md:grid-cols-7 gap-2"><RateFields ageBands={ageBands} /></div><div className="flex justify-end mt-3"><button disabled={pending} className="rounded-md px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: '#7A9A4A' }}>+ Add Rate</button></div></form>
+        {rates.map(rate => <form key={rate.id} onSubmit={event => rateSubmit(event, rate.id)} className="bg-white rounded-lg border border-gray-200 p-4"><div className="grid grid-cols-2 md:grid-cols-7 gap-2"><RateFields rate={rate} ageBands={ageBands} /></div><div className="flex justify-end gap-2 mt-3"><button type="button" onClick={() => removeRate(rate.id)} disabled={pending} className="text-xs text-red-600 px-3 py-1.5">Delete</button><button disabled={pending} className="rounded-md px-3 py-1.5 text-xs font-medium text-white" style={{ backgroundColor: 'var(--olive)' }}>Save Rate</button></div></form>)}
+        <form onSubmit={event => rateSubmit(event)} className="bg-[var(--olive)]/5 rounded-lg border border-[var(--olive)]/30 p-4"><p className="text-sm font-medium text-gray-700 mb-3">Add Rate</p><div className="grid grid-cols-2 md:grid-cols-7 gap-2"><RateFields ageBands={ageBands} /></div><div className="flex justify-end mt-3"><button disabled={pending} className="rounded-md px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: 'var(--olive)' }}>+ Add Rate</button></div></form>
       </section>
 
       {error && <p className="text-sm text-red-600 bg-red-50 rounded-md px-4 py-3">{error}</p>}

@@ -71,7 +71,7 @@ export default function ReceivablesTable({ rows }: { rows: ReceivableRow[] }) {
                   <p className="text-sm font-semibold text-gray-900">${fmt(row.totalSelling)}</p>
                   <div className="flex items-center gap-2 mt-0.5 justify-end">
                     <div className="w-20 h-1.5 rounded-full bg-gray-100 overflow-hidden">
-                      <div className="h-full rounded-full bg-[#7A9A4A]" style={{ width: `${pct}%` }} />
+                      <div className="h-full rounded-full bg-[var(--olive)]" style={{ width: `${pct}%` }} />
                     </div>
                     <span className="text-xs text-gray-400">{pct}%</span>
                   </div>
@@ -136,7 +136,7 @@ export default function ReceivablesTable({ rows }: { rows: ReceivableRow[] }) {
                       <button
                         type="button"
                         onClick={() => setPaying(row.quoteId)}
-                        className="text-sm font-medium text-[#4C5E2A] hover:text-[#7A9A4A] border border-[#7A9A4A]/30 rounded px-3 py-1.5 hover:bg-[#7A9A4A]/5 transition"
+                        className="text-sm font-medium text-[var(--olive-dk)] hover:text-[var(--olive)] border border-[var(--olive)]/30 rounded px-3 py-1.5 hover:bg-[var(--olive)]/5 transition"
                       >
                         + Record payment
                       </button>

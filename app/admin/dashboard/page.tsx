@@ -113,7 +113,7 @@ export default async function AdminDashboardPage() {
         <h1 className="text-lg font-semibold text-gray-900">Dashboard</h1>
         <Link href="/admin/requests/new"
           className="rounded-md px-4 py-2 text-sm font-medium text-white"
-          style={{ backgroundColor: '#7A9A4A' }}>
+          style={{ backgroundColor: 'var(--olive)' }}>
           + New Request
         </Link>
       </div>
@@ -161,7 +161,7 @@ export default async function AdminDashboardPage() {
                       className="w-full rounded-t"
                       style={{
                         height: m.total > 0 ? `${Math.max((m.total / chartMax) * 96, 4)}px` : '2px',
-                        backgroundColor: i === 5 ? '#7A9A4A' : '#B8CFA0',
+                        backgroundColor: i === 5 ? 'var(--olive)' : '#B8CFA0',
                       }}
                     />
                   </div>
@@ -177,7 +177,7 @@ export default async function AdminDashboardPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-gray-900">Upcoming Departures</h2>
-            <Link href="/admin/departures" className="text-xs text-[#7A9A4A] hover:underline">View all</Link>
+            <Link href="/admin/departures" className="text-xs text-[var(--olive)] hover:underline">View all</Link>
           </div>
           {upcomingDepartures && upcomingDepartures.length > 0 ? (
             <ul className="space-y-3">
@@ -202,12 +202,12 @@ export default async function AdminDashboardPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-gray-900">Requests Pipeline</h2>
-            <Link href="/admin/requests" className="text-xs text-[#7A9A4A] hover:underline">View all</Link>
+            <Link href="/admin/requests" className="text-xs text-[var(--olive)] hover:underline">View all</Link>
           </div>
           <ul className="space-y-2 text-sm">
             {stageCounts.map(s => (
               <li key={s.key} className="flex justify-between text-gray-700">
-                <Link href={`/admin/requests?stage=${s.key}`} className="hover:text-[#7A9A4A]">{s.label}</Link>
+                <Link href={`/admin/requests?stage=${s.key}`} className="hover:text-[var(--olive)]">{s.label}</Link>
                 <span className="font-medium tabular-nums">{s.count}</span>
               </li>
             ))}

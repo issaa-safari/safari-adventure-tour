@@ -37,7 +37,7 @@ export default async function DestinationsPage({
         <Link
           href="/admin/content/destinations/new"
           className="rounded-md px-4 py-2 text-sm font-medium text-white"
-          style={{ backgroundColor: '#7A9A4A' }}>
+          style={{ backgroundColor: 'var(--olive)' }}>
           + New Destination
         </Link>
       </div>
@@ -48,7 +48,7 @@ export default async function DestinationsPage({
           href="/admin/content/destinations?tab=content"
           className={'px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ' +
             (activeTab === 'content'
-              ? 'border-[#7A9A4A] text-[#7A9A4A]'
+              ? 'border-[var(--olive)] text-[var(--olive)]'
               : 'border-transparent text-gray-500 hover:text-gray-700')}>
           With Content
           <span className="ml-1.5 text-xs text-gray-400">({withContent.length})</span>
@@ -57,7 +57,7 @@ export default async function DestinationsPage({
           href="/admin/content/destinations?tab=empty"
           className={'px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ' +
             (activeTab === 'empty'
-              ? 'border-[#7A9A4A] text-[#7A9A4A]'
+              ? 'border-[var(--olive)] text-[var(--olive)]'
               : 'border-transparent text-gray-500 hover:text-gray-700')}>
           Without Content
           <span className="ml-1.5 text-xs text-gray-400">({withoutContent.length})</span>
@@ -75,7 +75,7 @@ export default async function DestinationsPage({
             {activeTab === 'content' && (
               <Link
                 href="/admin/content/destinations/new"
-                className="text-sm font-medium text-[#7A9A4A] hover:underline">
+                className="text-sm font-medium text-[var(--olive)] hover:underline">
                 Add your first destination
               </Link>
             )}
@@ -113,7 +113,7 @@ export default async function DestinationsPage({
                     <Link
                       href={'/admin/content/destinations/' + dest.id}
                       className="text-xs font-medium text-white rounded-md px-3 py-1.5"
-                      style={{ backgroundColor: '#7A9A4A' }}>
+                      style={{ backgroundColor: 'var(--olive)' }}>
                       Edit
                     </Link>
                   </td>

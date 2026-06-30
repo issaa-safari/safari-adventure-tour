@@ -31,7 +31,7 @@ export default async function ClientsPage({
         <h1 className="text-lg font-semibold text-gray-900">Clients</h1>
         <Link href="/admin/requests/new"
           className="rounded-md px-4 py-2 text-sm font-medium text-white"
-          style={{ backgroundColor: '#7A9A4A' }}>
+          style={{ backgroundColor: 'var(--olive)' }}>
           + New Request
         </Link>
       </div>
@@ -55,8 +55,8 @@ export default async function ClientsPage({
         <form method="GET" className="flex gap-2 flex-1">
           <input type="text" name="search" defaultValue={search}
             placeholder="Search by name or email..."
-            className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]" />
-          <button type="submit" className="rounded-md px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: '#7A9A4A' }}>
+            className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]" />
+          <button type="submit" className="rounded-md px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: 'var(--olive)' }}>
             Search
           </button>
         </form>
@@ -65,7 +65,7 @@ export default async function ClientsPage({
             <Link key={f.key} href={"/admin/clients?filter=" + f.key}
               className={"rounded-md px-3 py-2 text-sm font-medium border transition " +
                 (filter === f.key ? 'text-white border-transparent' : 'bg-white text-gray-600 border-gray-200')}
-              style={filter === f.key ? { backgroundColor: '#7A9A4A' } : {}}>
+              style={filter === f.key ? { backgroundColor: 'var(--olive)' } : {}}>
               {f.label}
             </Link>
           ))}
@@ -96,12 +96,12 @@ export default async function ClientsPage({
                   className={"border-b border-gray-50 hover:bg-gray-50 transition " + (i === clients.length - 1 ? 'border-0' : '')}>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-full bg-[#7A9A4A]/10 flex items-center justify-center text-xs font-medium text-[#4C5E2A]">
+                      <div className="h-8 w-8 rounded-full bg-[var(--olive)]/10 flex items-center justify-center text-xs font-medium text-[var(--olive-dk)]">
                         {(client.first_name?.[0] ?? '?').toUpperCase()}
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">{client.first_name} {client.last_name}</p>
-                        {client.total_bookings >= 2 && <span className="text-xs text-[#7A9A4A]">Repeat booker</span>}
+                        {client.total_bookings >= 2 && <span className="text-xs text-[var(--olive)]">Repeat booker</span>}
                       </div>
                     </div>
                   </td>
@@ -118,7 +118,7 @@ export default async function ClientsPage({
   <Link
     href={"/admin/clients/" + client.id}
     className="text-xs font-medium text-white rounded-md px-3 py-1.5"
-    style={{ backgroundColor: '#7A9A4A' }}>
+    style={{ backgroundColor: 'var(--olive)' }}>
     View
   </Link>
 </td>

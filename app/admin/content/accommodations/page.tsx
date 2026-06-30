@@ -43,7 +43,7 @@ export default async function AccommodationsPage({
         <Link
           href="/admin/content/accommodations/new"
           className="rounded-md px-4 py-2 text-sm font-medium text-white"
-          style={{ backgroundColor: '#7A9A4A' }}>
+          style={{ backgroundColor: 'var(--olive)' }}>
           + New Accommodation
         </Link>
       </div>
@@ -54,7 +54,7 @@ export default async function AccommodationsPage({
           href="/admin/content/accommodations?tab=content"
           className={'px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ' +
             (activeTab === 'content'
-              ? 'border-[#7A9A4A] text-[#7A9A4A]'
+              ? 'border-[var(--olive)] text-[var(--olive)]'
               : 'border-transparent text-gray-500 hover:text-gray-700')}>
           With Content
           <span className="ml-1.5 text-xs text-gray-400">({withContent.length})</span>
@@ -63,7 +63,7 @@ export default async function AccommodationsPage({
           href="/admin/content/accommodations?tab=empty"
           className={'px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ' +
             (activeTab === 'empty'
-              ? 'border-[#7A9A4A] text-[#7A9A4A]'
+              ? 'border-[var(--olive)] text-[var(--olive)]'
               : 'border-transparent text-gray-500 hover:text-gray-700')}>
           Without Content
           <span className="ml-1.5 text-xs text-gray-400">({withoutContent.length})</span>
@@ -81,7 +81,7 @@ export default async function AccommodationsPage({
             {activeTab === 'content' && (
               <Link
                 href="/admin/content/accommodations/new"
-                className="text-sm font-medium text-[#7A9A4A] hover:underline">
+                className="text-sm font-medium text-[var(--olive)] hover:underline">
                 Add your first accommodation
               </Link>
             )}

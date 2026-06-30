@@ -27,7 +27,7 @@ export default async function ToursPage() {
         </div>
         <Link href="/admin/tours/new"
           className="rounded-md px-4 py-2 text-sm font-medium text-white"
-          style={{ backgroundColor: '#7A9A4A' }}>
+          style={{ backgroundColor: 'var(--olive)' }}>
           Create Your Template
         </Link>
       </div>
@@ -37,7 +37,7 @@ export default async function ToursPage() {
           <p className="text-gray-400 text-sm">No tours yet.</p>
           <Link href="/admin/tours/new"
             className="mt-4 inline-block rounded-md px-4 py-2 text-sm font-medium text-white"
-            style={{ backgroundColor: '#7A9A4A' }}>
+            style={{ backgroundColor: 'var(--olive)' }}>
             Create First Template
           </Link>
         </div>
@@ -45,10 +45,10 @@ export default async function ToursPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {tours.map((tour: any) => (
             <div key={tour.id}
-              className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:border-[#7A9A4A] hover:shadow-sm transition flex flex-col">
+              className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:border-[var(--olive)] hover:shadow-sm transition flex flex-col">
 
               {/* Card image / colour band */}
-              <div className="h-28 bg-gradient-to-br from-[#4C5E2A] to-[#7A9A4A] relative flex items-start justify-between p-3">
+              <div className="h-28 bg-gradient-to-br from-[var(--olive-dk)] to-[var(--olive)] relative flex items-start justify-between p-3">
                 <span className="text-xs font-medium bg-white/20 text-white px-2 py-0.5 rounded-full">
                   {TYPE_LABEL[tour.type] ?? tour.type}
                 </span>
@@ -104,7 +104,7 @@ export default async function ToursPage() {
                 <div className="mt-4 flex items-center gap-2">
                   <Link href={`/admin/tours/${tour.id}`}
                     className="flex-1 rounded-md px-3 py-1.5 text-xs font-medium text-white text-center"
-                    style={{ backgroundColor: '#7A9A4A' }}>
+                    style={{ backgroundColor: 'var(--olive)' }}>
                     Edit Tour
                   </Link>
                   <Link href={`/admin/tours/${tour.id}/days`}

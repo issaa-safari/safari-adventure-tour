@@ -36,7 +36,7 @@ export default async function ActivitiesPage({
         <Link
           href="/admin/content/activities/new"
           className="rounded-md px-4 py-2 text-sm font-medium text-white"
-          style={{ backgroundColor: '#7A9A4A' }}>
+          style={{ backgroundColor: 'var(--olive)' }}>
           + New Activity
         </Link>
       </div>
@@ -46,7 +46,7 @@ export default async function ActivitiesPage({
           href="/admin/content/activities?tab=content"
           className={'px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ' +
             (activeTab === 'content'
-              ? 'border-[#7A9A4A] text-[#7A9A4A]'
+              ? 'border-[var(--olive)] text-[var(--olive)]'
               : 'border-transparent text-gray-500 hover:text-gray-700')}>
           With Content
           <span className="ml-1.5 text-xs text-gray-400">({withContent.length})</span>
@@ -55,7 +55,7 @@ export default async function ActivitiesPage({
           href="/admin/content/activities?tab=empty"
           className={'px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ' +
             (activeTab === 'empty'
-              ? 'border-[#7A9A4A] text-[#7A9A4A]'
+              ? 'border-[var(--olive)] text-[var(--olive)]'
               : 'border-transparent text-gray-500 hover:text-gray-700')}>
           Without Content
           <span className="ml-1.5 text-xs text-gray-400">({withoutContent.length})</span>
@@ -69,7 +69,7 @@ export default async function ActivitiesPage({
               {activeTab === 'content' ? 'No activities with content yet.' : 'All activities have content.'}
             </p>
             {activeTab === 'content' && (
-              <Link href="/admin/content/activities/new" className="text-sm font-medium text-[#7A9A4A] hover:underline">
+              <Link href="/admin/content/activities/new" className="text-sm font-medium text-[var(--olive)] hover:underline">
                 Add your first activity
               </Link>
             )}
@@ -82,7 +82,6 @@ export default async function ActivitiesPage({
                 <th className="px-4 py-3 font-medium hidden sm:table-cell">Location</th>
                 <th className="px-4 py-3 font-medium text-center hidden md:table-cell">Description</th>
                 <th className="px-4 py-3 font-medium text-center hidden md:table-cell">Image</th>
-                <th className="px-4 py-3 font-medium text-center hidden md:table-cell">Video</th>
                 <th className="px-4 py-3"></th>
               </tr>
             </thead>
@@ -111,11 +110,6 @@ export default async function ActivitiesPage({
                       <span className={`inline-flex items-center justify-center w-6 h-6 rounded text-xs font-medium ${
                         hasImg ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-400'}`}>
                         {hasImg}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-center hidden md:table-cell">
-                      <span className="inline-flex items-center justify-center w-6 h-6 rounded text-xs font-medium bg-gray-100 text-gray-400">
-                        0
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right">

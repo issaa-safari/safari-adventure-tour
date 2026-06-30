@@ -217,7 +217,7 @@ export default async function AnalyticsPage() {
                         className="flex-1 rounded-t"
                         style={{
                           height: `${Math.max((m.accepted / chartMaxCreated) * 96, 4)}px`,
-                          backgroundColor: i === 5 ? '#7A9A4A' : '#9DB870',
+                          backgroundColor: i === 5 ? 'var(--olive)' : '#9DB870',
                         }}
                       />
                     )}
@@ -235,7 +235,7 @@ export default async function AnalyticsPage() {
               Created
             </div>
             <div className="flex items-center gap-1.5 text-xs text-gray-500">
-              <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#7A9A4A' }} />
+              <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: 'var(--olive)' }} />
               Accepted
             </div>
           </div>
@@ -330,7 +330,7 @@ export default async function AnalyticsPage() {
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full"
-                        style={{ width: `${Math.max(barPct, 1)}%`, backgroundColor: '#7A9A4A' }}
+                        style={{ width: `${Math.max(barPct, 1)}%`, backgroundColor: 'var(--olive)' }}
                       />
                     </div>
                   </div>
@@ -348,7 +348,7 @@ export default async function AnalyticsPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-gray-900">Website Bookings</h2>
-            <Link href="/admin/bookings" className="text-xs text-[#7A9A4A] hover:underline">View all</Link>
+            <Link href="/admin/bookings" className="text-xs text-[var(--olive)] hover:underline">View all</Link>
           </div>
           {totalBookings === 0 ? (
             <p className="text-sm text-gray-400 py-8 text-center">No website bookings yet.</p>
@@ -359,7 +359,7 @@ export default async function AnalyticsPage() {
                 <p className="text-xs text-gray-500 mt-0.5">Bookings</p>
               </div>
               <div>
-                <p className="text-2xl font-semibold" style={{ color: '#7A9A4A' }}>${fmt(bookingRevenue)}</p>
+                <p className="text-2xl font-semibold" style={{ color: 'var(--olive)' }}>${fmt(bookingRevenue)}</p>
                 <p className="text-xs text-gray-500 mt-0.5">Revenue</p>
               </div>
               <div>
@@ -389,7 +389,7 @@ export default async function AnalyticsPage() {
                       </span>
                     </div>
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full" style={{ width: `${Math.max(barPct, 1)}%`, backgroundColor: '#7A9A4A' }} />
+                      <div className="h-full rounded-full" style={{ width: `${Math.max(barPct, 1)}%`, backgroundColor: 'var(--olive)' }} />
                     </div>
                   </div>
                 )
@@ -403,7 +403,7 @@ export default async function AnalyticsPage() {
       <div className="bg-white rounded-lg border border-gray-200 p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold text-gray-900">Request Pipeline</h2>
-          <Link href="/admin/requests" className="text-xs text-[#7A9A4A] hover:underline">View all</Link>
+          <Link href="/admin/requests" className="text-xs text-[var(--olive)] hover:underline">View all</Link>
         </div>
         {totalRequests === 0 ? (
           <p className="text-sm text-gray-400 py-4 text-center">No requests yet.</p>
@@ -414,7 +414,7 @@ export default async function AnalyticsPage() {
               const p = Math.round((count / totalRequests) * 100)
               return (
                 <Link key={stage} href={`/admin/requests?stage=${stage}`}
-                  className="text-center p-3 rounded-lg bg-gray-50 hover:bg-[#7A9A4A]/5 hover:border-[#7A9A4A]/20 border border-transparent transition">
+                  className="text-center p-3 rounded-lg bg-gray-50 hover:bg-[var(--olive)]/5 hover:border-[var(--olive)]/20 border border-transparent transition">
                   <p className="text-2xl font-semibold text-gray-900">{count}</p>
                   <p className="text-xs text-gray-500 capitalize mt-0.5">{stage.replace('_', ' ')}</p>
                   <p className="text-xs text-gray-400">{p}%</p>

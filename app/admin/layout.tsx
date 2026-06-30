@@ -17,7 +17,7 @@ export default async function AdminLayout({
   if (!adminProfile) return <>{children}</>
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--safari-parchment)' }}>
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--admin-bg)' }}>
       <AdminSidebar
         fullName={adminProfile?.full_name ?? user.email ?? 'Admin'}
         role={adminProfile?.role ?? 'admin'}

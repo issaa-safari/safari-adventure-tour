@@ -132,11 +132,11 @@ export default function RatePicker({
     setDescription(name)
   }
 
-  const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]'
+  const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--olive)]'
   const labelCls = 'block text-xs text-gray-500 mb-1'
 
   return (
-    <div className="bg-[#7A9A4A]/5 rounded-lg border border-[#7A9A4A]/20 p-4 space-y-4">
+    <div className="bg-[var(--olive)]/5 rounded-lg border border-[var(--olive)]/20 p-4 space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium text-gray-700">Add from rate card</p>
         <button type="button" onClick={onCancel} className="text-xs text-gray-400 hover:text-gray-600">✕</button>
@@ -179,7 +179,7 @@ export default function RatePicker({
               onClick={handleLookup}
               disabled={!entityId || !date || lookupPending}
               className="shrink-0 px-3 py-2 rounded-md text-sm font-medium text-white disabled:opacity-40"
-              style={{ backgroundColor: '#7A9A4A' }}
+              style={{ backgroundColor: 'var(--olive)' }}
             >
               {lookupPending ? '…' : 'Find'}
             </button>
@@ -208,8 +208,8 @@ export default function RatePicker({
                     onClick={() => setSelectedRate({ card, rate })}
                     className={`text-left rounded-md border px-3 py-2 text-sm transition ${
                       isSelected
-                        ? 'border-[#7A9A4A] bg-[#7A9A4A]/5 text-[#4C5E2A]'
-                        : 'border-gray-200 hover:border-[#7A9A4A]/40 text-gray-700'
+                        ? 'border-[var(--olive)] bg-[var(--olive)]/5 text-[var(--olive-dk)]'
+                        : 'border-gray-200 hover:border-[var(--olive)]/40 text-gray-700'
                     }`}
                   >
                     <span className="font-medium">{card.name}</span>
@@ -230,7 +230,7 @@ export default function RatePicker({
 
       {/* Step 3: Quantity + description + markup */}
       {selectedRate && (
-        <div className="space-y-3 pt-1 border-t border-[#7A9A4A]/20">
+        <div className="space-y-3 pt-1 border-t border-[var(--olive)]/20">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <label className={labelCls}>
@@ -277,7 +277,7 @@ export default function RatePicker({
             <input
               type="checkbox" checked={isOptional}
               onChange={e => setIsOptional(e.target.checked)}
-              className="h-4 w-4 rounded border-gray-300 text-[#7A9A4A]"
+              className="h-4 w-4 rounded border-gray-300 text-[var(--olive)]"
             />
             Optional item (add-on)
           </label>
@@ -293,7 +293,7 @@ export default function RatePicker({
             onClick={handleAdd}
             disabled={addPending || !description.trim() || !totalSelling}
             className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-            style={{ backgroundColor: '#7A9A4A' }}
+            style={{ backgroundColor: 'var(--olive)' }}
           >
             {addPending ? 'Adding…' : 'Add Line'}
           </button>
