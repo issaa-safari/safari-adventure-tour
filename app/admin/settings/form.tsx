@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { saveSettings } from './actions'
+import { Button } from '@/components/ui/button'
+import { Alert } from '@/components/ui/alert'
 
 interface Settings {
   id: string
@@ -33,7 +35,7 @@ interface Settings {
   updated_at: string
 }
 
-const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]'
+const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]'
 const labelCls = 'block text-sm font-medium text-gray-700 mb-1'
 
 function Field({ label, name, value, type = 'text', ...props }: {
@@ -118,11 +120,9 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
         </div>
       </Section>
 
-      {error && <p className="text-sm text-red-600 bg-red-50 rounded-md px-4 py-3">{error}</p>}
+      {error && <Alert variant="error">{error}</Alert>}
       <div className="flex items-center justify-between">
-        <button type="submit" disabled={loading} className="rounded-md px-6 py-2.5 text-sm font-medium text-white disabled:opacity-60" style={{ backgroundColor: '#7A9A4A' }}>
-          {loading ? 'Saving…' : 'Save Settings'}
-        </button>
+        <Button type="submit" loading={loading} loadingText="Saving…">Save Settings</Button>
         {settings.updated_at && <p className="text-xs text-gray-400">Last saved {new Date(settings.updated_at).toLocaleString('en-GB')}</p>}
       </div>
     </form>

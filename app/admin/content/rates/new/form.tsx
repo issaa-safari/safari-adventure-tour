@@ -3,11 +3,13 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { createRateCard } from './actions'
+import { Button, ButtonLink } from '@/components/ui/button'
+import { Alert } from '@/components/ui/alert'
 import { COST_CATEGORIES, ENTITY_TYPES, label } from '../constants'
 
 type Entity = { id: string; name: string }
 type Entities = Record<string, Entity[]>
-const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]'
+const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]'
 const linkedTypes = new Set(['accommodation', 'activity', 'vehicle', 'staff', 'destination'])
 
 export default function NewRateCardForm({ entities }: { entities: Entities }) {
@@ -42,10 +44,10 @@ export default function NewRateCardForm({ entities }: { entities: Entities }) {
             <div><label className="block text-sm font-medium text-gray-700 mb-1">Currency</label><input name="currency" defaultValue="USD" maxLength={3} required className={inputCls} /></div>
           </div>
           <div><label className="block text-sm font-medium text-gray-700 mb-1">Notes</label><textarea name="notes" rows={3} className={inputCls} /></div>
-          <label className="flex items-center gap-3 text-sm text-gray-700"><input type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)} className="accent-[#7A9A4A]" />Active</label>
+          <label className="flex items-center gap-3 text-sm text-gray-700"><input type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)} className="accent-[var(--olive)]" />Active</label>
         </div>
-        {error && <p className="text-sm text-red-600 bg-red-50 rounded-md px-4 py-3">{error}</p>}
-        <div className="flex gap-3"><button disabled={loading} className="rounded-md px-6 py-2.5 text-sm font-medium text-white disabled:opacity-60" style={{ backgroundColor: '#7A9A4A' }}>{loading ? 'Creating…' : 'Create Rate Card'}</button><Link href="/admin/content/rates" className="rounded-md border border-gray-300 px-6 py-2.5 text-sm font-medium text-gray-700">Cancel</Link></div>
+        {error && <Alert variant="error">{error}</Alert>}
+        <div className="flex gap-3"><Button type="submit" loading={loading} loadingText="Creating…">Create Rate Card</Button><ButtonLink href="/admin/content/rates">Cancel</ButtonLink></div>
       </form>
     </div>
   )

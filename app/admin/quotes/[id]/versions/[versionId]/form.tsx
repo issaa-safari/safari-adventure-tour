@@ -56,7 +56,7 @@ const METHOD_LABELS: Record<string, string> = {
   percentage: '% of adult rate', fixed: 'Fixed price', free: 'Free (no charge)',
 }
 
-const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]'
+const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]'
 const labelCls = 'block text-sm font-medium text-gray-700 mb-1'
 
 function blankTravellerForm(ageBands: AgeBand[]) {
@@ -367,7 +367,7 @@ export default function VersionEditorForm({
                   onClick={() => set({ pricingMethod: m })}
                   className={`px-3 py-1 rounded-full text-xs font-medium border transition ${
                     f.pricingMethod === m
-                      ? 'border-[#7A9A4A] bg-[#7A9A4A]/10 text-[#4C5E2A]'
+                      ? 'border-[var(--olive)] bg-[var(--olive)]/10 text-[var(--olive-dk)]'
                       : 'border-gray-300 text-gray-500 hover:border-gray-400'
                   }`}
                 >
@@ -385,7 +385,7 @@ export default function VersionEditorForm({
                   min={0}
                   max={200}
                   step={0.5}
-                  className="w-20 rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]"
+                  className="w-20 rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]"
                   value={f.pricingPercent}
                   onChange={e => set({ pricingPercent: e.target.value })}
                 />
@@ -402,7 +402,7 @@ export default function VersionEditorForm({
                   type="number"
                   min={0}
                   step={0.01}
-                  className="w-28 rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]"
+                  className="w-28 rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]"
                   value={f.pricingPercent}
                   onChange={e => set({ pricingPercent: e.target.value })}
                   placeholder="0.00"
@@ -431,7 +431,7 @@ export default function VersionEditorForm({
                 type="checkbox"
                 checked={f.isPaying}
                 onChange={e => set({ isPaying: e.target.checked })}
-                className="h-4 w-4 rounded border-gray-300 text-[#7A9A4A] focus:ring-[#7A9A4A]"
+                className="h-4 w-4 rounded border-gray-300 text-[var(--olive)] focus:ring-[var(--olive)]"
               />
               <span className="text-sm text-gray-700">Paying traveller</span>
             </label>
@@ -440,7 +440,7 @@ export default function VersionEditorForm({
                 type="checkbox"
                 checked={f.isComplimentary}
                 onChange={e => set({ isComplimentary: e.target.checked })}
-                className="h-4 w-4 rounded border-gray-300 text-[#7A9A4A] focus:ring-[#7A9A4A]"
+                className="h-4 w-4 rounded border-gray-300 text-[var(--olive)] focus:ring-[var(--olive)]"
               />
               <span className="text-sm text-gray-700">Complimentary</span>
             </label>
@@ -488,8 +488,7 @@ export default function VersionEditorForm({
               type="button"
               onClick={handleSaveDates}
               disabled={datesPending}
-              className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-              style={{ backgroundColor: '#7A9A4A' }}
+              className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60 bg-olive hover:bg-olive-dk"
             >
               {datesPending ? 'Saving…' : 'Save Dates'}
             </button>
@@ -510,7 +509,7 @@ export default function VersionEditorForm({
               onClick={() => handleSaveLang(lang)}
               className={`px-3 py-1 rounded-full text-xs font-medium border transition disabled:opacity-50 ${
                 language === lang
-                  ? 'border-[#7A9A4A] bg-[#7A9A4A]/10 text-[#4C5E2A]'
+                  ? 'border-[var(--olive)] bg-[var(--olive)]/10 text-[var(--olive-dk)]'
                   : 'border-gray-300 text-gray-500 hover:border-gray-400'
               }`}
             >
@@ -540,7 +539,7 @@ export default function VersionEditorForm({
             <button
               type="button"
               onClick={() => { setShowAdd(true); setAddError('') }}
-              className="text-sm font-medium text-[#7A9A4A] hover:text-[#4C5E2A]"
+              className="text-sm font-medium text-[var(--olive)] hover:text-[var(--olive-dk)]"
             >
               + Add Traveller
             </button>
@@ -573,8 +572,7 @@ export default function VersionEditorForm({
                           type="button"
                           onClick={handleUpdate}
                           disabled={editPending}
-                          className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-                          style={{ backgroundColor: '#7A9A4A' }}
+                          className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60 bg-olive hover:bg-olive-dk"
                         >
                           {editPending ? 'Saving…' : 'Save Changes'}
                         </button>
@@ -673,8 +671,7 @@ export default function VersionEditorForm({
                 type="button"
                 onClick={handleAdd}
                 disabled={addPending}
-                className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-                style={{ backgroundColor: '#7A9A4A' }}
+                className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60 bg-olive hover:bg-olive-dk"
               >
                 {addPending ? 'Adding…' : 'Add Traveller'}
               </button>
@@ -724,7 +721,7 @@ export default function VersionEditorForm({
           </div>
           <div>
             <label className={labelCls}>Client Price (USD)</label>
-            <div className={inputCls.replace('focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]', '').replace('text-gray-900', 'text-gray-700').replace('bg-white', 'bg-gray-50').replace('border-gray-300', 'border-gray-200')} style={{ display: 'flex', alignItems: 'center' }}>
+            <div className={inputCls.replace('focus:outline-none focus:ring-2 focus:ring-[var(--olive)]', '').replace('text-gray-900', 'text-gray-700').replace('bg-white', 'bg-gray-50').replace('border-gray-300', 'border-gray-200')} style={{ display: 'flex', alignItems: 'center' }}>
               <span className="font-semibold">${clientPrice.toFixed(2)}</span>
             </div>
           </div>
@@ -743,8 +740,7 @@ export default function VersionEditorForm({
               type="button"
               onClick={handleSavePricing}
               disabled={pricingPending}
-              className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-              style={{ backgroundColor: '#7A9A4A' }}
+              className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60 bg-olive hover:bg-olive-dk"
             >
               {pricingPending ? 'Saving…' : 'Save Pricing'}
             </button>

@@ -2,17 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-
-const STATUS_STYLES: Record<string, string> = {
-  draft:    'bg-gray-100 text-gray-600',
-  ready:    'bg-blue-100 text-blue-700',
-  sent:     'bg-purple-100 text-purple-700',
-  viewed:   'bg-indigo-100 text-indigo-700',
-  accepted: 'bg-green-100 text-green-700',
-  declined: 'bg-red-100 text-red-700',
-  expired:  'bg-amber-100 text-amber-700',
-  cancelled:'bg-gray-100 text-gray-500',
-}
+import { ButtonLink, Button } from '@/components/ui/button'
+import StatusBadge from '@/components/admin/status-badge'
 
 export default async function QuotesPage({
   searchParams,
@@ -77,12 +68,7 @@ export default async function QuotesPage({
           <h1 className="text-lg font-semibold text-gray-900">Quotes</h1>
           <p className="text-sm text-gray-500 mt-0.5">Build and send pricing proposals to clients</p>
         </div>
-        <Link
-          href="/admin/quotes/new"
-          className="rounded-md px-4 py-2 text-sm font-medium text-white"
-          style={{ backgroundColor: '#7A9A4A' }}>
-          + New Quote
-        </Link>
+        <ButtonLink href="/admin/quotes/new" size="sm">+ New Quote</ButtonLink>
       </div>
 
       {/* Status tabs */}
@@ -93,7 +79,7 @@ export default async function QuotesPage({
             href={`/admin/quotes?status=${s}`}
             className={'px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap ' +
               (activeStatus === s
-                ? 'border-[#7A9A4A] text-[#7A9A4A]'
+                ? 'border-[var(--olive)] text-[var(--olive)]'
                 : 'border-transparent text-gray-500 hover:text-gray-700')}>
             <span className="capitalize">{s}</span>
             {counts[s] ? (
@@ -110,7 +96,7 @@ export default async function QuotesPage({
           {activeStatus === 'draft' && (
             <Link
               href="/admin/quotes/new"
-              className="text-sm font-medium text-[#7A9A4A] hover:underline">
+              className="text-sm font-medium text-[var(--olive)] hover:underline">
               Create your first quote
             </Link>
           )}
@@ -129,15 +115,12 @@ export default async function QuotesPage({
               <Link
                 key={q.id}
                 href={`/admin/quotes/${q.id}`}
-                className="block bg-white rounded-lg border border-gray-200 p-4 hover:border-[#7A9A4A] hover:shadow-sm transition">
+                className="block bg-white rounded-lg border border-gray-200 p-4 hover:border-[var(--olive)] hover:shadow-sm transition">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className="text-xs font-mono text-gray-400">{q.quote_number}</span>
-                      <span className={'text-xs px-2 py-0.5 rounded-full font-medium ' +
-                        (STATUS_STYLES[q.status] ?? 'bg-gray-100 text-gray-600')}>
-                        {q.status}
-                      </span>
+                      <StatusBadge status={q.status} />
                       <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 capitalize">
                         {q.mode === 'fixed_departure' ? 'Fixed Departure' : 'Custom Safari'}
                       </span>

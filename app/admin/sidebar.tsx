@@ -4,19 +4,24 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useState, useEffect, useTransition, useRef } from 'react'
+import {
+  LayoutDashboard, Inbox, Map, Library, FileText,
+  CalendarDays, BookOpen, Users, DollarSign, BarChart3,
+  Search, Leaf,
+} from 'lucide-react'
 import type { SearchResults, SearchQuote, SearchClient, SearchRequest } from '@/lib/types'
 
 const NAV_ITEMS = [
-  { label: 'Dashboard',      href: '/admin/dashboard',   icon: '⌂' },
-  { label: 'Requests',       href: '/admin/requests',    icon: '▤' },
-  { label: 'Tour Templates', href: '/admin/tours',       icon: '◈' },
-  { label: 'Content',        href: '/admin/content',     icon: '▧' },
-  { label: 'Quotes',         href: '/admin/quotes',      icon: '✦' },
-  { label: 'Departures',     href: '/admin/departures',  icon: '◉' },
-  { label: 'Bookings',       href: '/admin/bookings',    icon: '✓' },
-  { label: 'Clients',        href: '/admin/clients',     icon: '◯' },
-  { label: 'Finance',        href: '/admin/finance',     icon: '$' },
-  { label: 'Analytics',      href: '/admin/analytics',   icon: '↗' },
+  { label: 'Dashboard',      href: '/admin/dashboard',   Icon: LayoutDashboard },
+  { label: 'Requests',       href: '/admin/requests',    Icon: Inbox },
+  { label: 'Tour Templates', href: '/admin/tours',       Icon: Map },
+  { label: 'Content',        href: '/admin/content',     Icon: Library },
+  { label: 'Quotes',         href: '/admin/quotes',      Icon: FileText },
+  { label: 'Departures',     href: '/admin/departures',  Icon: CalendarDays },
+  { label: 'Bookings',       href: '/admin/bookings',    Icon: BookOpen },
+  { label: 'Clients',        href: '/admin/clients',     Icon: Users },
+  { label: 'Finance',        href: '/admin/finance',     Icon: DollarSign },
+  { label: 'Analytics',      href: '/admin/analytics',   Icon: BarChart3 },
 ]
 
 function SearchModal({ onClose }: { onClose: () => void }) {
@@ -49,14 +54,14 @@ function SearchModal({ onClose }: { onClose: () => void }) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4"
-      style={{ backgroundColor: 'rgba(26,46,19,0.55)' }}
+      style={{ backgroundColor: 'rgba(32,39,26,0.55)' }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
       <div className="w-full max-w-lg rounded-xl shadow-2xl overflow-hidden"
-        style={{ backgroundColor: 'var(--safari-warm)', border: '1px solid var(--safari-border)' }}>
+        style={{ backgroundColor: 'var(--admin-surface)', border: '1px solid var(--admin-border)' }}>
         <div className="flex items-center gap-3 px-4 py-3"
-          style={{ borderBottom: '1px solid var(--safari-border)' }}>
-          <span className="text-gray-400">🔍</span>
+          style={{ borderBottom: '1px solid var(--admin-border)' }}>
+          <Search size={15} className="text-gray-400 shrink-0" />
           <input
             ref={inputRef}
             className="flex-1 bg-transparent text-sm outline-none placeholder-gray-400"
@@ -79,16 +84,19 @@ function SearchModal({ onClose }: { onClose: () => void }) {
           )}
 
           {query.length >= 2 && !searching && !hasResults && (
-            <div className="px-4 py-6 text-center text-sm text-gray-400">No results for "{query}"</div>
+            <div className="px-4 py-6 text-center text-sm text-gray-400">No results for &ldquo;{query}&rdquo;</div>
           )}
 
           {(results?.quotes?.length ?? 0) > 0 && (
             <div>
               <p className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide"
-                style={{ backgroundColor: '#F5F0E8' }}>Quotes</p>
+                style={{ backgroundColor: 'var(--admin-bg)' }}>Quotes</p>
               {results?.quotes.map((q: SearchQuote) => (
                 <button key={q.id} onClick={() => go(`/admin/quotes/${q.id}`)}
-                  className="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-[#F5F0E8] transition text-left">
+                  className="w-full flex items-center justify-between px-4 py-2.5 text-sm text-left transition"
+                  style={{ ['--tw-hover-bg' as string]: 'var(--admin-bg)' }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--admin-bg)')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = '')}>
                   <div>
                     <span className="font-mono text-xs text-gray-400 mr-2">{q.quote_number}</span>
                     <span className="font-medium text-gray-800">{q.client_name ?? q.title ?? 'Quote'}</span>
@@ -102,10 +110,12 @@ function SearchModal({ onClose }: { onClose: () => void }) {
           {(results?.clients?.length ?? 0) > 0 && (
             <div>
               <p className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide"
-                style={{ backgroundColor: '#F5F0E8' }}>Clients</p>
+                style={{ backgroundColor: 'var(--admin-bg)' }}>Clients</p>
               {results?.clients.map((c: SearchClient) => (
                 <button key={c.id} onClick={() => go(`/admin/clients/${c.id}`)}
-                  className="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-[#F5F0E8] transition text-left">
+                  className="w-full flex items-center justify-between px-4 py-2.5 text-sm text-left transition"
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--admin-bg)')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = '')}>
                   <span className="font-medium text-gray-800">{c.first_name} {c.last_name}</span>
                   <span className="text-xs text-gray-400">{c.email}</span>
                 </button>
@@ -116,10 +126,12 @@ function SearchModal({ onClose }: { onClose: () => void }) {
           {(results?.requests?.length ?? 0) > 0 && (
             <div>
               <p className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide"
-                style={{ backgroundColor: '#F5F0E8' }}>Requests</p>
+                style={{ backgroundColor: 'var(--admin-bg)' }}>Requests</p>
               {results?.requests.map((r: SearchRequest) => (
                 <button key={r.id} onClick={() => go(`/admin/requests/${r.id}`)}
-                  className="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-[#F5F0E8] transition text-left">
+                  className="w-full flex items-center justify-between px-4 py-2.5 text-sm text-left transition"
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--admin-bg)')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = '')}>
                   <div>
                     <span className="font-mono text-xs text-gray-400 mr-2">{r.reference}</span>
                     <span className="font-medium text-gray-800">{r.client_name ?? r.reference}</span>
@@ -134,7 +146,7 @@ function SearchModal({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="px-4 py-2 text-xs text-gray-400 flex gap-4"
-          style={{ borderTop: '1px solid var(--safari-border)', backgroundColor: '#F5F0E8' }}>
+          style={{ borderTop: '1px solid var(--admin-border)', backgroundColor: 'var(--admin-bg)' }}>
           <span>↵ to open</span>
           <span>Esc to close</span>
         </div>
@@ -176,19 +188,18 @@ export default function AdminSidebar({
     <>
       {searchOpen && <SearchModal onClose={() => setSearchOpen(false)} />}
 
-      <header className="sticky top-0 z-30" style={{ boxShadow: '0 2px 8px rgba(26,46,19,0.12)' }}>
-        {/* Brand bar — deep forest */}
-        <div style={{ backgroundColor: 'var(--safari-deep)' }}>
+      <header className="sticky top-0 z-30" style={{ boxShadow: '0 2px 8px rgba(32,39,26,0.12)' }}>
+        {/* Brand bar */}
+        <div style={{ backgroundColor: 'var(--bush)' }}>
           <div className="mx-auto flex h-10 max-w-7xl items-center justify-between px-4">
             <Link href="/admin/dashboard" className="flex items-center gap-2.5">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full text-sm"
-                style={{ backgroundColor: 'var(--safari-brand)', color: '#fff' }}>
-                🌿
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-olive hover:bg-olive-dk">
+                <Leaf size={13} color="#fff" />
               </span>
-              <span className="text-sm font-bold text-white tracking-wide">SafariOffice</span>
+              <span className="text-sm font-bold text-white tracking-wide">Safari Adventure Tours</span>
               <span className="hidden sm:block rounded text-[10px] font-semibold px-2 py-0.5"
-                style={{ backgroundColor: 'var(--safari-sand)', color: 'var(--safari-deep)' }}>
-                Safari Adventure Tour
+                style={{ backgroundColor: 'var(--gold)', color: 'var(--bush)' }}>
+                Admin
               </span>
             </Link>
 
@@ -207,8 +218,8 @@ export default function AdminSidebar({
           </div>
         </div>
 
-        {/* Nav strip — warm parchment */}
-        <nav style={{ backgroundColor: 'var(--safari-warm)', borderBottom: '2px solid var(--safari-border)' }}>
+        {/* Nav strip */}
+        <nav style={{ backgroundColor: 'var(--admin-surface)', borderBottom: '2px solid var(--admin-border)' }}>
           <div className="mx-auto flex h-11 max-w-7xl items-center gap-0 overflow-x-auto px-2">
 
             {/* Search pill */}
@@ -216,13 +227,13 @@ export default function AdminSidebar({
               onClick={() => setSearchOpen(true)}
               className="flex shrink-0 items-center gap-2 mr-3 px-3 h-7 rounded-full text-xs transition"
               style={{
-                backgroundColor: 'var(--safari-parchment)',
-                border: '1px solid var(--safari-border)',
-                color: '#7A6652',
+                backgroundColor: 'var(--admin-bg)',
+                border: '1px solid var(--admin-border)',
+                color: 'var(--admin-text-muted)',
               }}
               title="Search (⌘K)"
             >
-              <span>🔍</span>
+              <Search size={12} />
               <span className="hidden md:inline">Search</span>
               <kbd className="hidden lg:inline ml-1 text-[10px] opacity-50">⌘K</kbd>
             </button>
@@ -234,21 +245,22 @@ export default function AdminSidebar({
                   key={item.label}
                   href={item.href}
                   title={item.label}
-                  className={`flex h-full shrink-0 items-center gap-1.5 border-b-2 px-3 text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'border-[#7A9A4A] text-[#3D5229]'
-                      : 'border-transparent text-[#7A6652] hover:text-[#3D5229] hover:border-[#C9A84C]/60'
-                  }`}
-                  style={isActive ? { backgroundColor: 'rgba(122,154,74,0.09)' } : {}}
+                  className="flex h-full shrink-0 items-center gap-1.5 border-b-2 px-3 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+                  style={isActive
+                    ? { borderBottomColor: 'var(--olive)', color: 'var(--olive-dk)', backgroundColor: 'rgba(122,154,74,0.08)' }
+                    : { borderBottomColor: 'transparent', color: 'var(--admin-text-muted)' }
+                  }
+                  onMouseEnter={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.color = 'var(--olive-dk)' } }}
+                  onMouseLeave={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.color = 'var(--admin-text-muted)' } }}
                 >
-                  <span className="text-xs opacity-60">{item.icon}</span>
+                  <item.Icon size={14} className="opacity-70 shrink-0" />
                   <span className="hidden sm:block">{item.label}</span>
                 </Link>
               )
             })}
 
             <span className="ml-auto hidden text-xs lg:block pr-1 capitalize"
-              style={{ color: '#A08060' }}>
+              style={{ color: 'var(--admin-text-muted)' }}>
               {role}
             </span>
           </div>

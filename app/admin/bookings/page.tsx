@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import StatusBadge from '@/components/admin/status-badge'
 
 export default async function BookingsPage() {
   const supabase = await createClient()
@@ -36,12 +37,6 @@ export default async function BookingsPage() {
       )
     `)
     .order('created_at', { ascending: false })
-
-  const STATUS_STYLES: Record<string, string> = {
-    confirmed: 'bg-green-100 text-green-700',
-    pending: 'bg-yellow-100 text-yellow-700',
-    cancelled: 'bg-red-100 text-red-700',
-  }
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -95,18 +90,14 @@ export default async function BookingsPage() {
                         ${Number(booking.total_price_usd).toLocaleString()}
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                          STATUS_STYLES[booking.status] ?? 'bg-gray-100 text-gray-600'
-                        }`}>
-                          {booking.status}
-                        </span>
+                        <StatusBadge status={booking.status} />
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-500">
                         {new Date(booking.created_at).toLocaleDateString('en-GB')}
                       </td>
                       <td className="px-4 py-3 text-right">
                         <Link href={`/admin/bookings/${booking.id}`}
-                          className="text-xs text-[#7A9A4A] hover:underline">
+                          className="text-xs text-[var(--olive)] hover:underline">
                           View Details
                         </Link>
                       </td>

@@ -2,23 +2,12 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
+import StatusBadge from '@/components/admin/status-badge'
 import VersionEditorForm from './form'
 import QuoteItineraryBuilder from './quote-itinerary-builder'
 import PriceLinesEditor from './price-lines'
 import VersionStatusControls from './version-status-controls'
 import CostSheetEditor, { CS_UNITS, type CostLine } from './cost-sheet'
-
-const STATUS_STYLES: Record<string, string> = {
-  draft:      'bg-gray-100 text-gray-600',
-  ready:      'bg-blue-100 text-blue-700',
-  sent:       'bg-purple-100 text-purple-700',
-  viewed:     'bg-indigo-100 text-indigo-700',
-  accepted:   'bg-green-100 text-green-700',
-  declined:   'bg-red-100 text-red-700',
-  expired:    'bg-amber-100 text-amber-700',
-  superseded: 'bg-gray-100 text-gray-400',
-  cancelled:  'bg-gray-100 text-gray-500',
-}
 
 export default async function VersionEditorPage({
   params,
@@ -153,10 +142,7 @@ export default async function VersionEditorPage({
             {version.title || clientName}
           </h1>
           <div className="flex items-center gap-2 mt-1.5">
-            <span className={'text-xs px-2 py-0.5 rounded-full font-medium ' +
-              (STATUS_STYLES[version.status] ?? 'bg-gray-100 text-gray-600')}>
-              {version.status}
-            </span>
+            <StatusBadge status={version.status} />
             <span className="text-xs text-gray-400">Version {version.version_number}</span>
             {isLocked && (
               <span className="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
@@ -196,7 +182,7 @@ export default async function VersionEditorPage({
         const marginPct = totalSelling > 0 ? ((totalSelling - totalCost) / totalSelling) * 100 : 0
         return (
           <div className="mt-4 mb-2 rounded-lg px-5 py-3 flex flex-wrap items-center gap-x-6 gap-y-1 text-sm border"
-            style={{ backgroundColor: 'rgba(122,154,74,0.07)', borderColor: '#C5D9B0' }}>
+            style={{ backgroundColor: 'rgba(122,154,74,0.07)', borderColor: 'var(--olive-lt)' }}>
             {payingPax > 0 && (
               <span className="text-gray-600">
                 <span className="font-semibold text-gray-900">{payingPax}</span>{' '}
@@ -210,13 +196,13 @@ export default async function VersionEditorPage({
             </span>
             {perPerson > 0 && (
               <span className="text-gray-600">
-                Per person <span className="font-semibold text-[#5C7A3E]">
+                Per person <span className="font-semibold text-[var(--olive-dk)]">
                   ${perPerson.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                 </span>
               </span>
             )}
             <span className="text-gray-600">
-              Margin <span className={`font-semibold ${marginPct < 15 ? 'text-red-600' : 'text-[#5C7A3E]'}`}>
+              Margin <span className={`font-semibold ${marginPct < 15 ? 'text-red-600' : 'text-[var(--olive-dk)]'}`}>
                 {marginPct.toFixed(1)}%
               </span>
             </span>

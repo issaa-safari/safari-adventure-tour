@@ -3,6 +3,8 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { updateDeparture, toggleDeparturePublished } from './actions'
+import { Button, ButtonLink } from '@/components/ui/button'
+import { Alert } from '@/components/ui/alert'
 
 interface Departure {
   id: string
@@ -44,7 +46,7 @@ export default function DepartureEditForm({ departure, departureId, tourDays }: 
     }
   }
 
-  const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]'
+  const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]'
 
   return (
     <div className="p-6 max-w-xl mx-auto">
@@ -174,7 +176,7 @@ export default function DepartureEditForm({ departure, departureId, tourDays }: 
               </div>
               <Link
                 href={`/admin/tours/${departure.tours?.id}/days`}
-                className="inline-block text-sm font-medium text-[#7A9A4A] hover:underline mt-3"
+                className="inline-block text-sm font-medium text-[var(--olive)] hover:underline mt-3"
               >
                 → Edit Itinerary
               </Link>
@@ -184,7 +186,7 @@ export default function DepartureEditForm({ departure, departureId, tourDays }: 
               <p className="mb-3">No itinerary days found for this tour.</p>
               <Link
                 href={`/admin/tours/${departure.tours?.id}/days`}
-                className="inline-block font-medium text-[#7A9A4A] hover:underline"
+                className="inline-block font-medium text-[var(--olive)] hover:underline"
               >
                 → Create Tour Days
               </Link>
@@ -192,23 +194,11 @@ export default function DepartureEditForm({ departure, departureId, tourDays }: 
           )}
         </div>
 
-        {error && (
-          <p className="text-sm text-red-600 bg-red-50 rounded-md px-4 py-3">{error}</p>
-        )}
+        {error && <Alert variant="error">{error}</Alert>}
 
         <div className="flex gap-3 items-center">
-          <button
-            type="submit"
-            disabled={loading}
-            className="rounded-md px-6 py-2.5 text-sm font-medium text-white disabled:opacity-60"
-            style={{ backgroundColor: '#7A9A4A' }}>
-            {loading ? 'Saving…' : 'Save Changes'}
-          </button>
-          <Link
-            href="/admin/departures"
-            className="rounded-md border border-gray-300 px-6 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
-            Cancel
-          </Link>
+          <Button type="submit" loading={loading} loadingText="Saving…">Save Changes</Button>
+          <ButtonLink href="/admin/departures">Cancel</ButtonLink>
           <div className="flex-1" />
           <button
             type="button"

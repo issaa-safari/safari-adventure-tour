@@ -2,30 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { setVersionStatus } from './price-line-actions'
-
-const STATUS_LABELS: Record<string, string> = {
-  draft: 'Draft',
-  ready: 'Ready',
-  sent: 'Sent',
-  viewed: 'Viewed',
-  accepted: 'Accepted',
-  declined: 'Declined',
-  expired: 'Expired',
-  cancelled: 'Cancelled',
-  superseded: 'Superseded',
-}
-
-const STATUS_STYLES: Record<string, string> = {
-  draft: 'bg-gray-100 text-gray-600',
-  ready: 'bg-blue-100 text-blue-700',
-  sent: 'bg-purple-100 text-purple-700',
-  viewed: 'bg-indigo-100 text-indigo-700',
-  accepted: 'bg-green-100 text-green-700',
-  declined: 'bg-red-100 text-red-700',
-  expired: 'bg-amber-100 text-amber-700',
-  superseded: 'bg-gray-100 text-gray-400',
-  cancelled: 'bg-gray-100 text-gray-500',
-}
+import StatusBadge from '@/components/admin/status-badge'
 
 const TRANSITIONS: Record<string, { to: string; label: string; style: string }[]> = {
   draft: [
@@ -78,9 +55,7 @@ export default function VersionStatusControls({
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-500">Status:</span>
-          <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${STATUS_STYLES[currentStatus] ?? 'bg-gray-100 text-gray-600'}`}>
-            {STATUS_LABELS[currentStatus] ?? currentStatus}
-          </span>
+          <StatusBadge status={currentStatus} />
         </div>
         <div className="flex gap-2 flex-wrap">
           {actions.map(action => (

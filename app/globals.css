@@ -1,33 +1,36 @@
 @import "tailwindcss";
 
 :root {
-  /* Existing tokens */
-  --safari-deep:      #1A2E13;
-  --safari-green:     #5C7A3E;
-  --safari-brand:     #7A9A4A;
-  --safari-brand-dk:  #4C5E2A;
-  --safari-sand:      #C9A84C;
-  --safari-sand-lt:   #E8DDD0;
-  --safari-earth:     #8B5E3C;
-  --safari-parchment: #F5F0E8;
-  --safari-warm:      #FFFCF7;
-  --safari-border:    #E0D4C3;
-  --background: var(--safari-parchment);
-  --foreground: #2C1A0E;
+  /* ── Kenyan landscape brand palette (shared: public + admin) ── */
+  --olive:      #7A9A4A;   /* primary brand / CTA / active */
+  --olive-dk:   #3D5229;   /* hover, pressed, dark text on olive tints */
+  --olive-lt:   #C5D9B0;   /* light olive borders / tints */
+  --bush:       #20271A;   /* deep forest — dark surfaces */
+  --sand:       #EAE3D2;   /* parchment cream — section fills */
+  --gold:       #C9A24B;   /* ochre — private safari accent */
+  --murram:     #B0492B;   /* red earth — bike tour accent */
+  --stone:      #6E6A59;   /* warm grey — body / secondary text */
 
-  /* Tour-page Kenyan landscape palette */
-  --sand:   #EAE3D2;
-  --olive:  #7A9A4A;
-  --bush:   #20271A;
-  --murram: #B0492B;
-  --gold:   #C9A24B;
-  --stone:  #6E6A59;
+  /* ── Admin-only utility tokens ── */
+  --admin-bg:         #F5F0E8;   /* page background */
+  --admin-surface:    #FFFCF7;   /* card / modal surface */
+  --admin-border:     #E0D4C3;   /* borders */
+  --admin-text:       #2C1A0E;   /* primary body text */
+  --admin-text-muted: #7A6652;   /* secondary / muted text */
+
+  /* ── Tailwind / Next.js expects these ── */
+  --background: var(--admin-bg);
+  --foreground:  var(--admin-text);
 }
 
 @theme inline {
-  --color-safari-deep:  #1A2E13;
-  --color-safari-brand: #7A9A4A;
-  --color-safari-sand:  #C9A84C;
+  --color-olive:      var(--olive);
+  --color-olive-dk:   var(--olive-dk);
+  --color-bush:       var(--bush);
+  --color-sand:       var(--sand);
+  --color-gold:       var(--gold);
+  --color-murram:     var(--murram);
+  --color-stone:      var(--stone);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);

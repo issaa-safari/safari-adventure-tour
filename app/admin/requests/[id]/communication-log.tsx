@@ -63,7 +63,7 @@ export default function CommunicationLog({
                 onClick={() => setType(t.key)}
                 className={`rounded-full px-3 py-1 text-xs font-medium border transition ${
                   type === t.key
-                    ? 'bg-[#7A9A4A] text-white border-[#7A9A4A]'
+                    ? 'bg-[var(--olive)] text-white border-[var(--olive)]'
                     : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
                 }`}
               >
@@ -77,13 +77,12 @@ export default function CommunicationLog({
           onChange={e => setSummary(e.target.value)}
           rows={2}
           placeholder="Log a note, call summary, or WhatsApp message..."
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]"
+          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]"
         />
         <button
           type="submit"
           disabled={saving || !summary.trim()}
-          className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-          style={{ backgroundColor: '#7A9A4A' }}
+          className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50 bg-olive hover:bg-olive-dk"
         >
           {saving ? 'Saving...' : 'Add Log Entry'}
         </button>

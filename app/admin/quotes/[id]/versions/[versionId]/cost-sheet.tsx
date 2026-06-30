@@ -375,8 +375,7 @@ export default function CostSheetEditor({
                 type="button"
                 onClick={handleSave}
                 disabled={saving || applying}
-                className="px-4 py-2 rounded-md text-sm font-semibold text-white disabled:opacity-50"
-                style={{ backgroundColor: '#7A9A4A' }}
+                className="px-4 py-2 rounded-md text-sm font-semibold text-white disabled:opacity-50 bg-olive hover:bg-olive-dk"
               >
                 {saving ? 'Saving…' : saved ? '✓ Saved' : 'Save Cost Sheet'}
               </button>

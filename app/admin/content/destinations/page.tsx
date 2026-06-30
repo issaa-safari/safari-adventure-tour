@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { ButtonLink, Button } from '@/components/ui/button'
 import ContentShell from '../content-shell'
 
 export default async function DestinationsPage({
@@ -34,12 +35,7 @@ export default async function DestinationsPage({
           <h1 className="text-lg font-semibold text-gray-900">Destinations</h1>
           <p className="text-sm text-gray-500 mt-0.5">Manage destination pages and content</p>
         </div>
-        <Link
-          href="/admin/content/destinations/new"
-          className="rounded-md px-4 py-2 text-sm font-medium text-white"
-          style={{ backgroundColor: '#7A9A4A' }}>
-          + New Destination
-        </Link>
+        <ButtonLink href="/admin/content/destinations/new" size="sm">+ New Destination</ButtonLink>
       </div>
 
       {/* Tabs */}
@@ -48,7 +44,7 @@ export default async function DestinationsPage({
           href="/admin/content/destinations?tab=content"
           className={'px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ' +
             (activeTab === 'content'
-              ? 'border-[#7A9A4A] text-[#7A9A4A]'
+              ? 'border-[var(--olive)] text-[var(--olive)]'
               : 'border-transparent text-gray-500 hover:text-gray-700')}>
           With Content
           <span className="ml-1.5 text-xs text-gray-400">({withContent.length})</span>
@@ -57,7 +53,7 @@ export default async function DestinationsPage({
           href="/admin/content/destinations?tab=empty"
           className={'px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ' +
             (activeTab === 'empty'
-              ? 'border-[#7A9A4A] text-[#7A9A4A]'
+              ? 'border-[var(--olive)] text-[var(--olive)]'
               : 'border-transparent text-gray-500 hover:text-gray-700')}>
           Without Content
           <span className="ml-1.5 text-xs text-gray-400">({withoutContent.length})</span>
@@ -75,7 +71,7 @@ export default async function DestinationsPage({
             {activeTab === 'content' && (
               <Link
                 href="/admin/content/destinations/new"
-                className="text-sm font-medium text-[#7A9A4A] hover:underline">
+                className="text-sm font-medium text-[var(--olive)] hover:underline">
                 Add your first destination
               </Link>
             )}
@@ -110,12 +106,9 @@ export default async function DestinationsPage({
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <Link
-                      href={'/admin/content/destinations/' + dest.id}
-                      className="text-xs font-medium text-white rounded-md px-3 py-1.5"
-                      style={{ backgroundColor: '#7A9A4A' }}>
-                      Edit
-                    </Link>
+                    <ButtonLink
+                      href={'/admin/content/destinations/' + dest.id} size="sm">Edit
+                    </ButtonLink>
                   </td>
                 </tr>
               ))}

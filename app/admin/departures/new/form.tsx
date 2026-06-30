@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { createDeparture } from './actions'
+import { Button, ButtonLink } from '@/components/ui/button'
+import { Alert } from '@/components/ui/alert'
 
 export default function NewDepartureForm({ tours }: { tours: any[] }) {
   const [error, setError] = useState('')
@@ -34,7 +36,7 @@ export default function NewDepartureForm({ tours }: { tours: any[] }) {
     }
   }
 
-  const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]'
+  const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]'
 
   return (
     <div className="p-6 max-w-xl mx-auto">
@@ -108,20 +110,11 @@ export default function NewDepartureForm({ tours }: { tours: any[] }) {
           </div>
         </div>
 
-        {error && (
-          <p className="text-sm text-red-600 bg-red-50 rounded-md px-4 py-3">{error}</p>
-        )}
+        {error && <Alert variant="error">{error}</Alert>}
 
         <div className="flex gap-3">
-          <button type="submit" disabled={loading}
-            className="rounded-md px-6 py-2.5 text-sm font-medium text-white disabled:opacity-60"
-            style={{ backgroundColor: '#7A9A4A' }}>
-            {loading ? 'Creating…' : 'Create Departure'}
-          </button>
-          <Link href="/admin/departures"
-            className="rounded-md border border-gray-300 px-6 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
-            Cancel
-          </Link>
+          <Button type="submit" loading={loading} loadingText="Creating…">Create Departure</Button>
+          <ButtonLink href="/admin/departures">Cancel</ButtonLink>
         </div>
       </form>
     </div>

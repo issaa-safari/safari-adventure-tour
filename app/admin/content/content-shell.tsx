@@ -34,7 +34,7 @@ function NavGroup({
               href={item.href}
               className={`flex items-center gap-2 border-b border-gray-200 px-2 py-2 text-sm transition ${
                 isActive
-                  ? 'bg-[#7A9A4A]/10 font-semibold text-[#4C5E2A]'
+                  ? 'bg-[var(--olive)]/10 font-semibold text-[var(--olive-dk)]'
                   : 'text-gray-600 hover:bg-white hover:text-gray-900'
               }`}
             >

@@ -9,7 +9,7 @@ interface Request { id: string; reference: string; client_id: string }
 interface Tour { id: string; title_en: string; type: string }
 interface Departure { id: string; start_date: string; end_date: string; tours: { title_en: string }[] | null }
 
-const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]'
+const inputCls = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]'
 const labelCls = 'block text-sm font-medium text-gray-700 mb-1'
 
 export default function NewQuoteForm({
@@ -67,7 +67,7 @@ export default function NewQuoteForm({
               onClick={() => setMode('custom')}
               className={'rounded-lg border-2 p-4 text-left transition ' +
                 (mode === 'custom'
-                  ? 'border-[#7A9A4A] bg-[#7A9A4A]/5'
+                  ? 'border-[var(--olive)] bg-[var(--olive)]/5'
                   : 'border-gray-200 hover:border-gray-300')}>
               <p className="font-medium text-gray-900 text-sm">Custom Safari</p>
               <p className="text-xs text-gray-500 mt-1">Build a bespoke itinerary and price from scratch</p>
@@ -77,7 +77,7 @@ export default function NewQuoteForm({
               onClick={() => setMode('fixed_departure')}
               className={'rounded-lg border-2 p-4 text-left transition ' +
                 (mode === 'fixed_departure'
-                  ? 'border-[#7A9A4A] bg-[#7A9A4A]/5'
+                  ? 'border-[var(--olive)] bg-[var(--olive)]/5'
                   : 'border-gray-200 hover:border-gray-300')}>
               <p className="font-medium text-gray-900 text-sm">Fixed Departure</p>
               <p className="text-xs text-gray-500 mt-1">Price a client into a scheduled group departure</p>
@@ -188,8 +188,7 @@ export default function NewQuoteForm({
             <button
               type="submit"
               disabled={loading}
-              className="rounded-md px-6 py-2.5 text-sm font-medium text-white disabled:opacity-60"
-              style={{ backgroundColor: '#7A9A4A' }}>
+              className="rounded-md px-6 py-2.5 text-sm font-medium text-white disabled:opacity-60 bg-olive hover:bg-olive-dk">
               {loading ? 'Creating…' : 'Create Quote'}
             </button>
             <Link

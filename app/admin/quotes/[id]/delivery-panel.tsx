@@ -123,7 +123,7 @@ export default function DeliveryPanel({
               <select
                 value={selectedVersionId}
                 onChange={e => setSelectedVersionId(e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]"
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--olive)]"
               >
                 {shareableVersions.map(v => (
                   <option key={v.id} value={v.id}>
@@ -136,8 +136,7 @@ export default function DeliveryPanel({
               type="button"
               onClick={handleCreate}
               disabled={pending || !selectedVersionId}
-              className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50 shrink-0"
-              style={{ backgroundColor: '#7A9A4A' }}
+              className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50 shrink-0 bg-olive hover:bg-olive-dk"
             >
               {pending ? 'Creating…' : 'Generate Link'}
             </button>
@@ -181,7 +180,7 @@ export default function DeliveryPanel({
                         <button
                           type="button"
                           onClick={() => copyLink(d.access_token)}
-                          className="shrink-0 text-xs px-2.5 py-1 rounded border border-gray-200 hover:border-[#7A9A4A] text-gray-600 hover:text-[#4C5E2A] transition"
+                          className="shrink-0 text-xs px-2.5 py-1 rounded border border-gray-200 hover:border-[var(--olive)] text-gray-600 hover:text-[var(--olive-dk)] transition"
                         >
                           {copiedToken === d.access_token ? 'Copied!' : 'Copy'}
                         </button>

@@ -148,13 +148,13 @@ export default async function FinancePage({
       <div className="flex gap-1 border-b border-gray-200 mb-6">
         <Link
           href="/admin/finance"
-          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === 'receivables' ? 'border-[#7A9A4A] text-[#7A9A4A]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === 'receivables' ? 'border-[var(--olive)] text-[var(--olive)]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
         >
           Receivables
         </Link>
         <Link
           href="/admin/finance?tab=pnl"
-          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === 'pnl' ? 'border-[#7A9A4A] text-[#7A9A4A]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === 'pnl' ? 'border-[var(--olive)] text-[var(--olive)]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
         >
           P&amp;L
         </Link>
@@ -301,7 +301,7 @@ export default async function FinancePage({
                           className="flex-1 rounded-t"
                           style={{
                             height: m.revenue > 0 ? `${Math.max((m.revenue / maxMonthRev) * 96, 4)}px` : '2px',
-                            backgroundColor: i === 5 ? '#7A9A4A' : '#B8CFA0',
+                            backgroundColor: i === 5 ? 'var(--olive)' : '#B8CFA0',
                           }}
                         />
                         {m.cost > 0 && (
@@ -320,7 +320,7 @@ export default async function FinancePage({
                 </div>
                 <div className="flex gap-4 mt-3">
                   <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <div className="w-3 h-3 rounded-sm bg-[#7A9A4A]" /> Revenue
+                    <div className="w-3 h-3 rounded-sm bg-[var(--olive)]" /> Revenue
                   </div>
                   <div className="flex items-center gap-1.5 text-xs text-gray-500">
                     <div className="w-3 h-3 rounded-sm bg-red-400" /> Cost

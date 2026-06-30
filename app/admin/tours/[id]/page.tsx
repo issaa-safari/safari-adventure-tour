@@ -110,7 +110,7 @@ export default async function TourDetailPage({
               <p className="text-xs text-gray-400">No itinerary built yet.</p>
             )}
             <Link href={"/admin/tours/" + tour.id + "/days"}
-              className="mt-3 block text-xs text-[#7A9A4A] hover:underline">
+              className="mt-3 block text-xs text-[var(--olive)] hover:underline">
               Build itinerary →
             </Link>
           </div>

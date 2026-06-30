@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { recordPayment } from './actions'
+import { Alert } from '@/components/ui/alert'
 
 export default function PaymentForm({
   quoteId,
@@ -52,7 +53,7 @@ export default function PaymentForm({
             min="0.01"
             defaultValue={outstanding > 0 ? outstanding.toFixed(2) : ''}
             required
-            className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#7A9A4A]"
+            className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--olive)]"
           />
         </div>
         <div>
@@ -62,7 +63,7 @@ export default function PaymentForm({
             type="date"
             defaultValue={new Date().toISOString().slice(0, 10)}
             required
-            className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#7A9A4A]"
+            className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--olive)]"
           />
         </div>
       </div>
@@ -72,7 +73,7 @@ export default function PaymentForm({
           <label className="block text-xs text-gray-500 mb-1">Type</label>
           <select
             name="paymentType"
-            className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#7A9A4A]"
+            className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--olive)]"
           >
             <option value="deposit">Deposit</option>
             <option value="balance">Balance</option>
@@ -85,7 +86,7 @@ export default function PaymentForm({
           <label className="block text-xs text-gray-500 mb-1">Method</label>
           <select
             name="method"
-            className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#7A9A4A]"
+            className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--olive)]"
           >
             <option value="">— select —</option>
             <option value="bank_transfer">Bank transfer</option>
@@ -104,18 +105,17 @@ export default function PaymentForm({
           name="reference"
           type="text"
           placeholder="Bank ref, receipt no, etc."
-          className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#7A9A4A]"
+          className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--olive)]"
         />
       </div>
 
-      {error && <p className="text-xs text-red-600 bg-red-50 rounded px-2 py-1.5">{error}</p>}
+      {error && <Alert variant="error">{error}</Alert>}
 
       <div className="flex gap-2 pt-1">
         <button
           type="submit"
           disabled={pending}
-          className="flex-1 rounded py-2 text-sm font-medium text-white disabled:opacity-50"
-          style={{ backgroundColor: '#7A9A4A' }}
+          className="flex-1 rounded py-2 text-sm font-medium text-white bg-olive disabled:opacity-50"
         >
           {pending ? 'Saving…' : 'Record Payment'}
         </button>

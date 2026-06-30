@@ -3,19 +3,9 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { headers } from 'next/headers'
+import StatusBadge from '@/components/admin/status-badge'
 import DeliveryPanel from './delivery-panel'
 import CloneVersionButton from './clone-version-button'
-
-const STATUS_STYLES: Record<string, string> = {
-  draft:    'bg-gray-100 text-gray-600',
-  ready:    'bg-blue-100 text-blue-700',
-  sent:     'bg-purple-100 text-purple-700',
-  viewed:   'bg-indigo-100 text-indigo-700',
-  accepted: 'bg-green-100 text-green-700',
-  declined: 'bg-red-100 text-red-700',
-  expired:  'bg-amber-100 text-amber-700',
-  cancelled:'bg-gray-100 text-gray-500',
-}
 
 export default async function QuoteDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -89,10 +79,7 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
             {latestVersion?.title || (client ? `${client.first_name} ${client.last_name}` : 'Quote')}
           </h1>
           <div className="flex items-center gap-2 mt-1.5">
-            <span className={'text-xs px-2 py-0.5 rounded-full font-medium ' +
-              (STATUS_STYLES[quote.status] ?? 'bg-gray-100 text-gray-600')}>
-              {quote.status}
-            </span>
+            <StatusBadge status={quote.status} />
             <span className="text-xs text-gray-400 capitalize">
               {quote.mode === 'fixed_departure' ? 'Fixed Departure' : 'Custom Safari'}
             </span>
@@ -104,8 +91,7 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
           {latestVersion && (
             <Link
               href={`/admin/quotes/${quote.id}/versions/${latestVersion.id}`}
-              className="rounded-md px-4 py-2 text-sm font-medium text-white"
-              style={{ backgroundColor: '#7A9A4A' }}>
+              className="rounded-md px-4 py-2 text-sm font-medium text-white bg-olive hover:bg-olive-dk">
               {quote.status === 'draft' || quote.status === 'ready'
                 ? `Edit Version ${latestVersion.version_number}`
                 : `View itinerary & costing (v${latestVersion.version_number})`}
@@ -122,7 +108,7 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
             {client ? (
               <>
                 <Link href={`/admin/clients/${quote.client_id}`}
-                  className="font-medium text-gray-900 hover:text-[#5C7A3E]">
+                  className="font-medium text-gray-900 hover:text-[var(--olive-dk)]">
                   {client.first_name} {client.last_name}
                 </Link>
                 <p className="text-sm text-gray-500 mt-0.5">{client.email}</p>
@@ -131,7 +117,7 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
                   {client.phone && (
                     <a href={`tel:${client.phone}`}
                       className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium"
-                      style={{ backgroundColor: '#F0F4ED', color: '#3D5229', border: '1px solid #C5D9B0' }}>
+                      style={{ backgroundColor: 'var(--admin-bg)', color: 'var(--olive-dk)', border: '1px solid var(--olive-lt)' }}>
                       📞 Call
                     </a>
                   )}
@@ -160,7 +146,7 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
               <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Linked Request</h2>
               <Link
                 href={`/admin/requests/${(requestRow as any).id}`}
-                className="text-sm text-[#7A9A4A] hover:underline font-mono">
+                className="text-sm text-[var(--olive)] hover:underline font-mono">
                 {(requestRow as any).reference}
               </Link>
             </div>
@@ -200,7 +186,7 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
                       <td className="px-5 py-3">
                         <Link
                           href={`/admin/quotes/${quote.id}/versions/${v.id}`}
-                          className="text-[#7A9A4A] hover:underline font-medium">
+                          className="text-[var(--olive)] hover:underline font-medium">
                           v{v.version_number}
                         </Link>
                         {v.title && (
@@ -208,10 +194,7 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
                         )}
                       </td>
                       <td className="px-5 py-3">
-                        <span className={'text-xs px-2 py-0.5 rounded-full font-medium ' +
-                          (STATUS_STYLES[v.status] ?? 'bg-gray-100 text-gray-600')}>
-                          {v.status}
-                        </span>
+                        <StatusBadge status={v.status} />
                       </td>
                       <td className="px-5 py-3 text-gray-500 hidden md:table-cell">
                         {v.travel_start_date

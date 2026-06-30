@@ -73,7 +73,7 @@ export default function TaskManager({ requestId, tasks: initial }: { requestId: 
         {!showAdd && (
           <button
             onClick={() => { setShowAdd(true); setError('') }}
-            className="text-xs text-[#7A9A4A] hover:text-[#4C5E2A] font-medium"
+            className="text-xs text-[var(--olive)] hover:text-[var(--olive-dk)] font-medium"
           >
             + Add Task
           </button>
@@ -87,15 +87,14 @@ export default function TaskManager({ requestId, tasks: initial }: { requestId: 
             value={title}
             onChange={e => setTitle(e.target.value)}
             placeholder="Task description…"
-            className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7A9A4A]"
+            className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[var(--olive)]"
           />
           {error && <p className="text-xs text-red-600">{error}</p>}
           <div className="flex gap-2">
             <button
               type="submit"
               disabled={pending || !title.trim()}
-              className="rounded-md px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
-              style={{ backgroundColor: '#7A9A4A' }}
+              className="rounded-md px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50 bg-olive hover:bg-olive-dk"
             >
               {pending ? 'Saving…' : 'Add'}
             </button>
@@ -122,7 +121,7 @@ export default function TaskManager({ requestId, tasks: initial }: { requestId: 
                 type="button"
                 onClick={() => handleToggle(task)}
                 disabled={pending}
-                className="mt-0.5 h-4 w-4 shrink-0 rounded border-2 border-gray-300 hover:border-[#7A9A4A] transition"
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-2 border-gray-300 hover:border-[var(--olive)] transition"
                 aria-label="Mark done"
               />
               <span className="flex-1 text-sm text-gray-700">{task.title}</span>
@@ -148,7 +147,7 @@ export default function TaskManager({ requestId, tasks: initial }: { requestId: 
                 type="button"
                 onClick={() => handleToggle(task)}
                 disabled={pending}
-                className="mt-0.5 h-4 w-4 shrink-0 rounded border-2 border-[#7A9A4A] bg-[#7A9A4A] flex items-center justify-center transition"
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-2 border-[var(--olive)] bg-[var(--olive)] flex items-center justify-center transition"
                 aria-label="Mark undone"
               >
                 <span className="text-white text-[9px] leading-none">✓</span>
