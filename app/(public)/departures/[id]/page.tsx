@@ -214,23 +214,24 @@ export default async function DepartureDetailPage({
   const itineraryDays: ItineraryDay[] = tourDays.map(d => {
     const dd = d.destination_id ? destMap[d.destination_id] : null
     return {
+      id: d.id,
       dayNumber: d.day_number,
-      dayNumberEnd: d.day_number_end ?? undefined,
-      titleEn: d.title_en ?? '',
-      titleAr: d.title_ar ?? undefined,
-      description: dd ? (isAr ? (dd.ar || dd.en) : dd.en) ?? undefined : undefined,
-      imageUrl: (d as any).image_url ?? undefined,
+      dayNumberEnd: d.day_number_end ?? null,
+      title: isAr ? (d.title_ar || d.title_en || '') : (d.title_en ?? ''),
+      description: dd ? (isAr ? (dd.ar || dd.en) : dd.en) ?? null : null,
+      imageUrl: (d as any).image_url ?? null,
       mealBreakfast: d.meal_breakfast ?? false,
       mealLunch: d.meal_lunch ?? false,
       mealDinner: d.meal_dinner ?? false,
-      distanceKm: d.distance_km ?? undefined,
-      accommodation: d.accommodation_id ? accomMap[d.accommodation_id] : undefined,
+      distanceKm: d.distance_km ?? null,
+      accommodation: d.accommodation_id ? accomMap[d.accommodation_id] ?? null : null,
       activities: (Array.isArray(d.activities) ? d.activities : []).map((a: any) => ({
         name: activityMap[a.activity_id]?.name ?? '',
-        descriptionEn: activityMap[a.activity_id]?.en ?? undefined,
-        descriptionAr: activityMap[a.activity_id]?.ar ?? undefined,
-        moment: a.moment,
-        optional: a.optional,
+        description: isAr
+          ? (activityMap[a.activity_id]?.ar || activityMap[a.activity_id]?.en || null)
+          : (activityMap[a.activity_id]?.en ?? null),
+        moment: a.moment ?? null,
+        optional: a.optional ?? false,
       })),
     }
   })
