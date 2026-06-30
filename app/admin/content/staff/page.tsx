@@ -30,8 +30,7 @@ export default async function TourStaffPage() {
           <h1 className="text-lg font-semibold text-gray-900">Tour Staff</h1>
           <p className="text-sm text-gray-500 mt-0.5">Guides, drivers, chefs, and coordinators</p>
         </div>
-        <ButtonLink href="/admin/content/staff/new" size="sm">+ New Staff Member
-        </Link>
+        <ButtonLink href="/admin/content/staff/new" size="sm">+ New Staff Member</ButtonLink>
       </div>
 
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
