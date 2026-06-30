@@ -59,13 +59,15 @@ export default function TourHero({
   const reduced = useReducedMotion()
   const dir = isAr ? 'rtl' : 'ltr'
 
+  const EASE = [0.22, 1, 0.36, 1] as const
+
   const fadeUp = (delay: number) =>
     reduced
       ? {}
       : {
           initial: { opacity: 0, y: 20 },
           animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] },
+          transition: { duration: 0.6, delay, ease: EASE },
         }
 
   const imageAnim = reduced
@@ -73,7 +75,7 @@ export default function TourHero({
     : {
         initial: { opacity: 0, scale: 1.06 },
         animate: { opacity: 1, scale: 1 },
-        transition: { duration: 1.1, ease: [0.22, 1, 0.36, 1] },
+        transition: { duration: 1.1, ease: EASE },
       }
 
   const chips = [

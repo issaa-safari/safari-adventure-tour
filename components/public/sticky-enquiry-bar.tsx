@@ -46,7 +46,7 @@ export default function StickyEnquiryBar({
           initial={reduced ? false : { y: 80, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 80, opacity: 0 }}
-          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] as const }}
           dir={isAr ? 'rtl' : 'ltr'}
           style={{
             position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,

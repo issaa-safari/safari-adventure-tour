@@ -87,7 +87,7 @@ function DayCard({
       ref={ref}
       initial={reduced ? false : { opacity: 0, y: 32 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.5, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] as const }}
       style={{
         background: '#fff',
         borderRadius: 12,
@@ -152,7 +152,7 @@ function DayCard({
       <motion.div
         initial={false}
         animate={{ height: isOpen ? 'auto' : 0, opacity: isOpen ? 1 : 0 }}
-        transition={{ duration: reduced ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: reduced ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] as const }}
         style={{ overflow: 'hidden' }}
       >
         {/* Day image */}

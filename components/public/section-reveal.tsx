@@ -3,6 +3,8 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import type { ReactNode } from 'react'
 
+const EASE = [0.22, 1, 0.36, 1] as const
+
 export default function SectionReveal({
   children,
   delay = 0,
@@ -12,13 +14,13 @@ export default function SectionReveal({
   delay?: number
   className?: string
 }) {
-  const reduced = useReducedMotion()
+    const reduced = useReducedMotion()
 
   return (
     <motion.div
       initial={reduced ? false : { opacity: 0, y: 28 }}
       whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.55, delay, ease: EASE }}
       viewport={{ once: true, margin: '-60px' }}
       className={className}
     >
