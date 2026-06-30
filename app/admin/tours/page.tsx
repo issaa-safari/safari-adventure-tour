@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { ButtonLink } from '@/components/ui/button'
 
 const TYPE_LABEL: Record<string, string> = {
   bike:    'Bike Tour',
@@ -25,21 +26,13 @@ export default async function ToursPage() {
           <h1 className="text-lg font-semibold text-gray-900">Tour Templates</h1>
           <p className="text-sm text-gray-500 mt-0.5">Manage your bilingual tour templates and itineraries</p>
         </div>
-        <Link href="/admin/tours/new"
-          className="rounded-md px-4 py-2 text-sm font-medium text-white"
-          style={{ backgroundColor: 'var(--olive)' }}>
-          Create Your Template
-        </Link>
+        <ButtonLink href="/admin/tours/new" size="sm">Create Your Template</ButtonLink>
       </div>
 
       {!tours || tours.length === 0 ? (
         <div className="text-center py-20">
           <p className="text-gray-400 text-sm">No tours yet.</p>
-          <Link href="/admin/tours/new"
-            className="mt-4 inline-block rounded-md px-4 py-2 text-sm font-medium text-white"
-            style={{ backgroundColor: 'var(--olive)' }}>
-            Create First Template
-          </Link>
+          <ButtonLink href="/admin/tours/new" size="sm" className="mt-4">Create First Template</ButtonLink>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -102,11 +95,7 @@ export default async function ToursPage() {
 
                 {/* Actions */}
                 <div className="mt-4 flex items-center gap-2">
-                  <Link href={`/admin/tours/${tour.id}`}
-                    className="flex-1 rounded-md px-3 py-1.5 text-xs font-medium text-white text-center"
-                    style={{ backgroundColor: 'var(--olive)' }}>
-                    Edit Tour
-                  </Link>
+                  <ButtonLink href={`/admin/tours/${tour.id}`} size="sm" className="flex-1 text-center">Edit Tour</ButtonLink>
                   <Link href={`/admin/tours/${tour.id}/days`}
                     className="rounded-md border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50">
                     Share Tour

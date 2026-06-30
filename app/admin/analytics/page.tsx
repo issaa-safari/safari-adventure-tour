@@ -235,7 +235,7 @@ export default async function AnalyticsPage() {
               Created
             </div>
             <div className="flex items-center gap-1.5 text-xs text-gray-500">
-              <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: 'var(--olive)' }} />
+              <div className="w-3 h-3 rounded-sm bg-olive" />
               Accepted
             </div>
           </div>

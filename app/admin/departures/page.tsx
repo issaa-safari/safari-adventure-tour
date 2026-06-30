@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { ButtonLink, Button } from '@/components/ui/button'
 import { toggleDeparturePublished } from './[id]/actions'
 import StatusBadge from '@/components/admin/status-badge'
 
@@ -31,11 +32,7 @@ export default async function DeparturesPage({
           <h1 className="text-lg font-semibold text-gray-900">Departures</h1>
           <p className="text-sm text-gray-500 mt-0.5">Scheduled fixed-date trips and seat inventory</p>
         </div>
-        <Link href="/admin/departures/new"
-          className="rounded-md px-4 py-2 text-sm font-medium text-white"
-          style={{ backgroundColor: 'var(--olive)' }}>
-          + New Departure
-        </Link>
+        <ButtonLink href="/admin/departures/new" size="sm">+ New Departure</ButtonLink>
       </div>
 
       {/* Tabs */}

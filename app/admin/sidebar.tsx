@@ -193,8 +193,7 @@ export default function AdminSidebar({
         <div style={{ backgroundColor: 'var(--bush)' }}>
           <div className="mx-auto flex h-10 max-w-7xl items-center justify-between px-4">
             <Link href="/admin/dashboard" className="flex items-center gap-2.5">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full"
-                style={{ backgroundColor: 'var(--olive)' }}>
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-olive hover:bg-olive-dk">
                 <Leaf size={13} color="#fff" />
               </span>
               <span className="text-sm font-bold text-white tracking-wide">Safari Adventure Tours</span>

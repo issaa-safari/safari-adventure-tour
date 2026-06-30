@@ -82,8 +82,7 @@ export default function CommunicationLog({
         <button
           type="submit"
           disabled={saving || !summary.trim()}
-          className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-          style={{ backgroundColor: 'var(--olive)' }}
+          className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50 bg-olive hover:bg-olive-dk"
         >
           {saving ? 'Saving...' : 'Add Log Entry'}
         </button>

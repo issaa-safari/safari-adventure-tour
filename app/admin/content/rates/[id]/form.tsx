@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { addSupplierRate, deleteSupplierRate, updateRateCard, updateSupplierRate } from './actions'
+import { Button } from '@/components/ui/button'
+import { Alert } from '@/components/ui/alert'
 import { COST_CATEGORIES, ENTITY_TYPES, PRICING_UNITS, RESIDENCIES, label } from '../constants'
 
 type Entity = { id: string; name: string }
@@ -79,17 +81,17 @@ export default function RateCardEditor({ card, rates, ageBands, entities }: { ca
           <div><label className="block text-sm font-medium text-gray-700 mb-1">Valid To</label><input type="date" name="validTo" defaultValue={card.valid_to} required className={inputCls} /></div>
         </div>
         <div><label className="block text-sm font-medium text-gray-700 mb-1">Notes</label><textarea name="notes" defaultValue={card.notes ?? ''} rows={2} className={inputCls} /></div>
-        <div className="flex items-center justify-between"><label className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)} className="accent-[var(--olive)]" />Active</label><button disabled={pending} className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60" style={{ backgroundColor: 'var(--olive)' }}>Save Card</button></div>
+        <div className="flex items-center justify-between"><label className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)} className="accent-[var(--olive)]" />Active</label><Button type="submit" size="sm" loading={pending} loadingText="Saving…">Save Card</Button></div>
       </form>
 
       <section className="space-y-3">
         <div><h2 className="text-sm font-semibold text-gray-900">Rates</h2><p className="text-xs text-gray-500">Use blank traveller or room categories when the rate applies to all.</p></div>
-        {rates.map(rate => <form key={rate.id} onSubmit={event => rateSubmit(event, rate.id)} className="bg-white rounded-lg border border-gray-200 p-4"><div className="grid grid-cols-2 md:grid-cols-7 gap-2"><RateFields rate={rate} ageBands={ageBands} /></div><div className="flex justify-end gap-2 mt-3"><button type="button" onClick={() => removeRate(rate.id)} disabled={pending} className="text-xs text-red-600 px-3 py-1.5">Delete</button><button disabled={pending} className="rounded-md px-3 py-1.5 text-xs font-medium text-white" style={{ backgroundColor: 'var(--olive)' }}>Save Rate</button></div></form>)}
-        <form onSubmit={event => rateSubmit(event)} className="bg-[var(--olive)]/5 rounded-lg border border-[var(--olive)]/30 p-4"><p className="text-sm font-medium text-gray-700 mb-3">Add Rate</p><div className="grid grid-cols-2 md:grid-cols-7 gap-2"><RateFields ageBands={ageBands} /></div><div className="flex justify-end mt-3"><button disabled={pending} className="rounded-md px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: 'var(--olive)' }}>+ Add Rate</button></div></form>
+        {rates.map(rate => <form key={rate.id} onSubmit={event => rateSubmit(event, rate.id)} className="bg-white rounded-lg border border-gray-200 p-4"><div className="grid grid-cols-2 md:grid-cols-7 gap-2"><RateFields rate={rate} ageBands={ageBands} /></div><div className="flex justify-end gap-2 mt-3"><Button type="button" variant="danger-text" size="sm" onClick={() => removeRate(rate.id)} disabled={pending}>Delete</Button><Button type="submit" size="sm" loading={pending} loadingText="Saving…">Save Rate</Button></div></form>)}
+        <form onSubmit={event => rateSubmit(event)} className="bg-[var(--olive)]/5 rounded-lg border border-[var(--olive)]/30 p-4"><p className="text-sm font-medium text-gray-700 mb-3">Add Rate</p><div className="grid grid-cols-2 md:grid-cols-7 gap-2"><RateFields ageBands={ageBands} /></div><div className="flex justify-end mt-3"><Button type="submit" loading={pending} loadingText="Adding…">+ Add Rate</Button></div></form>
       </section>
 
-      {error && <p className="text-sm text-red-600 bg-red-50 rounded-md px-4 py-3">{error}</p>}
-      {message && <p className="text-sm text-green-700 bg-green-50 rounded-md px-4 py-3">{message}</p>}
+      {error && <Alert variant="error">{error}</Alert>}
+      {message && <Alert variant="success">{message}</Alert>}
     </div>
   )
 }

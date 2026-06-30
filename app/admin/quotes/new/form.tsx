@@ -188,8 +188,7 @@ export default function NewQuoteForm({
             <button
               type="submit"
               disabled={loading}
-              className="rounded-md px-6 py-2.5 text-sm font-medium text-white disabled:opacity-60"
-              style={{ backgroundColor: 'var(--olive)' }}>
+              className="rounded-md px-6 py-2.5 text-sm font-medium text-white disabled:opacity-60 bg-olive hover:bg-olive-dk">
               {loading ? 'Creating…' : 'Create Quote'}
             </button>
             <Link

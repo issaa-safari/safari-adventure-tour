@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { ButtonLink, Button } from '@/components/ui/button'
 
 export default async function ClientsPage({
   searchParams,
@@ -29,11 +30,7 @@ export default async function ClientsPage({
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-lg font-semibold text-gray-900">Clients</h1>
-        <Link href="/admin/requests/new"
-          className="rounded-md px-4 py-2 text-sm font-medium text-white"
-          style={{ backgroundColor: 'var(--olive)' }}>
-          + New Request
-        </Link>
+        <ButtonLink href="/admin/requests/new" size="sm">+ New Request</ButtonLink>
       </div>
 
       <div className="grid grid-cols-3 gap-4 mb-6">
@@ -56,9 +53,7 @@ export default async function ClientsPage({
           <input type="text" name="search" defaultValue={search}
             placeholder="Search by name or email..."
             className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)]" />
-          <button type="submit" className="rounded-md px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: 'var(--olive)' }}>
-            Search
-          </button>
+          <Button type="submit" size="sm">Search</Button>
         </form>
         <div className="flex gap-2">
           {[{ key: 'all', label: 'All' }, { key: 'arabic', label: 'Arabic' }].map(f => (
@@ -117,8 +112,7 @@ export default async function ClientsPage({
                  <td className="px-4 py-3">
   <Link
     href={"/admin/clients/" + client.id}
-    className="text-xs font-medium text-white rounded-md px-3 py-1.5"
-    style={{ backgroundColor: 'var(--olive)' }}>
+    className="text-xs font-medium text-white rounded-md px-3 py-1.5 bg-olive hover:bg-olive-dk">
     View
   </Link>
 </td>

@@ -534,8 +534,7 @@ export default function PriceLinesEditor({
                 type="button"
                 onClick={handleAdd}
                 disabled={addPending || !addForm.description.trim() || !addForm.unitCostUsd}
-                className="text-xs font-medium text-white px-3 py-1 rounded disabled:opacity-50"
-                style={{ backgroundColor: 'var(--olive)' }}
+                className="text-xs font-medium text-white px-3 py-1 rounded disabled:opacity-50 bg-olive hover:bg-olive-dk"
               >
                 {addPending ? '…' : 'Add'}
               </button>

@@ -224,7 +224,7 @@ export default function ItineraryBuilder({
         <div className="bg-white rounded-lg border border-gray-200 p-10 text-center space-y-4">
           <p className="text-sm text-gray-500">No itinerary days yet.</p>
           <div className="flex items-center justify-center gap-3">
-            <button onClick={generateDays} className="rounded-md px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: 'var(--olive)' }}>
+            <button onClick={generateDays} className="rounded-md px-4 py-2 text-sm font-medium text-white bg-olive hover:bg-olive-dk">
               Generate {durationDays} blank days
             </button>
             <button onClick={addDay} className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
@@ -422,8 +422,7 @@ export default function ItineraryBuilder({
       {days.length > 0 && (
         <div className="sticky bottom-4">
           <button onClick={save} disabled={loading}
-            className="rounded-md px-6 py-2.5 text-sm font-medium text-white shadow-lg disabled:opacity-60"
-            style={{ backgroundColor: 'var(--olive)' }}>
+            className="rounded-md px-6 py-2.5 text-sm font-medium text-white shadow-lg disabled:opacity-60 bg-olive hover:bg-olive-dk">
             {loading ? 'Saving…' : 'Save Itinerary'}
           </button>
         </div>

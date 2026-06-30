@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { ButtonLink, Button } from '@/components/ui/button'
 
 const KES_RATE = 129
 
@@ -111,11 +112,7 @@ export default async function AdminDashboardPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold text-gray-900">Dashboard</h1>
-        <Link href="/admin/requests/new"
-          className="rounded-md px-4 py-2 text-sm font-medium text-white"
-          style={{ backgroundColor: 'var(--olive)' }}>
-          + New Request
-        </Link>
+        <ButtonLink href="/admin/requests/new" size="sm">+ New Request</ButtonLink>
       </div>
 
       {/* KPIs */}

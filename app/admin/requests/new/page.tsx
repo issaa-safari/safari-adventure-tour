@@ -140,8 +140,7 @@ export default function NewRequestPage() {
         )}
         <div className="flex gap-3">
           <button type="submit" disabled={loading}
-            className="rounded-md px-6 py-2.5 text-sm font-medium text-white disabled:opacity-60"
-            style={{ backgroundColor: 'var(--olive)' }}>
+            className="rounded-md px-6 py-2.5 text-sm font-medium text-white disabled:opacity-60 bg-olive hover:bg-olive-dk">
             {loading ? 'Saving...' : 'Save Request'}
           </button>
           <Link href="/admin/requests"

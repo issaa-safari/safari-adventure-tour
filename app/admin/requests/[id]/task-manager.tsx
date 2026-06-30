@@ -94,8 +94,7 @@ export default function TaskManager({ requestId, tasks: initial }: { requestId: 
             <button
               type="submit"
               disabled={pending || !title.trim()}
-              className="rounded-md px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
-              style={{ backgroundColor: 'var(--olive)' }}
+              className="rounded-md px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50 bg-olive hover:bg-olive-dk"
             >
               {pending ? 'Saving…' : 'Add'}
             </button>

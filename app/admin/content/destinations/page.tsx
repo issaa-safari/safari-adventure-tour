@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { ButtonLink, Button } from '@/components/ui/button'
 import ContentShell from '../content-shell'
 
 export default async function DestinationsPage({
@@ -34,12 +35,7 @@ export default async function DestinationsPage({
           <h1 className="text-lg font-semibold text-gray-900">Destinations</h1>
           <p className="text-sm text-gray-500 mt-0.5">Manage destination pages and content</p>
         </div>
-        <Link
-          href="/admin/content/destinations/new"
-          className="rounded-md px-4 py-2 text-sm font-medium text-white"
-          style={{ backgroundColor: 'var(--olive)' }}>
-          + New Destination
-        </Link>
+        <ButtonLink href="/admin/content/destinations/new" size="sm">+ New Destination</ButtonLink>
       </div>
 
       {/* Tabs */}
@@ -110,12 +106,9 @@ export default async function DestinationsPage({
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <Link
-                      href={'/admin/content/destinations/' + dest.id}
-                      className="text-xs font-medium text-white rounded-md px-3 py-1.5"
-                      style={{ backgroundColor: 'var(--olive)' }}>
-                      Edit
-                    </Link>
+                    <ButtonLink
+                      href={'/admin/content/destinations/' + dest.id} size="sm">Edit
+                    </ButtonLink>
                   </td>
                 </tr>
               ))}

@@ -91,8 +91,7 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
           {latestVersion && (
             <Link
               href={`/admin/quotes/${quote.id}/versions/${latestVersion.id}`}
-              className="rounded-md px-4 py-2 text-sm font-medium text-white"
-              style={{ backgroundColor: 'var(--olive)' }}>
+              className="rounded-md px-4 py-2 text-sm font-medium text-white bg-olive hover:bg-olive-dk">
               {quote.status === 'draft' || quote.status === 'ready'
                 ? `Edit Version ${latestVersion.version_number}`
                 : `View itinerary & costing (v${latestVersion.version_number})`}

@@ -488,8 +488,7 @@ export default function VersionEditorForm({
               type="button"
               onClick={handleSaveDates}
               disabled={datesPending}
-              className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-              style={{ backgroundColor: 'var(--olive)' }}
+              className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60 bg-olive hover:bg-olive-dk"
             >
               {datesPending ? 'Saving…' : 'Save Dates'}
             </button>
@@ -573,8 +572,7 @@ export default function VersionEditorForm({
                           type="button"
                           onClick={handleUpdate}
                           disabled={editPending}
-                          className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-                          style={{ backgroundColor: 'var(--olive)' }}
+                          className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60 bg-olive hover:bg-olive-dk"
                         >
                           {editPending ? 'Saving…' : 'Save Changes'}
                         </button>
@@ -673,8 +671,7 @@ export default function VersionEditorForm({
                 type="button"
                 onClick={handleAdd}
                 disabled={addPending}
-                className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-                style={{ backgroundColor: 'var(--olive)' }}
+                className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60 bg-olive hover:bg-olive-dk"
               >
                 {addPending ? 'Adding…' : 'Add Traveller'}
               </button>
@@ -743,8 +740,7 @@ export default function VersionEditorForm({
               type="button"
               onClick={handleSavePricing}
               disabled={pricingPending}
-              className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-              style={{ backgroundColor: 'var(--olive)' }}
+              className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60 bg-olive hover:bg-olive-dk"
             >
               {pricingPending ? 'Saving…' : 'Save Pricing'}
             </button>

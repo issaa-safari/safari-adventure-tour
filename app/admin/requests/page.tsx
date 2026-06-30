@@ -41,8 +41,7 @@ export default async function RequestsPage({
     <div className="flex flex-1 min-h-screen">
       <div className="w-48 bg-white border-r border-gray-200 p-3 flex flex-col gap-1">
         <Link href="/admin/requests/new"
-          className="mb-3 rounded-md px-3 py-2 text-sm font-medium text-white text-center"
-          style={{ backgroundColor: 'var(--olive)' }}>
+          className="mb-3 rounded-md px-3 py-2 text-sm font-medium text-white text-center bg-olive hover:bg-olive-dk">
           + New Request
         </Link>
         {STAGES.map((stage) => (
@@ -71,8 +70,7 @@ export default async function RequestsPage({
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <p className="text-gray-400 text-sm">No requests in this stage.</p>
             <Link href="/admin/requests/new"
-              className="mt-4 rounded-md px-4 py-2 text-sm font-medium text-white"
-              style={{ backgroundColor: 'var(--olive)' }}>
+              className="mt-4 rounded-md px-4 py-2 text-sm font-medium text-white bg-olive hover:bg-olive-dk">
               + Add First Request
             </Link>
           </div>

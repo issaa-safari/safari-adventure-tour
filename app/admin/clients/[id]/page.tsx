@@ -214,8 +214,7 @@ export default async function ClientDetailPage({
             <div className="space-y-2">
               <Link
                 href="/admin/requests/new"
-                className="block w-full rounded-md px-3 py-2 text-sm font-medium text-white text-center"
-                style={{ backgroundColor: 'var(--olive)' }}>
+                className="block w-full rounded-md px-3 py-2 text-sm font-medium text-white text-center bg-olive hover:bg-olive-dk">
                 + New Request
               </Link>
             </div>

@@ -178,8 +178,7 @@ export default function RatePicker({
               type="button"
               onClick={handleLookup}
               disabled={!entityId || !date || lookupPending}
-              className="shrink-0 px-3 py-2 rounded-md text-sm font-medium text-white disabled:opacity-40"
-              style={{ backgroundColor: 'var(--olive)' }}
+              className="shrink-0 px-3 py-2 rounded-md text-sm font-medium text-white disabled:opacity-40 bg-olive hover:bg-olive-dk"
             >
               {lookupPending ? '…' : 'Find'}
             </button>
@@ -292,8 +291,7 @@ export default function RatePicker({
             type="button"
             onClick={handleAdd}
             disabled={addPending || !description.trim() || !totalSelling}
-            className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-            style={{ backgroundColor: 'var(--olive)' }}
+            className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50 bg-olive hover:bg-olive-dk"
           >
             {addPending ? 'Adding…' : 'Add Line'}
           </button>

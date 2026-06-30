@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { ButtonLink, Button } from '@/components/ui/button'
 import StatusBadge from '@/components/admin/status-badge'
 
 export default async function QuotesPage({
@@ -67,12 +68,7 @@ export default async function QuotesPage({
           <h1 className="text-lg font-semibold text-gray-900">Quotes</h1>
           <p className="text-sm text-gray-500 mt-0.5">Build and send pricing proposals to clients</p>
         </div>
-        <Link
-          href="/admin/quotes/new"
-          className="rounded-md px-4 py-2 text-sm font-medium text-white"
-          style={{ backgroundColor: 'var(--olive)' }}>
-          + New Quote
-        </Link>
+        <ButtonLink href="/admin/quotes/new" size="sm">+ New Quote</ButtonLink>
       </div>
 
       {/* Status tabs */}

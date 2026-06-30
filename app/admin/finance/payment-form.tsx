@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { recordPayment } from './actions'
+import { Alert } from '@/components/ui/alert'
 
 export default function PaymentForm({
   quoteId,
@@ -108,14 +109,13 @@ export default function PaymentForm({
         />
       </div>
 
-      {error && <p className="text-xs text-red-600 bg-red-50 rounded px-2 py-1.5">{error}</p>}
+      {error && <Alert variant="error">{error}</Alert>}
 
       <div className="flex gap-2 pt-1">
         <button
           type="submit"
           disabled={pending}
-          className="flex-1 rounded py-2 text-sm font-medium text-white disabled:opacity-50"
-          style={{ backgroundColor: 'var(--olive)' }}
+          className="flex-1 rounded py-2 text-sm font-medium text-white bg-olive disabled:opacity-50"
         >
           {pending ? 'Saving…' : 'Record Payment'}
         </button>

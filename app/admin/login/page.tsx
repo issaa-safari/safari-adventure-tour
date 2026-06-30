@@ -54,7 +54,7 @@ export default function AdminLoginPage() {
       <div className="flex w-full lg:w-1/2 items-center justify-center bg-white px-6 py-12">
         <div className="w-full max-w-sm">
           <div className="mb-8">
-            <div className="h-10 w-10 rounded-lg mb-6" style={{ backgroundColor: 'var(--olive)' }} />
+            <div className="h-10 w-10 rounded-lg mb-6 bg-olive hover:bg-olive-dk" />
             <h1 className="text-2xl font-semibold text-gray-900">Admin Login</h1>
             <p className="text-sm text-gray-500 mt-1">
               Sign in to manage Safari Adventure Tour
@@ -105,7 +105,7 @@ className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-
             <button
               type="submit"
               disabled={loading}
-className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)] focus:border-[var(--olive)]"              style={{ backgroundColor: 'var(--olive)' }}
+className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--olive)] focus:border-[var(--olive)] bg-olive hover:bg-olive-dk"
             >
               {loading ? 'Signing in…' : 'Sign In'}
             </button>

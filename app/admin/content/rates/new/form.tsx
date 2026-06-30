@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { createRateCard } from './actions'
+import { Button, ButtonLink } from '@/components/ui/button'
+import { Alert } from '@/components/ui/alert'
 import { COST_CATEGORIES, ENTITY_TYPES, label } from '../constants'
 
 type Entity = { id: string; name: string }
@@ -44,8 +46,8 @@ export default function NewRateCardForm({ entities }: { entities: Entities }) {
           <div><label className="block text-sm font-medium text-gray-700 mb-1">Notes</label><textarea name="notes" rows={3} className={inputCls} /></div>
           <label className="flex items-center gap-3 text-sm text-gray-700"><input type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)} className="accent-[var(--olive)]" />Active</label>
         </div>
-        {error && <p className="text-sm text-red-600 bg-red-50 rounded-md px-4 py-3">{error}</p>}
-        <div className="flex gap-3"><button disabled={loading} className="rounded-md px-6 py-2.5 text-sm font-medium text-white disabled:opacity-60" style={{ backgroundColor: 'var(--olive)' }}>{loading ? 'Creating…' : 'Create Rate Card'}</button><Link href="/admin/content/rates" className="rounded-md border border-gray-300 px-6 py-2.5 text-sm font-medium text-gray-700">Cancel</Link></div>
+        {error && <Alert variant="error">{error}</Alert>}
+        <div className="flex gap-3"><Button type="submit" loading={loading} loadingText="Creating…">Create Rate Card</Button><ButtonLink href="/admin/content/rates">Cancel</ButtonLink></div>
       </form>
     </div>
   )

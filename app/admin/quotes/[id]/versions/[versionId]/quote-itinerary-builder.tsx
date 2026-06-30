@@ -451,8 +451,7 @@ export default function QuoteItineraryBuilder({
             <button
               type="button"
               onClick={prefillFromTour}
-              className="rounded-md px-4 py-2 text-sm font-medium text-white"
-              style={{ backgroundColor: 'var(--olive)' }}
+              className="rounded-md px-4 py-2 text-sm font-medium text-white bg-olive hover:bg-olive-dk"
             >
               Pre-fill from tour template ({tourDays.length} days)
             </button>
@@ -738,8 +737,7 @@ export default function QuoteItineraryBuilder({
       {!isLocked && (
         <div className="sticky bottom-4">
           <button type="button" onClick={save} disabled={loading}
-            className="rounded-md px-6 py-2.5 text-sm font-medium text-white shadow-lg disabled:opacity-60"
-            style={{ backgroundColor: 'var(--olive)' }}>
+            className="rounded-md px-6 py-2.5 text-sm font-medium text-white shadow-lg disabled:opacity-60 bg-olive hover:bg-olive-dk">
             {loading ? 'Saving…' : 'Save Itinerary'}
           </button>
         </div>

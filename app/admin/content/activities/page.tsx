@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { ButtonLink, Button } from '@/components/ui/button'
 import ContentShell from '../content-shell'
 
 export default async function ActivitiesPage({
@@ -33,12 +34,7 @@ export default async function ActivitiesPage({
           <h1 className="text-lg font-semibold text-gray-900">Activities</h1>
           <p className="text-sm text-gray-500 mt-0.5">Manage activities used in tour itineraries</p>
         </div>
-        <Link
-          href="/admin/content/activities/new"
-          className="rounded-md px-4 py-2 text-sm font-medium text-white"
-          style={{ backgroundColor: 'var(--olive)' }}>
-          + New Activity
-        </Link>
+        <ButtonLink href="/admin/content/activities/new" size="sm">+ New Activity</ButtonLink>
       </div>
 
       <div className="flex gap-1 mb-6 border-b border-gray-200">

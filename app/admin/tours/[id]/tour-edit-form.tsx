@@ -220,8 +220,7 @@ export default function TourEditForm({ tour }: { tour: any }) {
 
       <div className="sticky bottom-4">
         <button type="submit" disabled={loading}
-          className="rounded-md px-6 py-2.5 text-sm font-medium text-white shadow-lg disabled:opacity-60"
-          style={{ backgroundColor: 'var(--olive)' }}>
+          className="rounded-md px-6 py-2.5 text-sm font-medium text-white shadow-lg disabled:opacity-60 bg-olive hover:bg-olive-dk">
           {loading ? 'Saving...' : 'Save Changes'}
         </button>
       </div>

@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { ButtonLink, Button } from '@/components/ui/button'
 import ContentShell from '../content-shell'
 
 const ROLE_STYLES: Record<string, string> = {
@@ -29,11 +30,7 @@ export default async function TourStaffPage() {
           <h1 className="text-lg font-semibold text-gray-900">Tour Staff</h1>
           <p className="text-sm text-gray-500 mt-0.5">Guides, drivers, chefs, and coordinators</p>
         </div>
-        <Link
-          href="/admin/content/staff/new"
-          className="rounded-md px-4 py-2 text-sm font-medium text-white"
-          style={{ backgroundColor: 'var(--olive)' }}>
-          + New Staff Member
+        <ButtonLink href="/admin/content/staff/new" size="sm">+ New Staff Member
         </Link>
       </div>
 
@@ -76,12 +73,9 @@ export default async function TourStaffPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <Link
-                      href={'/admin/content/staff/' + s.id}
-                      className="text-xs font-medium text-white rounded-md px-3 py-1.5"
-                      style={{ backgroundColor: 'var(--olive)' }}>
-                      Edit
-                    </Link>
+                    <ButtonLink
+                      href={'/admin/content/staff/' + s.id} size="sm">Edit
+                    </ButtonLink>
                   </td>
                 </tr>
               ))}

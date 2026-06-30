@@ -127,8 +127,7 @@ export default async function RequestDetailPage({
             </div>
             <Link
               href={`/admin/quotes/new?request=${id}`}
-              className="shrink-0 rounded-md px-4 py-2 text-sm font-medium text-white"
-              style={{ backgroundColor: 'var(--olive)' }}>
+              className="shrink-0 rounded-md px-4 py-2 text-sm font-medium text-white bg-olive hover:bg-olive-dk">
               + Create Quote
             </Link>
           </div>
@@ -269,8 +268,7 @@ export default async function RequestDetailPage({
                 <p className="text-sm text-gray-500 mb-4">No quotes yet for this request.</p>
                 <Link
                   href={`/admin/quotes/new?request=${id}`}
-                  className="inline-block rounded-md px-4 py-2 text-sm font-medium text-white"
-                  style={{ backgroundColor: 'var(--olive)' }}>
+                  className="inline-block rounded-md px-4 py-2 text-sm font-medium text-white bg-olive hover:bg-olive-dk">
                   Create First Quote
                 </Link>
               </div>
@@ -310,8 +308,7 @@ export default async function RequestDetailPage({
                           <div className="flex items-center gap-2 shrink-0">
                             <Link
                               href={`/admin/quotes/${quote.id}/versions/${version.id}`}
-                              className="rounded-md px-3 py-1.5 text-xs font-medium text-white"
-                              style={{ backgroundColor: 'var(--olive)' }}>
+                              className="rounded-md px-3 py-1.5 text-xs font-medium text-white bg-olive hover:bg-olive-dk">
                               Edit Quote
                             </Link>
                             <Link

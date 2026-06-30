@@ -136,8 +136,7 @@ export default function DeliveryPanel({
               type="button"
               onClick={handleCreate}
               disabled={pending || !selectedVersionId}
-              className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50 shrink-0"
-              style={{ backgroundColor: 'var(--olive)' }}
+              className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50 shrink-0 bg-olive hover:bg-olive-dk"
             >
               {pending ? 'Creating…' : 'Generate Link'}
             </button>
