@@ -1,204 +1,236 @@
-'use client'
-
+import { Suspense } from 'react'
 import Link from 'next/link'
-import { Suspense, useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
 import PublicHeader from '@/components/public/header'
 import PublicFooter from '@/components/public/footer'
+import WhatsAppButton from '@/components/public/whatsapp-button'
 import FeaturedDepartures from '@/components/public/featured-departures'
 import Testimonials from '@/components/public/testimonials'
-import WhatsAppButton from '@/components/public/whatsapp-button'
-import { STOCK_HERO_IMAGE } from '@/lib/stock-images'
+import HomeHero from '@/components/public/home-hero'
+import ChooseYourTrail from '@/components/public/choose-your-trail'
+import HomeWhyDirect from '@/components/public/home-why-direct'
+import SectionReveal from '@/components/public/section-reveal'
+import { getServerLocale } from '@/lib/i18n'
+import { whatsappLink } from '@/lib/site'
 
-const G = '#7A9A4A'
+const BUSH = '#20271A'
+const STONE = '#6E6A59'
+const OLIVE = '#7A9A4A'
 
-function HomeContent() {
-  const searchParams = useSearchParams()
-  const [mounted, setMounted] = useState(false)
-  const currentLang = searchParams.get('lang') || 'en'
+export const dynamic = 'force-dynamic'
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ lang?: string }>
+}) {
+  const sp = await searchParams
+  const locale = await getServerLocale(sp)
+  const isAr = locale === 'ar'
+  const dir = isAr ? 'rtl' : 'ltr'
 
-  if (!mounted) return null
+  const supabase = await createClient()
 
-  const t = currentLang === 'ar' ? {
-    experienceAfricasSafaris: 'اختبر أعظم الرحلات في أفريقيا',
-    discoverUntamed: 'اكتشف جمال إفريقيا الشرقية البري مع أدلاء خبراء وأماكن إقامة فاخرة ومغامرات لا تُنسى.',
-    browseTours: 'استعرض الجولات',
-    planYourTrip: 'خطط رحلتك',
-    happyTravelers: 'مسافرون سعداء',
-    uniqueTours: 'جولات فريدة',
-    yearsExperience: 'سنوات الخبرة',
-    satisfactionRate: 'معدل الرضا',
-    whyChooseUs: 'لماذا تختار نا؟',
-    expertGuides: 'أدلاء خبراء',
-    guideDescription: 'يتمتع أدلاؤنا الطبيعيون بعقود من الخبرة المشتركة في تحديد الحياة البرية ومشاركة قصص البرية الأفريقية.',
-    luxuryStays: 'إقامة فاخرة',
-    staysDescription: 'أماكن إقامة مختارة بعناية تتراوح من الأكواخ الحميمية إلى المنتجعات عالمية الطراز.',
-    peaceOfMind: 'راحة البال',
-    mindDescription: 'السلامة هي أولويتنا. تشمل جميع الجولات تأمين السفر والأدلاء المحترفين والدعم 24/7.',
-    readyForAdventure: 'هل أنت مستعد لمغامرتك الأفريقية؟',
-    getPersonalizedQuote: 'احصل على عرض سعر مخصص لرحلة أحلامك. سيقوم خبراؤنا بتخصيص كل التفاصيل وفقاً لتفضيلاتك.',
-    requestCustomQuote: 'طلب عرض سعر مخصص',
+  // Fetch one active tour per type to power the trail cards and hero
+  const { data: tours } = await supabase
+    .from('tours')
+    .select('id, type, hero_image_url, gallery_urls')
+    .eq('status', 'active')
+    .in('type', ['bike', 'private'])
+    .limit(10)
+
+  const bikeTour = (tours ?? []).find(t => t.type === 'bike') ?? null
+  const privateTour = (tours ?? []).find(t => t.type === 'private') ?? null
+
+  // Hero image: prefer the bike tour's hero (most dramatic), fall back to private
+  const heroTour = bikeTour ?? privateTour
+  const heroImageUrl: string | null =
+    (heroTour?.hero_image_url as string | null) ??
+    ((heroTour?.gallery_urls as string[] | null)?.[0] ?? null)
+
+  const bikeImageUrl: string | null =
+    (bikeTour?.hero_image_url as string | null) ??
+    ((bikeTour?.gallery_urls as string[] | null)?.[0] ?? null)
+  const privateImageUrl: string | null =
+    (privateTour?.hero_image_url as string | null) ??
+    ((privateTour?.gallery_urls as string[] | null)?.[0] ?? null)
+
+  const waHref = whatsappLink(
+    isAr ? 'مرحباً، أود الاستفسار عن جولة' : "Hi, I'd like to enquire about a tour"
+  )
+
+  const t = isAr ? {
+    featuredHeading: 'المواعيد القادمة',
+    credibility1: 'مقرنا نيروبي، كينيا',
+    credibility2: 'تأسسنا عام 2009',
+    credibility3: 'نتحدث الإنجليزية والعربية والسواحيلية',
+    ctaHeading: 'هل أنت مستعد لتخطيط رحلتك؟',
+    ctaSub: 'تواصل معنا لتحصل على عرض مخصص، أو ابدأ محادثة على واتساب.',
+    ctaQuote: 'طلب عرض سعر',
+    ctaWhatsapp: 'تحدث معنا على واتساب',
+    testimonialsLabel: 'ماذا يقول مسافرونا',
   } : {
-    experienceAfricasSafaris: 'Experience Africa\'s Greatest Safaris',
-    discoverUntamed: 'Discover the untamed beauty of East Africa with expert guides, luxury accommodations, and unforgettable wildlife encounters.',
-    browseTours: 'Browse Tours',
-    planYourTrip: 'Plan Your Trip',
-    happyTravelers: 'Happy Travelers',
-    uniqueTours: 'Unique Tours',
-    yearsExperience: 'Years Experience',
-    satisfactionRate: 'Satisfaction Rate',
-    whyChooseUs: 'Why Choose Safari Adventure Riders?',
-    expertGuides: 'Expert Guides',
-    guideDescription: 'Our naturalist guides have decades of combined experience identifying wildlife and sharing stories of the African bush.',
-    luxuryStays: 'Luxury Stays',
-    staysDescription: 'Hand-picked accommodations ranging from intimate lodges to world-class resorts, all carefully curated for comfort.',
-    peaceOfMind: 'Peace of Mind',
-    mindDescription: 'Safety is our priority. All tours include travel insurance, professional guides, and 24/7 support.',
-    readyForAdventure: 'Ready for Your African Adventure?',
-    getPersonalizedQuote: 'Get a personalized quote for your dream safari. Our experts will tailor every detail to your preferences.',
-    requestCustomQuote: 'Request Your Custom Quote',
+    featuredHeading: 'Upcoming Departures',
+    credibility1: 'Based in Nairobi, Kenya',
+    credibility2: 'Operating since 2009',
+    credibility3: 'English · Arabic · Swahili',
+    ctaHeading: 'Ready to plan your trip?',
+    ctaSub: 'Get in touch for a personalised quote, or start a conversation on WhatsApp.',
+    ctaQuote: 'Request a Quote',
+    ctaWhatsapp: 'Chat on WhatsApp',
+    testimonialsLabel: 'What our travellers say',
   }
 
   return (
-    <main>
-      {/* Hero Section */}
-      <section
-        className="relative bg-gray-900 text-white py-24 md:py-40 bg-cover bg-center"
-        style={{
-          backgroundImage: `linear-gradient(rgba(17,24,39,0.62), rgba(17,24,39,0.72)), url(${STOCK_HERO_IMAGE})`,
-        }}
-      >
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            {t.experienceAfricasSafaris}
-          </h1>
-          <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            {t.discoverUntamed}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href={`/tours?lang=${currentLang}`}
-              className="px-8 py-3 rounded-lg font-semibold transition inline-block text-center"
-              style={{ backgroundColor: G, color: 'white' }}
-            >
-              {t.browseTours}
-            </Link>
-            <Link
-              href={`/quote-request?lang=${currentLang}`}
-              className="px-8 py-3 rounded-lg font-semibold border-2 border-white text-white hover:bg-white hover:text-gray-900 transition inline-block text-center"
-            >
-              {t.planYourTrip}
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Stats */}
-      <section className="bg-white py-12 md:py-16">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-bold" style={{ color: G }}>
-                500+
-              </div>
-              <p className="text-gray-600 mt-2">{t.happyTravelers}</p>
-            </div>
-            <div>
-              <div className="text-4xl font-bold" style={{ color: G }}>
-                20+
-              </div>
-              <p className="text-gray-600 mt-2">{t.uniqueTours}</p>
-            </div>
-            <div>
-              <div className="text-4xl font-bold" style={{ color: G }}>
-                15+
-              </div>
-              <p className="text-gray-600 mt-2">{t.yearsExperience}</p>
-            </div>
-            <div>
-              <div className="text-4xl font-bold" style={{ color: G }}>
-                99%
-              </div>
-              <p className="text-gray-600 mt-2">{t.satisfactionRate}</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Upcoming Departures */}
-      <FeaturedDepartures lang={currentLang} />
-
-      {/* Why Choose Us */}
-      <section className="py-16 md:py-20 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-12">
-            {t.whyChooseUs}
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-white rounded-xl p-8 border border-gray-200">
-                <div className="text-4xl mb-4">🎯</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">{t.expertGuides}</h3>
-                <p className="text-gray-600">
-                  {t.guideDescription}
-                </p>
-              </div>
-              <div className="bg-white rounded-xl p-8 border border-gray-200">
-                <div className="text-4xl mb-4">⭐</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">{t.luxuryStays}</h3>
-                <p className="text-gray-600">
-                  {t.staysDescription}
-                </p>
-              </div>
-              <div className="bg-white rounded-xl p-8 border border-gray-200">
-                <div className="text-4xl mb-4">🛡️</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">{t.peaceOfMind}</h3>
-                <p className="text-gray-600">
-                  {t.mindDescription}
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Testimonials */}
-        <Testimonials lang={currentLang} />
-
-        {/* CTA Section */}
-        <section className="py-16 md:py-20" style={{ backgroundColor: G }}>
-          <div className="max-w-4xl mx-auto px-4 text-center text-white">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              {t.readyForAdventure}
-            </h2>
-            <p className="text-lg mb-8 opacity-90">
-              {t.getPersonalizedQuote}
-            </p>
-            <Link
-              href={`/quote-request?lang=${currentLang}`}
-              className="px-8 py-3 bg-white text-gray-900 rounded-lg font-semibold hover:bg-gray-100 transition inline-block"
-            >
-              {t.requestCustomQuote}
-            </Link>
-          </div>
-        </section>
-      </main>
-    )
-}
-
-export default function HomePage() {
-  return (
-    <>
+    <div dir={dir}>
       <Suspense>
         <PublicHeader />
       </Suspense>
-      <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
-        <HomeContent />
-      </Suspense>
+
+      <main>
+        {/* 1. Hero */}
+        <HomeHero
+          heroImageUrl={heroImageUrl}
+          heroTourId={heroTour?.id ?? null}
+          isAr={isAr}
+          locale={locale}
+        />
+
+        {/* 2. Choose Your Trail */}
+        <ChooseYourTrail
+          bikeCard={{ type: 'bike', imageUrl: bikeImageUrl, tourId: bikeTour?.id ?? null }}
+          privateCard={{ type: 'private', imageUrl: privateImageUrl, tourId: privateTour?.id ?? null }}
+          isAr={isAr}
+          locale={locale}
+        />
+
+        {/* 3. Featured Departures */}
+        <div style={{ background: '#fff' }}>
+          <FeaturedDepartures lang={locale} />
+        </div>
+
+        {/* 4. Credibility bar — true claims only, no fabricated metrics */}
+        <SectionReveal>
+          <section style={{
+            background: BUSH,
+            padding: '36px 24px',
+          }}>
+            <div style={{
+              maxWidth: 900,
+              margin: '0 auto',
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              gap: '8px 40px',
+            }}>
+              {[t.credibility1, t.credibility2, t.credibility3].map((fact, i) => (
+                <span key={i} style={{
+                  color: 'rgba(234,227,210,0.8)',
+                  fontFamily: 'var(--font-body, sans-serif)',
+                  fontSize: '0.88rem',
+                  letterSpacing: '0.04em',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                }}>
+                  {i > 0 && (
+                    <span aria-hidden="true" style={{ color: 'rgba(234,227,210,0.3)', fontSize: '1rem' }}>·</span>
+                  )}
+                  {fact}
+                </span>
+              ))}
+            </div>
+          </section>
+        </SectionReveal>
+
+        {/* 5. Why Book Direct */}
+        <HomeWhyDirect isAr={isAr} />
+
+        {/* 6. Testimonials */}
+        <div style={{ background: '#fff' }}>
+          <SectionReveal>
+            <div style={{
+              maxWidth: 1120, margin: '0 auto',
+              padding: '0 24px',
+              paddingTop: 64,
+            }}>
+              <h2 style={{
+                fontFamily: 'var(--font-display, "Readex Pro", sans-serif)',
+                fontSize: 'clamp(1.4rem, 3vw, 2rem)',
+                fontWeight: 700,
+                color: BUSH,
+                margin: '0 0 8px',
+              }}>
+                {t.testimonialsLabel}
+              </h2>
+            </div>
+          </SectionReveal>
+          <Testimonials lang={locale} />
+        </div>
+
+        {/* 7. Final CTA */}
+        <section style={{ background: BUSH, padding: '80px 24px' }}>
+          <div style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center' }}>
+            <SectionReveal>
+              <h2 style={{
+                fontFamily: 'var(--font-display, "Readex Pro", sans-serif)',
+                fontSize: 'clamp(1.6rem, 4vw, 2.4rem)',
+                fontWeight: 700,
+                color: '#fff',
+                margin: '0 0 16px',
+              }}>
+                {t.ctaHeading}
+              </h2>
+              <p style={{
+                color: 'rgba(234,227,210,0.75)',
+                fontFamily: 'var(--font-body, sans-serif)',
+                fontSize: '1rem',
+                lineHeight: 1.7,
+                margin: '0 0 36px',
+              }}>
+                {t.ctaSub}
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, justifyContent: 'center' }}>
+                <Link
+                  href={`/quote-request?lang=${locale}`}
+                  style={{
+                    background: OLIVE,
+                    color: '#fff',
+                    fontFamily: 'var(--font-body, sans-serif)',
+                    fontWeight: 700,
+                    fontSize: '1rem',
+                    padding: '14px 28px',
+                    borderRadius: 8,
+                    textDecoration: 'none',
+                  }}
+                >
+                  {t.ctaQuote}
+                </Link>
+                <a
+                  href={waHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    background: '#25D366',
+                    color: '#fff',
+                    fontFamily: 'var(--font-body, sans-serif)',
+                    fontWeight: 700,
+                    fontSize: '1rem',
+                    padding: '14px 28px',
+                    borderRadius: 8,
+                    textDecoration: 'none',
+                  }}
+                >
+                  {t.ctaWhatsapp}
+                </a>
+              </div>
+            </SectionReveal>
+          </div>
+        </section>
+      </main>
+
       <PublicFooter />
-      <WhatsAppButton />
-    </>
+      <WhatsAppButton lang={locale} />
+    </div>
   )
 }

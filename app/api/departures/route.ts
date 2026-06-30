@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 
-// Public list of published, upcoming departures for the homepage / listings.
+// Public list of upcoming departures for the homepage / listings.
+// Uses the anon client + RLS (group_30) — never the service role.
 export async function GET() {
-  const admin = createAdminClient()
+  const supabase = await createClient()
   const today = new Date().toISOString().split('T')[0]
 
-  const { data, error } = await admin
+  const { data, error } = await supabase
     .from('departures')
     .select(`
       id, start_date, end_date, max_seats, booked_seats, price_usd, status,
