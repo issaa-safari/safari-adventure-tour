@@ -1,18 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { findOrCreateClientByEmail } from '@/lib/server/clients'
+import { quoteRequestSchema } from '@/lib/validation/schemas'
+import { safeErrorResponse } from '@/lib/security/safe-error'
+import { logger } from '@/lib/security/logger'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { firstName, lastName, email, phone, country, tourType, startDate, duration, groupSize, budget, preferences, heardAboutUs } = body
-
-    if (!firstName || !lastName || !email || !phone) {
+    const parsed = quoteRequestSchema.safeParse(await request.json())
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: parsed.error.issues[0]?.message ?? 'Invalid request' },
         { status: 400 }
       )
     }
+    const { firstName, lastName, email, phone, tourType, startDate, groupSize, preferences, heardAboutUs } = parsed.data
 
     const admin = createAdminClient()
 
@@ -26,7 +28,7 @@ export async function POST(request: NextRequest) {
         phone,
       })
     } catch (err) {
-      console.error('[quote-request] client resolution failed', err)
+      logger.error('quote_request.client_resolution_failed', err)
       return NextResponse.json({ error: 'Failed to identify client' }, { status: 500 })
     }
 
@@ -41,7 +43,7 @@ export async function POST(request: NextRequest) {
         tour_id: tourId,
         stage: 'new',
         source: 'website',
-        travelers_adults: groupSize ? parseInt(groupSize) : 1,
+        travelers_adults: groupSize ? parseInt(String(groupSize), 10) : 1,
         preferred_start_date: startDate || null,
         client_question: preferences || null,
         heard_about_us: heardAboutUs || null,
@@ -50,8 +52,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (requestError || !newRequest) {
-      console.error('[quote-request] request insert failed', requestError)
-      return NextResponse.json({ error: 'Failed to create enquiry' }, { status: 500 })
+      return safeErrorResponse('quote_request.request_insert_failed', requestError, { message: 'Failed to create enquiry' })
     }
 
     // Create a draft quote linked to the request
@@ -69,8 +70,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (quoteError || !quote) {
-      console.error('[quote-request] quote insert failed', quoteError)
-      return NextResponse.json({ error: 'Failed to create quote request' }, { status: 500 })
+      return safeErrorResponse('quote_request.quote_insert_failed', quoteError, { message: 'Failed to create quote request' })
     }
 
     return NextResponse.json(
@@ -78,7 +78,6 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     )
   } catch (error) {
-    console.error('[quote-request] unexpected error', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return safeErrorResponse('quote_request.unexpected_error', error)
   }
 }

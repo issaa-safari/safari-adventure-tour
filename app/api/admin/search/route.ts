@@ -2,6 +2,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import type { SearchQuote, SearchRequest } from '@/lib/types'
+import { toIlikePattern } from '@/lib/db/safe-search'
 
 // PostgREST returns the embedded relation as an object for a to-one join.
 type ClientEmbed = { first_name: string | null; last_name: string | null } | null
@@ -20,7 +21,7 @@ export async function GET(req: NextRequest) {
   if (q.length < 2) return NextResponse.json({ quotes: [], clients: [], requests: [] })
 
   const admin = createAdminClient()
-  const like = `%${q}%`
+  const like = toIlikePattern(q)
 
   const [{ data: quotesRaw }, { data: clients }, { data: requestsRaw }] = await Promise.all([
     admin.from('quotes')
