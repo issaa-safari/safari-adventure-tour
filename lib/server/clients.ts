@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { sanitizeSearchTerm } from '@/lib/db/safe-search'
 
 // Find a CRM client by normalised email, creating one if absent.
 // Throws on hard DB failure — callers that require a client must not swallow this.
@@ -12,7 +13,7 @@ export async function findOrCreateClientByEmail(
   const { data: existing, error: lookupError } = await admin
     .from('clients')
     .select('id, first_name, last_name, phone')
-    .ilike('email', email)
+    .ilike('email', sanitizeSearchTerm(email))
     .limit(1)
     .maybeSingle()
 

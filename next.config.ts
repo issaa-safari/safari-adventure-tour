@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { securityHeaders } from "./lib/security/headers";
 
 const nextConfig: NextConfig = {
   images: {
@@ -7,6 +8,14 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "**.supabase.co" },
       { protocol: "https", hostname: "**.supabase.in" },
     ],
+  },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: securityHeaders,
+      },
+    ];
   },
 };
 

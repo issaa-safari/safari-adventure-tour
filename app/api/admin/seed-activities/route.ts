@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 import { assertAdminAccess } from '@/lib/auth/admin-access'
+import { safeErrorResponse } from '@/lib/security/safe-error'
 
 // One-time seeding of the Activities content library with EN + AR descriptions.
 // Runs server-side (no SQL paste needed). Idempotent: skips names that already exist.
@@ -132,7 +133,7 @@ async function handle() {
     const { error, count } = await admin
       .from('activities')
       .insert(toInsert, { count: 'exact' })
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (error) return safeErrorResponse('seed_activities.insert_failed', error, { message: 'Failed to seed activities' })
     inserted = count ?? toInsert.length
   }
 
